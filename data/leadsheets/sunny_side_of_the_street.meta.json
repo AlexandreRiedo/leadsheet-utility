@@ -1,0 +1,11 @@
+﻿{
+    "title": "Sunny Side Of The Street",
+    "composer": "Jimmy McHugh",
+    "key": "C",
+    "time_signature": [
+        4,
+        4
+    ],
+    "default_tempo": 100,
+    "form_repeats": 10
+}

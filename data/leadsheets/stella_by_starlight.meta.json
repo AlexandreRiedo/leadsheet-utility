@@ -1,0 +1,11 @@
+﻿{
+    "title": "Stella By Starlight",
+    "composer": "Victor Young",
+    "key": "Bb",
+    "time_signature": [
+        4,
+        4
+    ],
+    "default_tempo": 100,
+    "form_repeats": 10
+}
