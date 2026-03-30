@@ -1,12 +1,12 @@
-# SPEC.md — JazzAR: Augmented Piano for Jazz Improvisation
+# SPEC.md — leadsheet-utility: Augmented Piano for Jazz Improvisation
 
 ## 1. Project Overview
 
-**JazzAR** is a Python application that augments a physical piano with projected light to help users learn and practice jazz improvisation. A projector mounted above the keyboard highlights scale tones, guide tones, and exercise-specific notes in real time, synchronized with an auto-generated backing track (walking bass + drums). The system reads a lead sheet file describing chord changes and timing, analyzes the harmony to compute chord-scales, and drives both the projection and the accompaniment from a shared musical timeline.
+**leadsheet-utility** is a Python application that augments a physical piano with projected light to help users learn and practice jazz improvisation. A projector mounted above the keyboard highlights scale tones, guide tones, and exercise-specific notes in real time, synchronized with an auto-generated backing track (walking bass + drums). The system reads a lead sheet file describing chord changes and timing, analyzes the harmony to compute chord-scales, and drives both the projection and the accompaniment from a shared musical timeline.
 
 ### Core Value Proposition
 
-Jazz improvisation is hard because the harmonic context changes rapidly and the player must simultaneously think about scales, voice-leading, phrasing, and rhythmic placement. JazzAR offloads the "which notes are correct right now?" question to the projector, freeing the player to focus on *creative* melodic decisions. On top of that, five structured exercises use color-coded projection to train specific improvisation skills drawn from established jazz pedagogy.
+Jazz improvisation is hard because the harmonic context changes rapidly and the player must simultaneously think about scales, voice-leading, phrasing, and rhythmic placement. leadsheet-utility offloads the "which notes are correct right now?" question to the projector, freeing the player to focus on *creative* melodic decisions. On top of that, five structured exercises use color-coded projection to train specific improvisation skills drawn from established jazz pedagogy.
 
 ---
 
@@ -16,18 +16,18 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
 
 1. The user physically mounts the projector above the piano (e.g., on a mic stand, tripod, or shelf). It points down at the keys. **The projector stays fixed from this point on.**
 2. The user downloads a GM SoundFont file (e.g., FluidR3_GM.sf2) and places it somewhere on disk.
-3. The user connects the projector as a secondary display and launches the app: `python -m jazzar`.
-4. On first launch, no `~/.jazzar/config.json` exists. The app prompts for the SoundFont path via a file dialog.
-5. No `~/.jazzar/calibration.json` exists either, so the app automatically enters **calibration mode** on the projector display. Four bright markers appear on a black background.
+3. The user connects the projector as a secondary display and launches the app: `python -m leadsheet_utility`.
+4. On first launch, no `~/.leadsheet-utility/config.json` exists. The app prompts for the SoundFont path via a file dialog.
+5. No `~/.leadsheet-utility/calibration.json` exists either, so the app automatically enters **calibration mode** on the projector display. Four bright markers appear on a black background.
 6. On the primary display (laptop/monitor), the app shows instructions: "Drag each marker to the corresponding corner of your piano keyboard."
 7. The user drags the 4 markers (via mouse on the projector window) until they sit on the physical corners of the keyboard. They press Enter to confirm.
 8. The app computes the homography, draws a preview of all 88 key outlines on the piano. If alignment looks good, the user presses Enter again. If not, they re-drag and retry.
-9. Config and calibration are saved to `~/.jazzar/`. **These steps never need to be repeated** unless the projector is physically moved or the SoundFont changes.
+9. Config and calibration are saved to `~/.leadsheet-utility/`. **These steps never need to be repeated** unless the projector is physically moved or the SoundFont changes.
 10. The app transitions to the main screen.
 
 ### Normal Usage (every session)
 
-1. User launches the app. It loads config + calibration from `~/.jazzar/`.
+1. User launches the app. It loads config + calibration from `~/.leadsheet-utility/`.
 2. The projector display goes fullscreen black (no light on the piano yet). The primary display shows the HUD.
 3. User presses `O` to open a `.tsv` lead sheet file (or the app loads the last-used file).
 4. The HUD shows: title, chord chart, tempo, exercise selection.
@@ -108,11 +108,11 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `leadsheet` | Parse MIR-style `.tsv` chord files into IR | — (pure Python) |
 | `harmony` | Chord symbol → scale pitches, chord tones, guide tones | — (pure Python, lookup tables) |
 | `timeline` | Musical clock: track beat position, current chord | `time` (perf_counter) |
-| `projection` | Render canonical keyboard image, warp with homography, display | `pygame`, `opencv-python` |
+| `projection` | Render canonical keyboard image, warp with homography, display | `pygame-ce`, `opencv-python` |
 | `backing` | Generate walking bass + drum MIDI events, render to audio via FluidSynth | `pyfluidsynth`, `numpy` |
 | `exercises` | 5 exercise modes: compute which keys to highlight per beat | — (pure Python) |
-| `calibration` | 4-point marker drag UI + `cv2.getPerspectiveTransform()` | `opencv-python`, `pygame` |
-| `gui` | Keyboard-shortcut-driven + simple Pygame overlay UI | `pygame` |
+| `calibration` | 4-point marker drag UI + `cv2.getPerspectiveTransform()` | `opencv-python`, `pygame-ce` |
+| `gui` | HUD window: chord display, exercise selection, transport | `pygame-ce` |
 
 ### Application States
 
@@ -137,9 +137,9 @@ The app is a simple state machine with three modes:
                   └──────────────┘
 ```
 
-- **Calibration mode**: projector shows markers on black; primary display shows instructions. Only entered on first launch or when user presses `C`.
-- **Main screen (stopped)**: projector is black (no light); primary display shows HUD with file info, exercise selection, tempo. The user loads files and configures here.
-- **Playing**: backing track audio plays via `pygame.mixer`; projector shows colored key highlights updated every frame; HUD shows current chord and progress.
+- **Calibration mode**: projection window shows markers on black; HUD window shows instructions. Only entered on first launch or when user presses `C`.
+- **Main screen (stopped)**: projection window is black (no light); HUD window shows file info, exercise selection, tempo. The user loads files and configures here.
+- **Playing**: backing track audio plays via `pygame.mixer`; projection window shows colored key highlights updated every frame; HUD window shows current chord and progress. Both windows are updated in the same loop iteration from the same timeline state.
 
 ---
 
@@ -282,7 +282,16 @@ class LeadSheet:
 
 ### Chord-Scale Mapping
 
-Given a chord symbol, determine the most common associated scale (chord-scale theory). This is implemented as a pure Python lookup table — no external library needed. Each scale is stored as a tuple of semitone intervals from the root:
+The analyzer determines the chord-scale for each chord using two layers:
+
+1. **Default lookup** — a dictionary mapping chord quality (+ extensions) to a default scale. This handles the common case and is always available as a fallback.
+2. **Context-aware resolution** — examines the surrounding chords (previous and next) to refine the scale choice. This produces more musically accurate results, especially for dominant chords whose function depends heavily on what they resolve to.
+
+The context-aware logic will be implemented incrementally. The default lookup is the MVP; context rules are added on top as the musical logic is developed.
+
+#### Layer 1: Default Lookup
+
+Each scale is stored as a tuple of semitone intervals from the root:
 
 ```python
 # Example: scale definitions as semitone intervals from root
@@ -290,6 +299,7 @@ SCALES = {
     "ionian":          (0, 2, 4, 5, 7, 9, 11),
     "dorian":          (0, 2, 3, 5, 7, 9, 10),
     "mixolydian":      (0, 2, 4, 5, 7, 9, 10),
+    "phrygian_dom":    (0, 1, 4, 5, 7, 8, 10),
     "locrian":         (0, 1, 3, 5, 6, 8, 10),
     "altered":         (0, 1, 3, 4, 6, 8, 10),
     "half_whole_dim":  (0, 1, 3, 4, 6, 7, 9, 10),
@@ -304,7 +314,7 @@ SCALES = {
 NOTE_TO_PC = {"C": 0, "Db": 1, "D": 2, "Eb": 3, "E": 4, "F": 5,
               "F#": 6, "Gb": 6, "G": 7, "Ab": 8, "A": 9, "Bb": 10, "B": 11}
 
-# Quality → default scale name
+# Quality → default scale name (fallback when context is unavailable)
 QUALITY_TO_SCALE = {
     "maj7": "ionian",
     "7":    "mixolydian",
@@ -349,6 +359,21 @@ Chord quality → default scale mapping:
 | `sus4` | Mixolydian sus | |
 | `6` | Major pentatonic / Ionian | |
 | `min6` | Dorian | |
+
+#### Layer 2: Context-Aware Resolution
+
+The default lookup is often insufficient because a chord's function — and therefore its correct scale — depends on where it resolves. The analyzer examines the previous and/or next chord to override the default. The `resolve_scale()` function receives the full context: `(prev_chord, current_chord, next_chord)`.
+
+Examples of context-dependent rules:
+
+- **Dominant → minor resolution** (e.g., `G:7 → C:min7` or `G:7 → C:minmaj7`): the dominant is functioning as a V7 in a minor key. The scale should be **Phrygian dominant** (5th mode of harmonic minor), not plain Mixolydian. Phrygian dominant has a b9 and b13, which are the characteristic tensions of a V7 resolving to minor.
+- **Dominant → major resolution** (e.g., `G:7 → C:maj7`): standard V7→I in major. **Mixolydian** is correct (the default).
+- **Secondary dominants**: if a `7` chord resolves down a fifth to another chord, it's likely a secondary dominant and its scale depends on the target chord's quality.
+- **Tritone substitutions**: a `7` chord resolving down a half step (e.g., `Db:7 → C:maj7`) is likely a tritone sub. **Lydian dominant** is the typical scale choice.
+- **ii-V relationships**: if `X:min7` is followed by `Y:7` a fourth above, they form a ii-V pair and should share a key center — the min7 is Dorian and the dominant inherits the same key.
+- **Diminished passing chords**: `B:dim7` between `C:min7` and `Bb:min7` functions as a chromatic passing chord; whole-half diminished is correct.
+
+These rules will be implemented incrementally as the musical logic is developed. The architecture supports this cleanly: `resolve_scale()` is a single function that takes context and can grow in sophistication without changing any other module. The default lookup always serves as the fallback when no context rule matches.
 
 ### Outputs per Chord
 
@@ -443,7 +468,7 @@ class KeyHighlight:
 
 The black background is critical: the projector emits no light for black pixels, so only highlighted keys are visible on the physical piano. This is what makes the augmentation work — colored light appears to "paint" the real piano keys.
 
-Colors must be configurable in `~/.jazzar/config.json`.
+Colors must be configurable in `~/.leadsheet-utility/config.json`.
 
 ---
 
@@ -506,10 +531,11 @@ def render_frame(
     # 2. Warp the entire image to projector space in one call
     warped = cv2.warpPerspective(canonical, H, projector_size, borderValue=(0, 0, 0))
 
-    # 3. Blit to Pygame surface
-    surface = pygame.surfarray.make_surface(warped.swapaxes(0, 1))
+    # 3. Convert to Pygame surface and blit to the projection window
+    #    cv2 uses BGR, pygame uses RGB — swap channels
+    warped_rgb = cv2.cvtColor(warped, cv2.COLOR_BGR2RGB)
+    surface = pygame.surfarray.make_surface(warped_rgb.swapaxes(0, 1))
     screen.blit(surface, (0, 0))
-    pygame.display.flip()
 ```
 
 This approach has several advantages: keys stay as simple axis-aligned rectangles in the canonical space (easy to reason about), the homography handles all perspective correction, and `cv2.warpPerspective()` is GPU-accelerated on most systems.
@@ -518,7 +544,7 @@ This approach has several advantages: keys stay as simple axis-aligned rectangle
 
 Calibration is a **mode within the main app**, not a separate script. The app enters calibration mode in two cases:
 
-- **First launch**: no `~/.jazzar/calibration.json` found → calibration mode starts automatically.
+- **First launch**: no `~/.leadsheet-utility/calibration.json` found → calibration mode starts automatically.
 - **User presses `C`** from the main screen → re-enters calibration mode, with the existing marker positions loaded as starting points for fine adjustment.
 
 The calibration computes the 3×3 homography matrix that maps from the canonical keyboard image to the projector's output, correcting for the projector's angle and position relative to the piano.
@@ -560,7 +586,7 @@ H = cv2.getPerspectiveTransform(src, dst)
 
 4. **Preview**: the system renders all 88 key outlines through the homography so the user can visually verify alignment. If it looks off, they re-drag markers and recompute.
 
-5. **Saved to** `~/.jazzar/calibration.json`:
+5. **Saved to** `~/.leadsheet-utility/calibration.json`:
 
 ```json
 {
@@ -577,9 +603,71 @@ Calibration only needs to be done **once per physical setup** — the projector 
 
 Target **60 FPS**. The per-frame work is: draw ~7–15 filled rectangles into a small canonical image, one `cv2.warpPerspective()` call, and a surface blit. Well within budget.
 
-### Multi-Display Setup
+### Multi-Display Architecture
 
-Pygame must open its fullscreen window on the projector (secondary display), not the laptop screen. Use `pygame.display.set_mode()` with `display=1` (or whichever index the projector is). The HUD/control UI runs on the primary display as a separate Pygame window, or as a non-fullscreen window on the same display.
+The app needs two simultaneous outputs on two different displays: the projection (fullscreen on the projector) and the HUD (windowed on the primary monitor). This requires two windows.
+
+**Problem**: standard `pygame` (2.6.x) supports only a single display surface per process. Calling `pygame.display.set_mode()` a second time destroys the first surface. It cannot drive two windows simultaneously.
+
+**Solution**: use **`pygame-ce`** (pygame Community Edition) instead of standard `pygame`. Since version 2.5.2, pygame-ce exposes a proper `pygame.Window` class that supports multiple windows in a single process, each with its own renderer. This is a drop-in replacement: `pip install pygame-ce` instead of `pip install pygame`. The API is identical for everything else.
+
+```python
+import pygame
+
+pygame.init()
+
+# Determine display layout
+desktop_sizes = pygame.display.get_desktop_sizes()
+primary_w, primary_h = desktop_sizes[0]
+
+# Window 1: Projection (fullscreen on the projector / secondary display)
+# Position it on the secondary monitor by offsetting past the primary
+proj_window = pygame.Window(
+    title="Projection",
+    size=desktop_sizes[1] if len(desktop_sizes) > 1 else (1920, 1080),
+    position=(primary_w, 0),  # top-left of secondary display
+    fullscreen_desktop=True,
+)
+proj_surface = proj_window.get_surface()
+
+# Window 2: HUD (windowed on the primary monitor)
+hud_window = pygame.Window(
+    title="leadsheet-utility",
+    size=(800, 500),
+    position=pygame.WINDOWPOS_CENTERED,  # centered on primary
+)
+hud_surface = hud_window.get_surface()
+```
+
+Both windows share the same event loop and the same `pygame.mixer` audio output. The timeline reads the audio playback position, and both windows use it in the same frame — no synchronization needed. The main loop looks like:
+
+```python
+clock = pygame.time.Clock()
+
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.WINDOWCLOSE:
+            running = False
+        handle_input(event)  # keyboard shortcuts
+
+    state = timeline.get_state()  # one read, used by both windows
+
+    # Update projection window
+    proj_surface.fill((0, 0, 0))
+    render_projection(proj_surface, state, highlights, H)
+    proj_window.flip()
+
+    # Update HUD window
+    hud_surface.fill((30, 30, 30))
+    render_hud(hud_surface, state, lead_sheet, current_exercise)
+    hud_window.flip()
+
+    clock.tick(60)
+```
+
+**Note on multi-monitor positioning**: the `Window.position` property uses absolute screen coordinates where (0, 0) is the top-left of the primary display. To place a window on the secondary monitor, offset the x-coordinate by the primary display's width. Use `pygame.display.get_desktop_sizes()` to query monitor dimensions at startup.
+
+**No shared clock problem**: both windows are rendered in the same thread, in the same frame, reading the same `timeline.get_state()` value. They are inherently synchronized.
 
 ---
 
@@ -665,7 +753,7 @@ The system requires a General MIDI SoundFont file (`.sf2`). Recommended options:
 - **MuseScore_General.sf2** (~200 MB) — higher quality, CC0 license.
 - Any GM-compatible SoundFont the user prefers.
 
-The SoundFont path is configured in `~/.jazzar/config.json`. On first launch, if no SoundFont is found, the app prompts the user to provide one. Stretch goal: auto-download a free SoundFont.
+The SoundFont path is configured in `~/.leadsheet-utility/config.json`. On first launch, if no SoundFont is found, the app prompts the user to provide one. Stretch goal: auto-download a free SoundFont.
 
 ```json
 {
@@ -748,9 +836,9 @@ Swing is handled in the backing track pre-renderer (offsets the "and" of each be
 
 ## 10. GUI
 
-### Framework: Pygame (same as projection)
+### Framework: pygame-ce (same as projection)
 
-The UI runs in a Pygame window on the **primary display** (the user's monitor). The projection runs fullscreen on the **secondary display** (the projector). Pygame can manage multiple windows or use a single window that spans both displays.
+The HUD runs in a second `pygame.Window` on the **primary display**, while the projection runs fullscreen on the **secondary display** (projector). Both windows are managed in the same event loop (see Section 7: Multi-Display Architecture). No threading, no synchronization — both read the same `timeline.get_state()` each frame.
 
 ### Approach: Keyboard Shortcuts + Minimal HUD
 
@@ -758,7 +846,7 @@ For MVP, the control interface is primarily keyboard-driven with a simple heads-
 
 ```
 ┌──────────────────────────────────────────────┐
-│  JazzAR                                      │
+│  leadsheet-utility                                      │
 │                                              │
 │  ♫ All The Things You Are — Jerome Kern      │
 │  Key: Ab    Time: 4/4    Tempo: 140 BPM      │
@@ -797,7 +885,7 @@ Use `tkinter.filedialog.askopenfilename()` for the native file picker — it's i
 
 ### Settings Persistence
 
-All settings stored in a single `~/.jazzar/config.json`:
+All settings stored in a single `~/.leadsheet-utility/config.json` (on Windows: `%USERPROFILE%\.leadsheet-utility\config.json`). Use `pathlib.Path.home() / ".leadsheet-utility"` in code for cross-platform compatibility.
 - SoundFont path (`.sf2` file for FluidSynth)
 - Projector display index
 - Piano range (MIDI low/high)
@@ -813,7 +901,7 @@ All settings stored in a single `~/.jazzar/config.json`:
 ## 11. Project Structure
 
 ```
-jazzar/
+leadsheet-utility/
 ├── CLAUDE.md              # Instructions for Claude Code
 ├── SPEC.md                # This file
 ├── README.md
@@ -821,7 +909,7 @@ jazzar/
 ├── requirements.txt
 │
 ├── src/
-│   └── jazzar/
+│   └── leadsheet_utility/
 │       ├── __init__.py
 │       ├── main.py                 # Entry point
 │       │
@@ -898,12 +986,18 @@ jazzar/
 
 ---
 
-## 12. Dependencies
+## 12. Dependencies & Platform Notes
+
+### Target Platform: Windows 10/11
+
+The primary development and deployment platform is **Windows**. The developer has a USB audio interface with studio speakers.
+
+### Python Dependencies
 
 ```
 # Core
 python = ">=3.11"
-pygame = ">=2.5"
+pygame-ce = ">=2.5.2"          # Community Edition — required for multi-window support
 numpy = ">=1.26"
 opencv-python = ">=4.9"
 pyfluidsynth = ">=1.3"
@@ -913,11 +1007,72 @@ pytest = ">=8.0"
 ruff = ">=0.4"
 ```
 
-Four runtime Python dependencies.
+**Important**: `pygame-ce` and standard `pygame` cannot be installed simultaneously — they conflict. If standard `pygame` is already installed, uninstall it first: `pip uninstall pygame && pip install pygame-ce`. The import name is still `import pygame`; only the pip package name differs.
 
-System-level dependencies:
-- **`fluidsynth`** (C library) — install via `brew install fluidsynth` (macOS), `apt install fluidsynth` (Ubuntu/Debian), or `pacman -S fluidsynth` (Arch). Required by `pyfluidsynth`.
-- **A General MIDI SoundFont** (`.sf2` file) — e.g., FluidR3_GM.sf2 (~150 MB) or MuseScore_General.sf2 (~200 MB). Free to download. Path configured in `~/.jazzar/config.json`.
+### System-Level Dependencies
+
+#### FluidSynth C Library (Windows)
+
+`pyfluidsynth` is a thin ctypes wrapper around `libfluidsynth.dll`. The DLL must be installed and findable at runtime.
+
+**Installation options (choose one):**
+
+1. **Chocolatey** (recommended):
+   ```
+   choco install fluidsynth
+   ```
+   This installs the binaries and adds them to PATH automatically.
+
+2. **Manual install from GitHub releases**:
+   - Download the latest precompiled Windows x64 zip from [FluidSynth releases](https://github.com/FluidSynth/fluidsynth/releases) (e.g., `fluidsynth-v2.4.x-win10-x64.zip`).
+   - Extract the zip somewhere permanent (e.g., `C:\tools\fluidsynth\`).
+   - Add the `bin\` directory to the system PATH so that `libfluidsynth-3.dll` is findable:
+     ```
+     setx PATH "%PATH%;C:\tools\fluidsynth\bin"
+     ```
+   - Restart the terminal. Verify: `fluidsynth --version`.
+
+3. **vcpkg**: `vcpkg install fluidsynth:x64-windows`
+
+**Verification**: after installation, this should work in Python:
+```python
+import fluidsynth
+fs = fluidsynth.Synth()
+print("FluidSynth OK")
+fs.delete()
+```
+
+If `pyfluidsynth` can't find the DLL, it will raise an `OSError`. The most common fix is ensuring the directory containing `libfluidsynth-3.dll` (or `libfluidsynth.dll`) is on the system PATH.
+
+#### General MIDI SoundFont
+
+A `.sf2` SoundFont file is required. Recommended free options:
+- **FluidR3_GM.sf2** (~150 MB) — widely used, good quality.
+- **MuseScore_General.sf2** (~200 MB) — higher quality, CC0 license.
+- **GeneralUser GS** (~30 MB) — smaller, decent quality.
+
+The SoundFont path is configured in `~/.leadsheet-utility/config.json` (on Windows: `%USERPROFILE%\.leadsheet-utility\config.json`). On first launch, the app prompts the user to locate their SoundFont file.
+
+### Audio Output & ASIO
+
+**ASIO is not involved in the MVP architecture.** Here's why:
+
+- FluidSynth renders audio **offline** (no audio driver attached). It produces raw samples in memory via `synth.get_samples()`. FluidSynth's audio driver settings (WASAPI, DirectSound, PortAudio/ASIO) are irrelevant because no driver is created.
+- Audio playback goes through **`pygame.mixer`**, which uses **SDL2** under the hood. On Windows, SDL2 outputs audio via **WASAPI** (or DirectSound as fallback). SDL2 does **not** support ASIO directly.
+- To route audio to a USB audio interface, the user simply sets the interface as the **default Windows audio output device** in Windows Sound Settings. `pygame.mixer` will then output to it automatically via WASAPI.
+- WASAPI in shared mode adds ~10–30ms of latency. For a pre-rendered backing track, this is imperceptible — the latency only affects when playback *starts*, not the timing between notes (which was baked in during pre-rendering).
+
+**If lower-latency real-time playback is needed later** (stretch goal): FluidSynth can be connected directly to a PortAudio driver, which supports ASIO. This would bypass `pygame.mixer` entirely and give <5ms latency. But for the offline pre-render architecture, this is unnecessary.
+
+### Windows-Specific Config Path
+
+On Windows, `~/.leadsheet-utility/` maps to `%USERPROFILE%\.leadsheet-utility\` (e.g., `C:\Users\Alexandre\.leadsheet-utility\`). The app should use `pathlib.Path.home() / ".leadsheet-utility"` for cross-platform compatibility.
+
+### Other Platforms (secondary)
+
+The app should work on macOS and Linux with minimal changes, but these are not the primary target:
+- macOS: `brew install fluidsynth`
+- Linux: `apt install fluidsynth` / `pacman -S fluidsynth`
 
 Optional (stretch goals):
 - `mido` + `python-rtmidi` — for MIDI file export or live MIDI output to a DAW
@@ -945,15 +1100,17 @@ Optional (stretch goals):
        │         ▼
        │    pygame.mixer.Sound plays the buffer → AUDIO OUT
        │
-       ├──▶ Main Pygame loop (every frame, ~30-60 FPS):
+       ├──▶ Main pygame-ce loop (every frame, ~60 FPS):
        │         │
        │         ├── timeline.get_state() reads audio playback position → current beat/chord
        │         │
        │         ├── exercises.*.get_highlights(chord, beat) → list of colored keys
        │         │
-       │         ├── projection.renderer draws colored keys → PROJECTOR DISPLAY
+       │         ├── projection.renderer draws to proj_window → PROJECTOR (secondary display)
        │         │
-       │         └── gui.hud draws current chord/bar/exercise info → PRIMARY DISPLAY
+       │         ├── gui.hud draws to hud_window → HUD (primary display)
+       │         │
+       │         └── both renderers present() — same frame, same state, inherently synced
        │
        └──▶ User interacts via keyboard shortcuts (change exercise, tempo, stop, etc.)
 ```
@@ -991,14 +1148,14 @@ Optional (stretch goals):
 - [ ] MIDI file export of the backing track
 - [ ] Live MIDI output to external DAW (via `mido` + `python-rtmidi`)
 - [ ] Multiple form structures (AABA, blues, etc.) with section markers
-- [ ] Real-time FluidSynth playback (connect synth to audio driver instead of pre-rendering, enabling live tempo changes without re-render)
+- [ ] Real-time FluidSynth playback via PortAudio/ASIO (connect synth directly to USB audio interface, bypassing pygame.mixer, enabling live tempo changes without re-render and <5ms latency)
 - [ ] Piano comping track (add chord voicings on a piano channel — trivial with FluidSynth, just more MidiEvents on a new channel)
 
 ---
 
 ## 15. Key Design Decisions & Constraints
 
-1. **Single framework, single thread**: Pygame handles the event loop, display, and audio playback. The projection is a `cv2.warpPerspective()` call per frame; the UI is text rendering; audio is `pygame.mixer`. All run in the same `while True` loop at 30–60 FPS. No thread synchronization, no framework conflicts.
+1. **Single framework, single thread (pygame-ce)** — use `pygame-ce` (Community Edition) instead of standard `pygame`. pygame-ce provides a `pygame.Window` class that supports multiple windows in one process, which is needed to drive the projector (fullscreen) and the HUD (windowed) simultaneously. Both windows share one event loop: no threading, no synchronization, no framework conflicts. `pip install pygame-ce` is a drop-in replacement for `pip install pygame`.
 
 2. **Pre-rendered audio eliminates real-time timing**: The hardest problem in music software is accurate real-time scheduling. By pre-rendering the entire backing track to a NumPy array before pressing play, we sidestep this entirely. The timeline derives its position from the audio playback clock, so projection and audio are always in sync by construction.
 
@@ -1027,16 +1184,34 @@ Provide 3–4 `.tsv` chord annotation files (with companion `.meta.json`) of **p
 
 ---
 
-## 17. Testing Strategy
+## 17. Testing Strategy: Test-Driven Development
 
-- **Unit tests** for `leadsheet.parser` (parse various chord symbols, edge cases, the "All The Things" example above).
-- **Unit tests** for `harmony.analyzer` (verify correct scales for each chord quality, especially extensions like `(b9)`, `(#9)`, `(#5)`).
-- **Unit tests** for `backing.bass` (verify voice-leading rules, output is valid MIDI range, approach notes work at chord boundaries).
-- **Unit tests** for `backing.drums` (verify correct GM note numbers, swing timing offsets).
-- **Unit tests** for each exercise (verify highlight outputs for known chord sequences).
-- **Integration test** for the full pipeline: parse `.tsv` → analyze → generate events → FluidSynth offline render → verify buffer length and non-silence.
-- **Integration test** for `backing.renderer`: render a 12-bar blues, verify the output is a valid stereo int16 NumPy array of the expected length.
-- **Manual testing** for projection alignment, visual correctness, and audio-projection sync.
+This project uses **Test-Driven Development (TDD)** as the primary development methodology. Claude Code will be writing the majority of the code, and TDD provides two critical benefits in this context:
+
+1. **Specification as code**: tests serve as unambiguous, executable specifications. When Claude Code writes a module, the tests define exactly what "correct" means — particularly important for the harmony analyzer and walking bass generator, where musical correctness is subtle.
+2. **Regression safety**: as Claude Code iterates on modules across sessions, tests catch regressions immediately. This is essential when the developer (a human) reviews and refines the context-aware harmony rules — each change can be validated instantly.
+
+### TDD Workflow
+
+For each module, the development cycle is:
+
+1. **Write tests first** — define the expected behavior with concrete examples before any implementation exists.
+2. **Run tests** — confirm they fail (red).
+3. **Implement** — write the minimum code to make tests pass (green).
+4. **Refactor** — clean up, then re-run tests to confirm nothing broke.
+
+Claude Code should follow this cycle for every module. When the developer asks Claude Code to implement a feature, Claude Code should propose tests first, get confirmation, then implement.
+
+### Test Coverage by Module
+
+- **`leadsheet.parser`** — parse various chord symbols, edge cases, multi-chord bars, the "All The Things You Are" example from this spec. Verify `ChordEvent` fields (root, quality, extensions, start_beat, end_beat, duration).
+- **`harmony.analyzer`** — verify correct scales for each chord quality, especially extensions like `(b9)`, `(#9)`, `(#5)`. Test context-aware resolution: given `G:7 → C:min7`, assert the scale for G7 is Phrygian dominant, not Mixolydian. Test fallback to default when no context rule matches.
+- **`backing.bass`** — verify voice-leading rules, output is valid MIDI range (28–48), approach notes work at chord boundaries, beat 4 approaches beat 1 of next chord by step.
+- **`backing.drums`** — verify correct GM note numbers (ride=51, hi-hat=44, kick=36), swing timing offsets match configured ratio.
+- **`exercises`** — verify highlight outputs for known chord sequences. For each exercise: given a specific chord and beat position, assert the exact set of highlighted MIDI notes and colors.
+- **`backing.renderer`** (integration) — render a 12-bar blues, verify the output is a valid stereo int16 NumPy array of the expected length.
+- **Full pipeline** (integration) — parse `.tsv` → analyze → generate events → FluidSynth offline render → verify buffer length and non-silence.
+- **Manual testing** — projection alignment, visual correctness, and audio-projection sync. These cannot be automated and require the physical piano + projector setup.
 
 ---
 
