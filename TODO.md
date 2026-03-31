@@ -1,8 +1,6 @@
 SETUP
-- CLAUDE.MD
-- Skills: Jazz Harmony Expert
-- Agents: DocExplorer
-- MEMORY.MD: TDD to always follow.
+- Skills: jazz-music-theory
+    - Read through the SKILL.md
 
 IMPLEMENT MIR -> CHORD_SCALES
 - TBD
