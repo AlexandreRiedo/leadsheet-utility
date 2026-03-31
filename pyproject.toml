@@ -19,6 +19,9 @@ pytest = ">=9.0.2,<10.0.0"
 ruff = ">=0.15.8,<0.16.0"
 
 
+[tool.poetry]
+package-mode = false
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

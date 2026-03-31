@@ -1,10 +1,3 @@
-INSTALLATION
-- Setup Poetry Env
-- Install pyFluidSynth
-- Install pygame-CE
-- Install openCV
-- Install numpy
-
 SETUP
 - CLAUDE.MD
 - Skills: Jazz Harmony Expert
