@@ -1004,6 +1004,7 @@ pyfluidsynth = ">=1.3"
 
 # Dev / test
 pytest = ">=8.0"
+ruff = ">=0.4"
 ```
 
 **Important**: `pygame-ce` and standard `pygame` cannot be installed simultaneously — they conflict. If standard `pygame` is already installed, uninstall it first: `pip uninstall pygame && pip install pygame-ce`. The import name is still `import pygame`; only the pip package name differs.
