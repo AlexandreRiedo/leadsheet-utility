@@ -69,8 +69,10 @@ Each scale is a tuple of semitone intervals from the root. These are the scales 
 | Mixolydian | `(0,2,4,5,7,9,10)` | 1 2 3 4 5 6 b7 | C D E F G A Bb |
 | Aeolian (natural minor) | `(0,2,3,5,7,8,10)` | 1 2 b3 4 5 b6 b7 | C D Eb F G Ab Bb |
 | Locrian | `(0,1,3,5,6,8,10)` | 1 b2 b3 4 b5 b6 b7 | C Db Eb F Gb Ab Bb |
-| Melodic minor | `(0,2,3,5,7,9,11)` | 1 2 b3 4 5 6 7 | C D Eb F G A B |
+| Harmonic minor | `(0,2,3,5,7,8,11)` | 1 2 b3 4 5 b6 7 | C D Eb F G Ab B |
+| Locrian ♮6 | `(0,1,3,5,6,9,10)` | 1 b2 b3 4 b5 6 b7 | C Db Eb F Gb A Bb |
 | Phrygian dominant | `(0,1,4,5,7,8,10)` | 1 b2 3 4 5 b6 b7 | C Db E F G Ab Bb |
+| Melodic minor | `(0,2,3,5,7,9,11)` | 1 2 b3 4 5 6 7 | C D Eb F G A B |
 | Lydian dominant | `(0,2,4,6,7,9,10)` | 1 2 3 #4 5 6 b7 | C D E F# G A Bb |
 | Altered | `(0,1,3,4,6,8,10)` | 1 b2 #2 3 #4 b6 b7 | C Db D# E F# Ab Bb |
 | Half-whole diminished | `(0,1,3,4,6,7,9,10)` | 1 b2 #2 3 #4 5 6 b7 | C Db D# E F# G A Bb |
@@ -79,17 +81,25 @@ Each scale is a tuple of semitone intervals from the root. These are the scales 
 
 **Symmetric scales** (diminished, whole-tone) have 6 or 8 notes instead of 7. The half-whole and whole-half diminished scales are inversions of each other: half-whole starts with a half step (used over dominant chords), whole-half starts with a whole step (used over diminished chords).
 
+### Modes of Harmonic Minor
+
+| Mode | Parent Relationship | Used Over |
+|------|-------------------|-----------|
+| Harmonic minor | 1st mode | minmaj7 |
+| Locrian ♮6 | 2nd mode of harmonic minor | hdim7 (natural 13 = natural 6, idiomatic for ii of minor ii-V-i) |
+| Phrygian dominant | 5th mode of harmonic minor | V7 → minor |
+
 ### Modes of Melodic Minor
 
 Several important jazz scales are modes of the melodic minor scale:
 
 | Mode | Parent Relationship | Used Over |
 |------|-------------------|-----------|
-| Melodic minor | 1st mode | minmaj7 |
+| Melodic minor | 1st mode | minmaj7 (alternative — brighter, no b6) |
 | Phrygian dominant | 5th mode of harmonic minor | V7 → minor |
 | Lydian dominant | 4th mode of melodic minor | Tritone subs, 7(#11) |
 | Altered | 7th mode of melodic minor | V7(#9), V7(b9,b13) |
-| Locrian natural 2 | 6th mode of melodic minor | hdim7 (alternative to Locrian) |
+| Locrian natural 2 | 6th mode of melodic minor | hdim7 (alternative; has natural 2/9 but b13, unlike Locrian ♮6) |
 
 ## 3. Chord-Scale Theory
 
@@ -100,21 +110,28 @@ This is Layer 1 of the harmony analyzer — the fallback when no context rule ap
 | Quality | Default Scale | Reasoning |
 |---------|--------------|-----------|
 | `maj7` | Ionian | Standard major sound |
-| `7` | Mixolydian | Plain dominant |
-| `min7` | Dorian | Default minor color in jazz (brighter than Aeolian due to natural 6) |
-| `hdim7` | Locrian | Half-diminished = m7b5 |
-| `dim7` | Whole-half diminished | Symmetric, each chord tone can be a root |
 | `maj` | Ionian | Major triad |
-| `min` | Dorian | Minor triad |
-| `aug` | Whole-tone | Augmented triad is a whole-tone subset |
-| `minmaj7` | Melodic minor | The natural 7 over minor = melodic minor |
+| `6` | Ionian | Major with added 6th |
+| `maj9` | Ionian | Major 9th |
+| `maj13` | Ionian | Fully voiced major chord, natural 13 confirms Ionian |
+| `maj69` | Ionian | Major 6/9 — no 7th, but 6 and 9 both diatonic to Ionian |
+| `maj7#11` | Lydian | #11 is the defining note of Lydian; often the IV chord in a major context |
+| `7` | Mixolydian | Plain dominant |
+| `9` | Mixolydian | Dominant 9th |
 | `sus4` | Mixolydian | Sus4 functions as a dominant suspension |
 | `sus2` | Mixolydian | Same family as sus4 |
-| `6` | Ionian | Major with added 6th |
+| `sus` | Mixolydian | Generic suspended (implies sus4) |
+| `7sus4` | Mixolydian | Dominant 7th with sus4 — unresolved dominant, same scale as plain 7 |
+| `min7` | Dorian | Default minor color in jazz (brighter than Aeolian due to natural 6) |
+| `min` | Dorian | Minor triad |
 | `min6` | Dorian | Minor with natural 6 = Dorian |
-| `9` | Mixolydian | Dominant 9th |
 | `min9` | Dorian | Minor 9th |
-| `maj9` | Ionian | Major 9th |
+| `min11` | Dorian | Minor 11th; natural 11 is diatonic to Dorian |
+| `min13` | Dorian | Minor 13th; natural 13 confirms Dorian (not Aeolian's b6) |
+| `minmaj7` | Harmonic minor | The natural 7 over minor = harmonic minor (raised 7th, b6 included) |
+| `hdim7` | Locrian ♮6 | Half-diminished = m7b5; natural 13 is idiomatic when functioning as ii of minor ii-V-i |
+| `dim7` | Whole-half diminished | Symmetric, each chord tone can be a root |
+| `aug` | Whole-tone | Augmented triad is a whole-tone subset |
 
 ### Extension Overrides
 
@@ -122,13 +139,16 @@ When a chord has parenthesized extensions, they override the default scale:
 
 | Quality + Extension | Scale | Why |
 |--------------------|-------|-----|
-| `7(b9)` | Half-whole diminished | b9 is characteristic of HW dim; also compatible with Phrygian dominant |
+| `7(b9)` | Phrygian dominant | b9 = b13 of harmonic minor V; implies minor resolution |
+| `7(b13)` | Phrygian dominant | b13 = b6 of harmonic minor V; same implication as b9 |
+| `7(b9,b13)` | Phrygian dominant | Both b9 and b13 = harmonic minor V (explicit confirmation) |
+| `7(b9,13)` | Half-whole diminished | Natural 13 with b9 distinguishes HW dim from Phrygian dominant (which has b13) |
 | `7(#9)` | Altered | #9 signals altered dominant |
+| `7(b9,#9)` | Altered | Both altered 9ths = fully altered dominant |
 | `7(#5)` | Whole-tone | #5 = augmented dominant, whole-tone contains #5 |
 | `7(#11)` | Lydian dominant | #11 is the defining note of Lydian dominant |
+| `7(b5)` | Lydian dominant | b5 is enharmonically #11 (seen in Take the A Train: D:7(b5)) |
 | `7(13)` | Mixolydian | Natural 13 confirms standard Mixolydian |
-| `7(b13)` | Altered | b13 with dominant = altered sound |
-| `7(b9,b13)` | Phrygian dominant | Both b9 and b13 = harmonic minor V |
 
 ## 4. Chord Tones, Guide Tones, and Tensions
 
@@ -176,7 +196,7 @@ Scale tones that are NOT chord tones. These add color without clashing:
 | `maj7` (Ionian) | 9, 13 | 2, 9 (avoid 4/11 — half step above 3rd) |
 | `7` (Mixolydian) | 9, 13 | 2, 9 |
 | `min7` (Dorian) | 9, 11, 13 | 2, 5, 9 |
-| `hdim7` (Locrian) | 11, b13 | 5, 8 (avoid b2/b9 — half step above root) |
+| `hdim7` (Locrian ♮6) | 11, 13 | 5, 9 (avoid b2/b9 — half step above root) |
 
 **Avoid notes**: Scale tones a half step above a chord tone create dissonance when sustained. In Ionian, the 4th (F over Cmaj7) is an avoid note because it's a half step above the 3rd (E). The projection doesn't distinguish avoid notes — all scale tones are shown — but this matters for the walking bass and exercise target note selection.
 
