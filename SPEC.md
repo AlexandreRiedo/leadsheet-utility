@@ -1131,7 +1131,7 @@ leadsheet-utility/
 ├── CLAUDE.md              # Instructions for Claude Code
 ├── SPEC.md                # This file
 ├── README.md
-├── pyproject.toml         # Project metadata, dependencies (use Poetry or pip)
+├── pyproject.toml         # Project metadata, dependencies (uses Poetry)
 ├── requirements.txt
 │
 ├── src/
@@ -1192,13 +1192,7 @@ leadsheet-utility/
 │   │   └── .gitkeep
 │   └── leadsheets/                 # Example .tsv chord annotation files
 │       ├── all_the_things.tsv
-│       ├── all_the_things.meta.json
-│       ├── blues_in_f.tsv
-│       ├── blues_in_f.meta.json
-│       ├── rhythm_changes_bb.tsv
-│       ├── rhythm_changes_bb.meta.json
-│       ├── ii_v_i_all_keys.tsv
-│       └── ii_v_i_all_keys.meta.json
+│       └── all_the_things.meta.json
 │
 └── tests/
     ├── test_parser.py

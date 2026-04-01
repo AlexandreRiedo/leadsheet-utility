@@ -14,8 +14,9 @@ class ChordEvent:
     bar_number: int = 1  # derived: floor(start_beat / beats_per_bar) + 1
     beat_in_bar: float = 0.0  # derived: start_beat % beats_per_bar
     scale_notes: list[int] = field(default_factory=list)  # MIDI 21-108
-    chord_tones: list[int] = field(default_factory=list)  # R, 3, 5, 7
-    guide_tones: list[int] = field(default_factory=list)  # typically 3rd and 7th
+    chord_tones: list[int] = field(default_factory=list)  # R, 3, 5, 7 (MIDI 21-108)
+    guide_tones: list[int] = field(default_factory=list)  # 3rd and 7th (MIDI 21-108)
+    available_tensions: list[int] = field(default_factory=list)  # scale non-chord-tones (MIDI 21-108)
 
 
 @dataclass
@@ -29,3 +30,4 @@ class LeadSheet:
     chords: list[ChordEvent] = field(default_factory=list)
     total_beats: float = 0.0  # end_beat of the last chord
     total_bars: int = 0  # derived from total_beats / beats_per_bar
+    guide_tone_line: list[int] = field(default_factory=list)  # voice-led guide tone per chord (MIDI)

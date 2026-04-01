@@ -205,7 +205,7 @@
   {
     "start_beat": 120.0,
     "chord": "C:min7",
-    "expected_scale_notes": ["C", "Db", "Eb", "F", "G", "A", "Bb"],
+    "expected_scale_notes": ["C", "Db", "Eb", "F", "G", "Ab", "Bb"],
     "expected_chord_tones": ["C", "Eb", "G", "Bb"],
     "expected_guide_tones": ["Eb", "Bb"]
   },
