@@ -1,0 +1,254 @@
+[
+  {
+    "start_beat": 0.0,
+    "chord": "F:min7",
+    "expected_scale_notes": ["F", "G", "Ab", "Bb", "C", "Db", "Eb"],
+    "expected_chord_tones": ["F", "Ab", "C", "Eb"],
+    "expected_guide_tones": ["Ab", "Eb"]
+  },
+  {
+    "start_beat": 4.0,
+    "chord": "Bb:min7",
+    "expected_scale_notes": ["Bb", "C", "Db", "Eb", "F", "G", "Ab"],
+    "expected_chord_tones": ["Bb", "Db", "F", "Ab"],
+    "expected_guide_tones": ["Db", "Ab"]
+  },
+  {
+    "start_beat": 8.0,
+    "chord": "Eb:7",
+    "expected_scale_notes": ["Eb", "F", "G", "Ab", "Bb", "C", "Db"],
+    "expected_chord_tones": ["Eb", "G", "Bb", "Db"],
+    "expected_guide_tones": ["G", "Db"]
+  },
+  {
+    "start_beat": 12.0,
+    "chord": "Ab:maj7",
+    "expected_scale_notes": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
+    "expected_chord_tones": ["Ab", "C", "Eb", "G"],
+    "expected_guide_tones": ["C", "G"]
+  },
+  {
+    "start_beat": 16.0,
+    "chord": "Db:maj7",
+    "expected_scale_notes": ["Db", "Eb", "F", "G", "Ab", "Bb", "C"],
+    "expected_chord_tones": ["Db", "F", "Ab", "C"],
+    "expected_guide_tones": ["F", "C"]
+  },
+  {
+    "start_beat": 20.0,
+    "chord": "G:7",
+    "expected_scale_notes": ["G", "A", "B", "C", "D", "E", "F"],
+    "expected_chord_tones": ["G", "B", "D", "F"],
+    "expected_guide_tones": ["B", "F"]
+  },
+  {
+    "start_beat": 24.0,
+    "chord": "C:maj7",
+    "expected_scale_notes": ["C", "D", "E", "F", "G", "A", "B"],
+    "expected_chord_tones": ["C", "E", "G", "B"],
+    "expected_guide_tones": ["E", "B"]
+  },
+  {
+    "start_beat": 32.0,
+    "chord": "C:min7",
+    "expected_scale_notes": ["C", "D", "Eb", "F", "G", "Ab", "Bb"],
+    "expected_chord_tones": ["C", "Eb", "G", "Bb"],
+    "expected_guide_tones": ["Eb", "Bb"]
+  },
+  {
+    "start_beat": 36.0,
+    "chord": "F:min7",
+    "expected_scale_notes": ["F", "G", "Ab", "Bb", "C", "D", "Eb"],
+    "expected_chord_tones": ["F", "Ab", "C", "Eb"],
+    "expected_guide_tones": ["Ab", "Eb"]
+  },
+  {
+    "start_beat": 40.0,
+    "chord": "Bb:7",
+    "expected_scale_notes": ["Bb", "C", "D", "Eb", "F", "G", "Ab"],
+    "expected_chord_tones": ["Bb", "D", "F", "Ab"],
+    "expected_guide_tones": ["D", "Ab"]
+  },
+  {
+    "start_beat": 44.0,
+    "chord": "Eb:maj7",
+    "expected_scale_notes": ["Eb", "F", "G", "Ab", "Bb", "C", "D"],
+    "expected_chord_tones": ["Eb", "G", "Bb", "D"],
+    "expected_guide_tones": ["G", "D"]
+  },
+  {
+    "start_beat": 48.0,
+    "chord": "Ab:maj7",
+    "expected_scale_notes": ["Ab", "Bb", "C", "D", "Eb", "F", "G"],
+    "expected_chord_tones": ["Ab", "C", "Eb", "G"],
+    "expected_guide_tones": ["C", "G"]
+  },
+  {
+    "start_beat": 52.0,
+    "chord": "A:hdim7",
+    "expected_scale_notes": ["A", "Bb", "C", "D", "Eb", "F#", "G"],
+    "expected_chord_tones": ["A", "C", "Eb", "G"],
+    "expected_guide_tones": ["C", "G"]
+  },
+  {
+    "start_beat": 54.0,
+    "chord": "D:7",
+    "expected_scale_notes": ["D", "E", "F#", "G", "A", "B", "C"],
+    "expected_chord_tones": ["D", "F#", "A", "C"],
+    "expected_guide_tones": ["F#", "C"]
+  },
+  {
+    "start_beat": 56.0,
+    "chord": "G:maj7",
+    "expected_scale_notes": ["G", "A", "B", "C", "D", "E", "F#"],
+    "expected_chord_tones": ["G", "B", "D", "F#"],
+    "expected_guide_tones": ["B", "F#"]
+  },
+  {
+    "start_beat": 62.0,
+    "chord": "E:7(#9)",
+    "expected_scale_notes": ["E", "F", "G", "G#", "A#", "C", "D"],
+    "expected_chord_tones": ["E", "G#", "B", "D"],
+    "expected_guide_tones": ["G#", "D"]
+  },
+  {
+    "start_beat": 64.0,
+    "chord": "A:min7",
+    "expected_scale_notes": ["A", "B", "C", "D", "E", "F#", "G"],
+    "expected_chord_tones": ["A", "C", "E", "G"],
+    "expected_guide_tones": ["C", "G"]
+  },
+  {
+    "start_beat": 68.0,
+    "chord": "D:7",
+    "expected_scale_notes": ["D", "E", "F#", "G", "A", "B", "C"],
+    "expected_chord_tones": ["D", "F#", "A", "C"],
+    "expected_guide_tones": ["F#", "C"]
+  },
+  {
+    "start_beat": 72.0,
+    "chord": "G:maj7",
+    "expected_scale_notes": ["G", "A", "B", "C", "D", "E", "F#"],
+    "expected_chord_tones": ["G", "B", "D", "F#"],
+    "expected_guide_tones": ["B", "F#"]
+  },
+  {
+    "start_beat": 80.0,
+    "chord": "F#:hdim7",
+    "expected_scale_notes": ["F#", "G", "A", "B", "C", "D#", "E"],
+    "expected_chord_tones": ["F#", "A", "C", "E"],
+    "expected_guide_tones": ["A", "E"]
+  },
+  {
+    "start_beat": 84.0,
+    "chord": "B:7",
+    "expected_scale_notes": ["B", "C#", "D#", "E", "F#", "G#", "A"],
+    "expected_chord_tones": ["B", "D#", "F#", "A"],
+    "expected_guide_tones": ["D#", "A"]
+  },
+  {
+    "start_beat": 88.0,
+    "chord": "E:maj7",
+    "expected_scale_notes": ["E", "F#", "G#", "A", "B", "C#", "D#"],
+    "expected_chord_tones": ["E", "G#", "B", "D#"],
+    "expected_guide_tones": ["G#", "D#"]
+  },
+  {
+    "start_beat": 92.0,
+    "chord": "C:7(#5)",
+    "expected_scale_notes": ["C", "D", "E", "F#", "G#", "A#"],
+    "expected_chord_tones": ["C", "E", "G", "Bb"],
+    "expected_guide_tones": ["E", "Bb"]
+  },
+  {
+    "start_beat": 96.0,
+    "chord": "F:min7",
+    "expected_scale_notes": ["F", "G", "Ab", "Bb", "C", "Db", "Eb"],
+    "expected_chord_tones": ["F", "Ab", "C", "Eb"],
+    "expected_guide_tones": ["Ab", "Eb"]
+  },
+  {
+    "start_beat": 100.0,
+    "chord": "Bb:min7",
+    "expected_scale_notes": ["Bb", "C", "Db", "Eb", "F", "G", "Ab"],
+    "expected_chord_tones": ["Bb", "Db", "F", "Ab"],
+    "expected_guide_tones": ["Db", "Ab"]
+  },
+  {
+    "start_beat": 104.0,
+    "chord": "Eb:7",
+    "expected_scale_notes": ["Eb", "F", "G", "Ab", "Bb", "C", "Db"],
+    "expected_chord_tones": ["Eb", "G", "Bb", "Db"],
+    "expected_guide_tones": ["G", "Db"]
+  },
+  {
+    "start_beat": 108.0,
+    "chord": "Ab:maj7",
+    "expected_scale_notes": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
+    "expected_chord_tones": ["Ab", "C", "Eb", "G"],
+    "expected_guide_tones": ["C", "G"]
+  },
+  {
+    "start_beat": 112.0,
+    "chord": "Db:maj7",
+    "expected_scale_notes": ["Db", "Eb", "F", "G", "Ab", "Bb", "C"],
+    "expected_chord_tones": ["Db", "F", "Ab", "C"],
+    "expected_guide_tones": ["F", "C"]
+  },
+  {
+    "start_beat": 116.0,
+    "chord": "Gb:7(13)",
+    "expected_scale_notes": ["Gb", "Ab", "Bb", "B", "Db", "Eb", "E"],
+    "expected_chord_tones": ["Gb", "Bb", "Db", "E"],
+    "expected_guide_tones": ["Bb", "E"]
+  },
+  {
+    "start_beat": 120.0,
+    "chord": "C:min7",
+    "expected_scale_notes": ["C", "Db", "Eb", "F", "G", "A", "Bb"],
+    "expected_chord_tones": ["C", "Eb", "G", "Bb"],
+    "expected_guide_tones": ["Eb", "Bb"]
+  },
+  {
+    "start_beat": 124.0,
+    "chord": "B:dim7",
+    "expected_scale_notes": ["B", "C#", "D", "E", "F", "G", "G#", "A#"],
+    "expected_chord_tones": ["B", "D", "F", "G#"],
+    "expected_guide_tones": ["D", "G#"]
+  },
+  {
+    "start_beat": 128.0,
+    "chord": "Bb:min7",
+    "expected_scale_notes": ["Bb", "C", "Db", "Eb", "F", "G", "Ab"],
+    "expected_chord_tones": ["Bb", "Db", "F", "Ab"],
+    "expected_guide_tones": ["Db", "Ab"]
+  },
+  {
+    "start_beat": 132.0,
+    "chord": "Eb:7",
+    "expected_scale_notes": ["Eb", "F", "G", "Ab", "Bb", "C", "Db"],
+    "expected_chord_tones": ["Eb", "G", "Bb", "Db"],
+    "expected_guide_tones": ["G", "Db"]
+  },
+  {
+    "start_beat": 136.0,
+    "chord": "Ab:maj7",
+    "expected_scale_notes": ["Ab", "Bb", "C", "Db", "Eb", "F", "G"],
+    "expected_chord_tones": ["Ab", "C", "Eb", "G"],
+    "expected_guide_tones": ["C", "G"]
+  },
+  {
+    "start_beat": 140.0,
+    "chord": "G:hdim7",
+    "expected_scale_notes": ["G", "Ab", "Bb", "C", "Db", "E", "F"],
+    "expected_chord_tones": ["G", "Bb", "Db", "F"],
+    "expected_guide_tones": ["Bb", "F"]
+  },
+  {
+    "start_beat": 142.0,
+    "chord": "C:7(b9)",
+    "expected_scale_notes": ["C", "Db", "E", "F", "G", "Ab", "Bb"],
+    "expected_chord_tones": ["C", "E", "G", "Bb"],
+    "expected_guide_tones": ["E", "Bb"]
+  }
+]

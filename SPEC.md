@@ -205,27 +205,36 @@ Beats are absolute positions within the form. In 4/4 time, beat 0.0–4.0 is bar
 ### Chord Symbol Grammar
 
 ```
-ROOT      = C | C# | Db | D | D# | Eb | E | F | F# | Gb | G | G# | Ab | A | A# | Bb | B
-QUALITY   = maj7 | min7 | 7 | hdim7 | dim7 | maj | min | aug | sus4 | sus2
-            | min9 | maj9 | 9 | min6 | 6 | minmaj7
-EXTENSION = ( ALTERATION )    ← optional, parenthesized
-ALTERATION = b5 | #5 | b9 | #9 | #11 | b13 | 13 | ...
-BASS       = / ROOT           ← optional slash bass note
-SYMBOL     = ROOT : QUALITY [EXTENSION] [BASS]
+SYMBOL     = ROOT ":" QUALITY [EXTENSION] [BASS]
+ROOT       = C | C# | Db | D | D# | Eb | E | F | F# | Gb | G | G# | Ab | A | A# | Bb | B
+QUALITY    = <string> — matched by prefix family (see Parsing Strategy below)
+EXTENSION  = "(" ALTERATION {"," ALTERATION} ")"
+ALTERATION = b5 | b6 | #5 | b9 | #9 | #11 | b13 | 13
+BASS       = "/" ROOT
 ```
 
-Key quality mappings:
-- `min7` → minor 7th (Dorian default)
-- `maj7` → major 7th (Ionian default)
-- `7` → dominant 7th (Mixolydian default)
-- `hdim7` → half-diminished / m7b5 (Locrian default)
-- `dim7` → fully diminished
-- `7(b9)` → dominant with flat 9 (half-whole diminished or Phrygian dominant)
-- `7(#9)` → dominant with sharp 9 (altered or half-whole diminished)
-- `7(#5)` → augmented dominant (whole-tone or Lydian dominant)
-- `7(13)` → dominant with natural 13 (Mixolydian / Lydian dominant)
+### Parsing Strategy
 
-The parser splits on `:` to separate root from quality, then extracts any parenthesized extensions.
+1. Split on `:` to separate root from the rest
+2. Extract parenthesized extensions with regex: `\(([^)]+)\)`
+3. Extract slash bass note: `/[A-G][#b]?$`
+4. What remains is the quality string — classify by **prefix family** rather than exact match:
+
+| Prefix | Family | Examples |
+|--------|--------|---------|
+| `hdim` | half-diminished | `hdim7` |
+| `min` | minor | `min7`, `min`, `minmaj7`, `min6`, `min9`, `min11`, `min13` |
+| `maj` | major | `maj7`, `maj`, `maj9`, `maj13`, `maj69`, `maj7#11` |
+| `dim` | diminished | `dim7` |
+| `aug` | augmented | `aug` |
+| `sus` | suspended | `sus4`, `sus2`, `sus` |
+| `7`, `9`, `11`, `13` | dominant | `7`, `9`, `7sus4`, `13` |
+
+No prefix collisions exist in the current set, but check in the order listed for clarity. Within a family, use the full quality string to look up the exact default scale from Layer 1; fall back to the family's base quality if no exact match.
+
+### Enharmonic Normalization
+
+The parser must handle both sharp and flat spellings. Both `F#:min7` and `Gb:min7` refer to the same pitch class (6). Normalize to a canonical spelling when computing pitch classes, but preserve the original spelling for display.
 
 ### Metadata Sidecar (Optional)
 
@@ -291,89 +300,193 @@ The context-aware logic will be implemented incrementally. The default lookup is
 
 #### Layer 1: Default Lookup
 
+##### Pitch Classes and Modulo-12 Arithmetic
+
+All pitch reasoning uses **pitch classes** (integers 0–11) and modulo-12 arithmetic:
+
+```
+C=0  C#/Db=1  D=2  D#/Eb=3  E=4  F=5  F#/Gb=6  G=7  G#/Ab=8  A=9  A#/Bb=10  B=11
+```
+
+MIDI note to pitch class: `pitch_class = midi_note % 12`. Interval between two notes: `interval = (note_pc - root_pc) % 12`.
+
+##### Scale Definitions
+
 Each scale is stored as a tuple of semitone intervals from the root:
 
 ```python
-# Example: scale definitions as semitone intervals from root
 SCALES = {
-    "ionian":          (0, 2, 4, 5, 7, 9, 11),
-    "dorian":          (0, 2, 3, 5, 7, 9, 10),
-    "mixolydian":      (0, 2, 4, 5, 7, 9, 10),
-    "phrygian_dom":    (0, 1, 4, 5, 7, 8, 10),
-    "locrian":         (0, 1, 3, 5, 6, 8, 10),
-    "altered":         (0, 1, 3, 4, 6, 8, 10),
-    "half_whole_dim":  (0, 1, 3, 4, 6, 7, 9, 10),
-    "whole_half_dim":  (0, 2, 3, 5, 6, 8, 9, 11),
-    "whole_tone":      (0, 2, 4, 6, 8, 10),
-    "melodic_minor":   (0, 2, 3, 5, 7, 9, 11),
-    "lydian_dominant": (0, 2, 4, 6, 7, 9, 10),
-    "lydian":          (0, 2, 4, 6, 7, 9, 11),
+    "ionian":              (0, 2, 4, 5, 7, 9, 11),
+    "dorian":              (0, 2, 3, 5, 7, 9, 10),
+    "phrygian":            (0, 1, 3, 5, 7, 8, 10),
+    "lydian":              (0, 2, 4, 6, 7, 9, 11),
+    "mixolydian":          (0, 2, 4, 5, 7, 9, 10),
+    "aeolian":             (0, 2, 3, 5, 7, 8, 10),
+    "locrian":             (0, 1, 3, 5, 6, 8, 10),
+    "harmonic_minor":      (0, 2, 3, 5, 7, 8, 11),
+    "locrian_nat6":        (0, 1, 3, 5, 6, 9, 10),
+    "phrygian_dom":        (0, 1, 4, 5, 7, 8, 10),
+    "melodic_minor":       (0, 2, 3, 5, 7, 9, 11),
+    "lydian_dominant":     (0, 2, 4, 6, 7, 9, 10),
+    "altered":             (0, 1, 3, 4, 6, 8, 10),
+    "half_whole_dim":      (0, 1, 3, 4, 6, 7, 9, 10),
+    "whole_half_dim":      (0, 2, 3, 5, 6, 8, 9, 11),
+    "whole_tone":          (0, 2, 4, 6, 8, 10),
 }
 
-# Root name → pitch class (C=0, Db=1, D=2, ...)
-NOTE_TO_PC = {"C": 0, "Db": 1, "D": 2, "Eb": 3, "E": 4, "F": 5,
-              "F#": 6, "Gb": 6, "G": 7, "Ab": 8, "A": 9, "Bb": 10, "B": 11}
-
-# Quality → default scale name (fallback when context is unavailable)
-QUALITY_TO_SCALE = {
-    "maj7": "ionian",
-    "7":    "mixolydian",
-    "min7": "dorian",
-    "hdim7": "locrian",
-    "dim7": "whole_half_dim",
-    # ... etc
-}
-
-def get_scale_midi_notes(root: str, quality: str, extensions: list[str],
-                         low: int = 21, high: int = 108) -> list[int]:
-    """Return all MIDI notes of the chord-scale across the full 88-key piano range."""
-    pc = NOTE_TO_PC[root]
-    scale_name = resolve_scale(quality, extensions)  # handles extension overrides
-    intervals = SCALES[scale_name]
-    notes = []
-    for midi in range(low, high + 1):
-        if (midi - pc) % 12 in intervals:
-            notes.append(midi)
-    return notes
+NOTE_TO_PC = {"C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3,
+              "E": 4, "F": 5, "F#": 6, "Gb": 6, "G": 7, "G#": 8,
+              "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11}
 ```
 
-Chord quality → default scale mapping:
+**Symmetric scales** (diminished, whole-tone) have 6 or 8 notes instead of 7. The half-whole and whole-half diminished scales are inversions of each other: half-whole starts with a half step (used over dominant chords), whole-half starts with a whole step (used over diminished chords).
 
-| Quality | Default Scale | Notes |
-|---|---|---|
-| `maj7` | Ionian (or Lydian if IV chord) | Context-dependent; default to Ionian |
+Key scale relationships:
+- **Modes of harmonic minor**: Locrian ♮6 (2nd mode), Phrygian dominant (5th mode)
+- **Modes of melodic minor**: Lydian dominant (4th mode), Altered (7th mode)
+
+##### Generating Scale Notes
+
+```python
+def get_scale_midi_notes(root_pc: int, intervals: tuple[int, ...],
+                         low: int = 21, high: int = 108) -> list[int]:
+    return [m for m in range(low, high + 1) if (m - root_pc) % 12 in intervals]
+```
+
+##### Default Quality-to-Scale Mapping
+
+This is the fallback when no context rule applies:
+
+| Quality | Default Scale | Reasoning |
+|---------|--------------|-----------|
+| `maj7` | Ionian | Standard major sound |
+| `maj` | Ionian | Major triad |
+| `6` | Ionian | Major with added 6th |
+| `maj9` | Ionian | Major 9th |
+| `maj13` | Ionian | Fully voiced major chord, natural 13 confirms Ionian |
+| `maj69` | Ionian | Major 6/9 — no 7th, but 6 and 9 both diatonic to Ionian |
+| `maj7#11` | Lydian | #11 is the defining note of Lydian; often the IV chord |
 | `7` | Mixolydian | Plain dominant |
-| `min7` | Dorian | Default minor color in jazz |
-| `hdim7` | Locrian | Half-diminished = m7b5 |
-| `dim7` | Diminished (whole-half) | Symmetric |
-| `maj` | Ionian | Triad, treat as major |
+| `9` | Mixolydian | Dominant 9th |
+| `sus4` | Mixolydian | Sus4 functions as a dominant suspension |
+| `sus2` | Mixolydian | Same family as sus4 |
+| `sus` | Mixolydian | Generic suspended (implies sus4) |
+| `7sus4` | Mixolydian | Dominant 7th with sus4 |
+| `min7` | Dorian | Default minor color in jazz (brighter than Aeolian due to natural 6) |
 | `min` | Dorian | Minor triad |
-| `aug` | Whole-tone | |
-| `7` + `(b9)` | Half-whole diminished | Or Phrygian dominant |
-| `7` + `(#9)` | Altered (melodic minor VII) | Or half-whole diminished |
-| `7` + `(#5)` | Whole-tone | Or Lydian dominant |
-| `7` + `(#11)` | Lydian dominant | |
-| `7` + `(13)` | Mixolydian | Natural 13 confirms Mixolydian |
-| `7` + `(b13)` | Altered or Mixolydian b13 | |
-| `minmaj7` | Melodic minor | |
-| `sus4` | Mixolydian sus | |
-| `6` | Major pentatonic / Ionian | |
-| `min6` | Dorian | |
+| `min6` | Dorian | Minor with natural 6 = Dorian |
+| `min9` | Dorian | Minor 9th |
+| `min11` | Dorian | Minor 11th; natural 11 is diatonic to Dorian |
+| `min13` | Dorian | Minor 13th; natural 13 confirms Dorian (not Aeolian's b6) |
+| `minmaj7` | Harmonic minor | The natural 7 over minor = harmonic minor (raised 7th, b6 included) |
+| `hdim7` | Locrian ♮6 | Half-diminished = m7b5; natural 13 is idiomatic when functioning as ii of minor ii-V-i |
+| `dim7` | Whole-half diminished | Symmetric, each chord tone can be a root |
+| `aug` | Whole-tone | Augmented triad is a whole-tone subset |
+
+##### Extension Overrides
+
+When a chord has parenthesized extensions, they override the default scale:
+
+| Quality + Extension | Scale | Why |
+|--------------------|-------|-----|
+| `7(b9)` | Phrygian dominant | b9 implies minor resolution (harmonic minor V) |
+| `7(b13)` | Phrygian dominant | b13 = b6 of harmonic minor V; same implication as b9 |
+| `7(b9,b13)` | Phrygian dominant | Both b9 and b13 = harmonic minor V (explicit confirmation) |
+| `7(b9,13)` | Half-whole diminished | Natural 13 with b9 distinguishes HW dim from Phrygian dominant (which has b13) |
+| `7(#9)` | Altered | #9 signals altered dominant |
+| `7(b9,#9)` | Altered | Both altered 9ths = fully altered dominant |
+| `7(#5)` | Whole-tone | #5 = augmented dominant |
+| `7(#11)` | Lydian dominant | #11 is the defining note of Lydian dominant |
+| `7(b5)` | Lydian dominant | b5 is enharmonically #11 |
+| `7(13)` | Mixolydian | Natural 13 confirms standard Mixolydian |
 
 #### Layer 2: Context-Aware Resolution
 
 The default lookup is often insufficient because a chord's function — and therefore its correct scale — depends on where it resolves. The analyzer examines the previous and/or next chord to override the default. The `resolve_scale()` function receives the full context: `(prev_chord, current_chord, next_chord)`.
 
-Examples of context-dependent rules:
+##### Rule 1: V7 Resolving to Minor
 
-- **Dominant → minor resolution** (e.g., `G:7 → C:min7` or `G:7 → C:minmaj7`): the dominant is functioning as a V7 in a minor key. The scale should be **Phrygian dominant** (5th mode of harmonic minor), not plain Mixolydian. Phrygian dominant has a b9 and b13, which are the characteristic tensions of a V7 resolving to minor.
-- **Dominant → major resolution** (e.g., `G:7 → C:maj7`): standard V7→I in major. **Mixolydian** is correct (the default).
-- **Secondary dominants**: if a `7` chord resolves down a fifth to another chord, it's likely a secondary dominant and its scale depends on the target chord's quality.
-- **Tritone substitutions**: a `7` chord resolving down a half step (e.g., `Db:7 → C:maj7`) is likely a tritone sub. **Lydian dominant** is the typical scale choice.
-- **ii-V relationships**: if `X:min7` is followed by `Y:7` a fourth above, they form a ii-V pair and should share a key center — the min7 is Dorian and the dominant inherits the same key.
-- **Diminished passing chords**: `B:dim7` between `C:min7` and `Bb:min7` functions as a chromatic passing chord; whole-half diminished is correct.
+**Pattern**: `X:7` → `Y:<minor>` where X is a 5th above Y (i.e. `(X_root - Y_root) % 12 == 7`), and `<minor>` is any quality starting with `min`.
 
-These rules will be implemented incrementally as the musical logic is developed. The architecture supports this cleanly: `resolve_scale()` is a single function that takes context and can grow in sophistication without changing any other module. The default lookup always serves as the fallback when no context rule matches.
+**Scale**: Phrygian dominant (5th mode of harmonic minor). The b9 and b13 are the characteristic tones of a V7 in minor; Mixolydian (the default) has a natural 9 and 13, which sound like a major-key dominant.
+
+```
+G:7 → C:min7   →  G Phrygian dominant (G Ab B C D Eb F)
+                   = C harmonic minor starting on G
+```
+
+**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 7` AND `next_chord.quality.startswith("min")`.
+
+##### Rule 2: Tritone Substitution
+
+**Pattern**: `X:7` → `Y` where X is a half step above Y (root moves down by 1 semitone).
+
+**Scale**: Lydian dominant. The #11 is the enharmonic equivalent of the original dominant's root — it connects the two keys smoothly.
+
+```
+Db:7 → C:maj7  →  Db Lydian dominant (Db Eb F G Ab Bb Cb)
+                   The G (= #11 of Db) is the 5th of C, linking the resolution
+```
+
+**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 1` AND `current_chord.quality.startswith("7")`.
+
+##### Rule 3: Extended ii-V Chain (iii-vi-ii-V)
+
+**Pattern**: A chain of chords whose roots each ascend by P4 (5 semitones), ending with a ii-V pair. Common forms:
+
+```
+vi-ii-V:     A:min7 → D:min7 → G:7        (roots: 9→2→7, each +5 mod 12)
+iii-vi-ii-V: E:min7 → A:min7 → D:min7 → G:7
+```
+
+**Scale**: All chords share the key center of the final resolution target. Each chord gets the diatonic mode for its degree — this **overrides the Layer 1 default of Dorian** for iii and vi:
+
+| Degree | Example (in C) | Scale | Layer 1 default |
+|--------|----------------|-------|-----------------|
+| iii | E:min7 | Phrygian | ~~Dorian~~ |
+| vi | A:min7 | Aeolian | ~~Dorian~~ |
+| ii | D:min7 | Dorian | Dorian (no change) |
+| V | G:7 | Mixolydian | Mixolydian (no change) |
+
+Secondary dominants (7 chords within the chain that resolve to a minor chord) get Phrygian dominant via Rule 1.
+
+**Detection**: Identify a ii-V pair (a `min*` chord followed by a `7*` chord with roots a P4 apart), then walk backwards. Each preceding chord is part of the chain if `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND `prev_chord.quality.startswith("min")` or `prev_chord.quality.startswith("7")`.
+
+##### Rule 4: I-vi-ii-V Turnaround
+
+**Pattern**: `W:maj7` → `X:min7` → `Y:min7` → `Z:7` where the I chord's root is a minor 3rd above the vi chord's root, followed by a descending-fifths chain (Rule 3).
+
+```
+C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
+```
+
+**Scale**: Same key-center logic as Rule 3. The I chord confirms the key unambiguously:
+
+| Degree | Example (in C) | Scale | Layer 1 default |
+|--------|----------------|-------|-----------------|
+| I | C:maj7 | Ionian | Ionian (no change) |
+| vi | A:min7 | Aeolian | ~~Dorian~~ |
+| ii | D:min7 | Dorian | Dorian (no change) |
+| V | G:7 | Mixolydian | Mixolydian (no change) |
+
+**Detection**: A Rule 3 chain is preceded by a chord where `prev_chord.quality.startswith("maj")` AND `(prev_chord.root_pc - current_chord.root_pc) % 12 == 3`.
+
+##### Rule 5: IV Chord in Major Context
+
+**Pattern**: `X:maj7` where the previous chord or key context suggests X is the IV degree.
+
+**Scale**: Lydian (instead of default Ionian). The #4 of Lydian avoids the clash between the natural 4 and the major 3rd of the chord.
+
+**Detection**: `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND both `prev_chord.quality.startswith("maj")` AND `current_chord.quality.startswith("maj")`.
+
+##### Resolution Priority
+
+When multiple rules could apply, use this priority:
+1. Extension overrides (explicit `b9`, `#9`, etc.) — always win
+2. Context rules (V→minor, tritone sub, ii-V chain)
+3. Default quality lookup
+
+These rules will be implemented incrementally. The architecture supports this cleanly: `resolve_scale()` is a single function that takes context and can grow in sophistication without changing any other module. The default lookup always serves as the fallback when no context rule matches.
 
 ### Outputs per Chord
 

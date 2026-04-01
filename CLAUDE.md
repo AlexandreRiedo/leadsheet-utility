@@ -8,6 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SPEC.md is the authoritative design reference (treat it as a living document that can evolve, but don't change it casually).
 
+## Project Status: Greenfield
+
+**Note to AI:** This project is currently in the initial setup phase. Many of the files, modules, tests, and directories mentioned in this document represent the **target architecture** and do not exist yet. Your immediate goal is to help me build towards this specification step-by-step. If a referenced file is missing, do not assume it's an error; assume we need to create it.
+
 ## Commands
 
 ```bash
