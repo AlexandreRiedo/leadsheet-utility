@@ -8,9 +8,6 @@ Each entry in tests/fixtures/harmony/<piece>.expected.json specifies a chord
 
 The corresponding lead sheet is parsed from data/leadsheets/<piece>.tsv,
 analyzed once per module, and then checked against every fixture entry.
-
-Known failures document unimplemented context rules (incremental Layer 2
-expansion per SPEC §5 "Context-Aware Resolution").
 """
 
 import json
@@ -29,7 +26,7 @@ from leadsheet_utility.leadsheet.parser import parse_leadsheet
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "harmony"
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "leadsheets"
 
-PIECES = ["all_the_things_you_are", "oleo", "stella_by_starlight"]
+PIECES = ["all_the_things_you_are", "oleo", "stella_by_starlight", "nefertiti"]
 
 # ---------------------------------------------------------------------------
 # Known scale-notes failures (chord_tones / guide_tones still pass)
@@ -37,7 +34,7 @@ PIECES = ["all_the_things_you_are", "oleo", "stella_by_starlight"]
 
 _KNOWN_SCALE_FAILURES: dict[tuple[str, float], str] = {
     ("all_the_things_you_are", 120.0): (
-        "The Cm7 here is a iii phrygian, not a ii dorian chord."
+        "The Cm7 here is a iii phrygian, not a ii dorian chord. Cf. that Barry Harris video, this ain't easy to know."
     ),
 }
 
