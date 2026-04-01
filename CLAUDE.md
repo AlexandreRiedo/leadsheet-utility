@@ -14,28 +14,32 @@ SPEC.md is the authoritative design reference (treat it as a living document tha
 
 ## Commands
 
+This project uses **Poetry** with `package-mode = false` (no installable package). Always prefix commands with `poetry run` to use the virtualenv, or activate the shell first with `poetry shell`.
+
 ```bash
-# Run the application
-python -m leadsheet_utility
-
-# Run all tests
-pytest
-
-# Run a single test file
-pytest tests/test_harmony.py
-
-# Run a single test by name
-pytest tests/test_harmony.py::test_minor7_dorian -v
-
-# Lint
-ruff check .
-
-# Format
-ruff format .
-
 # Install dependencies (Poetry, Python 3.13+)
 poetry install
+
+# Run the application
+poetry run python -m leadsheet_utility
+
+# Run all tests
+poetry run pytest
+
+# Run a single test file
+poetry run pytest tests/test_harmony.py
+
+# Run a single test by name
+poetry run pytest tests/test_harmony.py::test_minor7_dorian -v
+
+# Lint
+poetry run ruff check .
+
+# Format
+poetry run ruff format .
 ```
+
+The `src/` layout is configured via `[tool.pytest.ini_options] pythonpath = ["src"]` in `pyproject.toml` so pytest can find `leadsheet_utility` without installing it.
 
 ## Architecture
 

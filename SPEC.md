@@ -145,7 +145,7 @@ The app is a simple state machine with three modes:
 
 ## 4. Lead Sheet Format (Input)
 
-The system reads a **MIR-style TSV chord annotation file** (tab-separated values). This is a standard format used in music information retrieval research. The file extension is `.tsv` (or `.lab` / `.txt`).
+The system reads a **MIR-style TSV chord annotation file** (tab-separated values). This is a standard format used in music information retrieval research. The file extension is `.tsv`.
 
 ### Format Specification
 
@@ -342,8 +342,23 @@ NOTE_TO_PC = {"C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3,
 **Symmetric scales** (diminished, whole-tone) have 6 or 8 notes instead of 7. The half-whole and whole-half diminished scales are inversions of each other: half-whole starts with a half step (used over dominant chords), whole-half starts with a whole step (used over diminished chords).
 
 Key scale relationships:
-- **Modes of harmonic minor**: Locrian ♮6 (2nd mode), Phrygian dominant (5th mode)
-- **Modes of melodic minor**: Lydian dominant (4th mode), Altered (7th mode)
+
+**Modes of Harmonic Minor**:
+
+| Mode | Parent Relationship | Used Over |
+|------|-------------------|-----------|
+| Harmonic minor | 1st mode | minmaj7 |
+| Locrian ♮6 | 2nd mode of harmonic minor | hdim7 (natural 13 = natural 6, idiomatic for ii of minor ii-V-i) |
+| Phrygian dominant | 5th mode of harmonic minor | V7 → minor |
+
+**Modes of Melodic Minor**:
+
+| Mode | Parent Relationship | Used Over |
+|------|-------------------|-----------|
+| Melodic minor | 1st mode | minmaj7 (alternative — brighter, no b6) |
+| Lydian dominant | 4th mode of melodic minor | Tritone subs, 7(#11) |
+| Altered | 7th mode of melodic minor | V7(#9), V7(b9,b13) |
+| Locrian natural 2 | 6th mode of melodic minor | hdim7 (alternative; has natural 2/9 but b13, unlike Locrian ♮6) |
 
 ##### Generating Scale Notes
 
@@ -435,8 +450,9 @@ Db:7 → C:maj7  →  Db Lydian dominant (Db Eb F G Ab Bb Cb)
 **Pattern**: A chain of chords whose roots each ascend by P4 (5 semitones), ending with a ii-V pair. Common forms:
 
 ```
-vi-ii-V:     A:min7 → D:min7 → G:7        (roots: 9→2→7, each +5 mod 12)
-iii-vi-ii-V: E:min7 → A:min7 → D:min7 → G:7
+vi-ii-V:      A:min7 → D:min7 → G:7        (roots: 9→2→7, each +5 mod 12)
+iii-vi-ii-V:  E:min7 → A:min7 → D:min7 → G:7
+iii-VI7-ii-V: E:min7 → A:7 → D:min7 → G:7  (A:7 is a secondary dominant V/ii)
 ```
 
 **Scale**: All chords share the key center of the final resolution target. Each chord gets the diatonic mode for its degree — this **overrides the Layer 1 default of Dorian** for iii and vi:
@@ -488,17 +504,96 @@ When multiple rules could apply, use this priority:
 
 These rules will be implemented incrementally. The architecture supports this cleanly: `resolve_scale()` is a single function that takes context and can grow in sophistication without changing any other module. The default lookup always serves as the fallback when no context rule matches.
 
+##### Common Jazz Progressions (Reference)
+
+These patterns appear frequently in the lead sheet corpus and inform context-aware resolution:
+
+| Progression | Example | Key Insight |
+|-------------|---------|-------------|
+| ii-V-I major | Dm7 → G7 → Cmaj7 | G7 gets Mixolydian |
+| ii-V-i minor | D:hdim7 → G:7 → C:min7 | G:7 gets Phrygian dominant |
+| I-vi-ii-V | Cmaj7 → Am7 → Dm7 → G7 | Am7=Aeolian, all in C major |
+| iii-vi-ii-V | Em7 → Am7 → Dm7 → G7 | Em7=Phrygian, Am7=Aeolian, all in C major |
+| Tritone sub | Dm7 → Db7 → Cmaj7 | Db7 gets Lydian dominant |
+| Backdoor ii-V | Fm7 → Bb7 → Cmaj7 | bVII7 resolving up to I |
+| Rhythm changes bridge | D7 → G7 → C7 → F7 | Circle of dominants, each Mixolydian |
+| Minor blues | Cm7 → Fm7 → G7 → Cm7 | G7 gets Phrygian dominant |
+| Diminished passing | Cmaj7 → C#dim7 → Dm7 | C#dim7 is chromatic connector |
+
+### Chord Tones
+
+The essential notes that define each chord (root, 3rd, 5th, 7th), expressed as semitone intervals from the root:
+
+| Quality | Root | 3rd | 5th | 7th | Intervals |
+|---------|------|-----|-----|-----|-----------|
+| `maj7` | 0 | 4 | 7 | 11 | `(0, 4, 7, 11)` |
+| `7` | 0 | 4 | 7 | 10 | `(0, 4, 7, 10)` |
+| `min7` | 0 | 3 | 7 | 10 | `(0, 3, 7, 10)` |
+| `hdim7` | 0 | 3 | 6 | 10 | `(0, 3, 6, 10)` |
+| `dim7` | 0 | 3 | 6 | 9 | `(0, 3, 6, 9)` |
+| `minmaj7` | 0 | 3 | 7 | 11 | `(0, 3, 7, 11)` |
+| `maj` | 0 | 4 | 7 | — | `(0, 4, 7)` |
+| `min` | 0 | 3 | 7 | — | `(0, 3, 7)` |
+| `aug` | 0 | 4 | 8 | — | `(0, 4, 8)` |
+| `6` | 0 | 4 | 7 | 9 | `(0, 4, 7, 9)` (6th replaces 7th) |
+| `min6` | 0 | 3 | 7 | 9 | `(0, 3, 7, 9)` |
+
+### Guide Tones
+
+The **3rd and 7th** of each chord. These two notes:
+- Define the chord quality (major vs minor vs dominant)
+- Move by small intervals (half step or whole step) across chord changes
+- Are the primary target notes in the Guide Tone exercise
+
+```python
+def get_guide_tones(root_pc: int, quality: str) -> tuple[int, int]:
+    """Return (3rd_pc, 7th_pc) for the chord."""
+    third = (root_pc + CHORD_TONES[quality][1]) % 12  # 3 or 4 semitones
+    seventh = (root_pc + CHORD_TONES[quality][3]) % 12  # 9, 10, or 11 semitones
+    return (third, seventh)
+```
+
+For triads without a 7th (`maj`, `min`, `aug`), the guide tone is just the 3rd.
+
+### Available Tensions
+
+Scale tones that are NOT chord tones. These add color without clashing:
+
+| Quality | Tensions | Intervals from root |
+|---------|----------|-----------|
+| `maj7` (Ionian) | 9, 13 | 2, 9 (avoid 4/11 — half step above 3rd) |
+| `7` (Mixolydian) | 9, 13 | 2, 9 |
+| `min7` (Dorian) | 9, 11, 13 | 2, 5, 9 |
+| `hdim7` (Locrian ♮6) | 11, 13 | 5, 9 (avoid b2/b9 — half step above root) |
+
+**Avoid notes**: Scale tones a half step above a chord tone create dissonance when sustained. In Ionian, the 4th (F over Cmaj7) is an avoid note because it's a half step above the 3rd (E). The projection doesn't distinguish avoid notes — all scale tones are shown — but this matters for the walking bass and exercise target note selection.
+
 ### Outputs per Chord
 
 For each `ChordEvent`, the analyzer populates:
 - `scale_notes` — all 7 (or 8) pitches of the chord-scale, across the full 88-key piano range (MIDI 21–108, A0–C8).
-- `chord_tones` — R, 3, 5, 7.
+- `chord_tones` — R, 3, 5, 7 (intervals from the chord tones table above).
 - `guide_tones` — 3rd and 7th (used by the guide-tone exercise).
-- `available_tensions` — 9, 11, 13 where applicable.
+- `available_tensions` — 9, 11, 13 where applicable (from the tensions table above).
 
 ### Voice-Leading for Guide Tones
 
-The analyzer also pre-computes a **guide-tone line** across the entire form: for each chord transition, pick the guide tone (3rd or 7th) that is closest by half-step to the previous guide tone. Store this as a list parallel to `chords`.
+The analyzer pre-computes a **guide-tone line** across the entire form: for each chord transition, pick the guide tone (3rd or 7th) that is closest in pitch to the previous guide tone. Store this as a list parallel to `chords`.
+
+Key voice-leading connections in jazz:
+- **3rd of ii → 7th of V** (same note or half step): e.g., Dm7 3rd (F) = G7 7th (F)
+- **7th of V → 3rd of I** (half step down): e.g., G7 7th (F) → Cmaj7 3rd (E)
+- **7th of ii → 3rd of V** (half step down): e.g., Dm7 7th (C) → G7 3rd (B)
+
+This is what makes ii-V-I progressions sound smooth — the guide tones descend by half step.
+
+```
+Dm7    → G7     → Cmaj7
+3rd=F    3rd=B     3rd=E
+7th=C    7th=F     7th=B
+
+Guide-tone line: F → F → E  (7th of G7 = F, same as 3rd of Dm7; then 3rd of Cmaj7 = E, half step down)
+```
 
 ---
 
@@ -879,12 +974,19 @@ The SoundFont path is configured in `~/.leadsheet-utility/config.json`. On first
 Algorithmic walking bass: for each bar, generate a 4-note (quarter-note) bass line as `MidiEvent` objects on channel 0.
 
 Algorithm outline:
-1. Beat 1: root of the chord (or a chord tone).
-2. Beat 3: 5th or another chord tone.
-3. Beats 2 & 4: scale tones or chromatic approach notes targeting the next strong-beat note.
-4. Beat 4 of the bar should approach beat 1 of the *next* bar's chord by half step or whole step.
+1. **Beat 1**: Root of the chord (in bass range). If repeating the same chord as previous bar, may use 5th or 3rd for variety.
+2. **Beat 2**: Scale tone between beat 1 and beat 3 (stepwise motion).
+3. **Beat 3**: 5th or another chord tone (3rd, 7th). Should differ from beat 1.
+4. **Beat 4**: Approach note targeting beat 1 of the next bar's chord — chromatic half step above/below the next root (strongest), whole step (diatonic), or the 5th of the next chord (dominant approach).
 5. Bass range: MIDI 28 (E1) to MIDI 48 (C3).
 6. Each note is a quarter-note duration (legato, slight overlap is fine for acoustic bass).
+7. Notes should generally move by step or small skip (2nds or 3rds), with occasional larger leaps (4ths, 5ths) for variety.
+
+**Direction and contour**: Alternate ascending and descending motion across bars to stay within range. If approaching the range ceiling (MIDI 48), walk downward. If approaching the floor (MIDI 28), walk upward. Avoid staying on the same note for consecutive beats (walking = motion).
+
+**Two-beat chords**: When a chord lasts only 2 beats:
+- Beat 1: Root
+- Beat 2: Approach note to the next chord's root
 
 ### Drum Pattern Generator
 
@@ -915,6 +1017,17 @@ def swing_offset(beat_fraction: float, swing_ratio: float = 0.67) -> float:
 ```
 
 Default swing ratio: 0.67 (triplet feel). Configurable from 0.5 (straight) to 0.75 (hard swing).
+
+**What gets swung**:
+- Ride cymbal "skip" notes (the "and" of 2 and 4)
+- Walking bass notes that fall on offbeats (rare in standard walking, but possible in rhythmic variations)
+- Ghost snare notes if placed on offbeats
+
+**What does NOT get swung**:
+- Quarter-note hits (beats 1, 2, 3, 4) — these stay on the grid
+- Hi-hat pedal on 2 and 4 — these are on the beat
+- Chord changes — always on beat boundaries
+- The timeline clock — stays in straight time for chord lookup
 
 ### Tempo Change Handling
 

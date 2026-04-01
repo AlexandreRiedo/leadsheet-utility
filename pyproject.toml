@@ -22,6 +22,9 @@ ruff = ">=0.15.8,<0.16.0"
 [tool.poetry]
 package-mode = false
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
