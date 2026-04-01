@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from leadsheet_utility.harmony.constants import (
     CHORD_TONES,
+    DOMINANT_SCALES,
     NOTE_TO_PC,
     QUALITY_TO_SCALE,
     SCALES,
@@ -56,7 +57,8 @@ def _slash_sus4_effective(chord: ChordEvent) -> tuple[int, str] | None:
 
 def _resolve_extension_scale(quality: str, extensions: list[str]) -> str | None:
     """Return a scale name when parenthesized extensions override the default.
-
+    
+    Also overrides the ii chord if it's actually a minmaj7 (Nefertiti).
     Only applies to dominant ``7`` chords. Returns *None* if no override.
     """
     if quality == "minmaj7":
@@ -205,6 +207,12 @@ def resolve_scale(
             and prev_chord.quality.startswith("maj")
             and (root_pc - NOTE_TO_PC[prev_chord.root]) % 12 == 5):
         return "lydian"
+
+    # Rule 6: hdim7 not followed by a dominant 7 → locrian_nat9 (not ii°7 in ii°-V context)
+    if (current_chord.quality.startswith("hdim")
+            and not (next_chord is not None
+                 and QUALITY_TO_SCALE.get(next_chord.quality) in DOMINANT_SCALES)):
+        return "locrian_nat9"
 
     # Priority 3: default quality lookup
     return QUALITY_TO_SCALE.get(current_chord.quality, "ionian")

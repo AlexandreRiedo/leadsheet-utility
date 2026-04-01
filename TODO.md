@@ -1,3 +1,2 @@
 # Harmony module
-- Inner Urge 
-    - Add locrian nat9 to be used if the next chord of a hdim7 is not a dominant
+- Edit SPEC.md and SKILL.md to take note of the slash chord common 7sus4 notation, and of the locrian nat9 rule

@@ -12,6 +12,7 @@ SCALES: dict[str, tuple[int, ...]] = {
     "locrian_nat6":     (0, 1, 3, 5, 6, 9, 10),
     "phrygian_dom":     (0, 1, 4, 5, 7, 8, 10),
     "melodic_minor":    (0, 2, 3, 5, 7, 9, 11),
+    "locrian_nat9":     (0, 2, 3, 5, 6, 8, 10),
     "lydian_dominant":  (0, 2, 4, 6, 7, 9, 10),
     "altered":          (0, 1, 3, 4, 6, 8, 10),
     "half_whole_dim":   (0, 1, 3, 4, 6, 7, 9, 10),
@@ -90,3 +91,6 @@ QUALITY_TO_SCALE: dict[str, str] = {
     "dim7":    "whole_half_dim",
     "aug":     "whole_tone",
 }
+
+# Scale names considered dominant-function for contextual half-diminished checks.
+DOMINANT_SCALES: set[str] = {"mixolydian", "lydian_dominant", "phrygian_dom", "altered"}

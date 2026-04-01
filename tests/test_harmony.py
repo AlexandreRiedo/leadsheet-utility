@@ -84,7 +84,7 @@ class TestDefaultQualityToScale:
         ("min6",    "dorian"),
         ("min9",    "dorian"),
         ("minmaj7", "melodic_minor"),
-        ("hdim7",   "locrian_nat6"),
+        ("hdim7",   "locrian_nat9"), # Without the context of a following 7, it should use the locrian_nat9
         ("dim7",    "whole_half_dim"),
         ("aug",     "whole_tone"),
     ])
