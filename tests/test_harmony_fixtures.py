@@ -62,6 +62,23 @@ _KNOWN_SCALE_FAILURES: dict[tuple[str, float], str] = {
 # Helpers
 # ---------------------------------------------------------------------------
 
+# Canonical flat spellings for display (pitch class → note name)
+_PC_NAME = {
+    0: "C",
+    1: "Db",
+    2: "D",
+    3: "Eb",
+    4: "E",
+    5: "F",
+    6: "Gb",
+    7: "G",
+    8: "Ab",
+    9: "A",
+    10: "Bb",
+    11: "B",
+}
+
+
 def _names_to_pcs(names: list[str]) -> frozenset[int]:
     return frozenset(NOTE_TO_PC[n] for n in names)
 
@@ -70,9 +87,15 @@ def _pcs_of(midi_list: list[int]) -> frozenset[int]:
     return frozenset(n % 12 for n in midi_list)
 
 
+def _fmt(pcs: frozenset[int]) -> str:
+    """Render a pitch-class set as space-separated note names."""
+    return "  ".join(_PC_NAME[pc] for pc in sorted(pcs))
+
+
 # ---------------------------------------------------------------------------
 # Module-scoped fixture: parse + analyze each piece once
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture(scope="module")
 def analyzed_leadsheets() -> dict[str, dict[float, object]]:
@@ -89,6 +112,7 @@ def analyzed_leadsheets() -> dict[str, dict[float, object]]:
 # Build parametrize cases
 # ---------------------------------------------------------------------------
 
+
 def _fixture_cases() -> list:
     cases = []
     for stem in PIECES:
@@ -96,7 +120,9 @@ def _fixture_cases() -> list:
         entries = json.loads(path.read_text(encoding="utf-8"))
         for entry in entries:
             beat = entry["start_beat"]
-            chord_label = entry["chord"].replace(":", "_").replace("(", "").replace(")", "")
+            chord_label = (
+                entry["chord"].replace(":", "_").replace("(", "").replace(")", "")
+            )
             case_id = f"{stem}@{beat}_{chord_label}"
             cases.append(pytest.param(stem, entry, id=case_id))
     return cases
@@ -105,6 +131,7 @@ def _fixture_cases() -> list:
 # ---------------------------------------------------------------------------
 # Tests
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.parametrize("piece,entry", _fixture_cases())
 def test_scale_notes(piece: str, entry: dict, analyzed_leadsheets):
@@ -115,9 +142,12 @@ def test_scale_notes(piece: str, entry: dict, analyzed_leadsheets):
     chord = analyzed_leadsheets[piece][entry["start_beat"]]
     expected = _names_to_pcs(entry["expected_scale_notes"])
     actual = _pcs_of(chord.scale_notes)
+    print(f"\n  produced: {_fmt(actual)}")
+    print(f"  expected: {_fmt(expected)}")
     assert actual == expected, (
-        f"{entry['chord']} (beat {entry['start_beat']}): "
-        f"scale {actual} != expected {expected}"
+        f"{entry['chord']} beat {entry['start_beat']}\n"
+        f"  produced: {_fmt(actual)}\n"
+        f"  expected: {_fmt(expected)}"
     )
 
 
@@ -126,9 +156,12 @@ def test_chord_tones(piece: str, entry: dict, analyzed_leadsheets):
     chord = analyzed_leadsheets[piece][entry["start_beat"]]
     expected = _names_to_pcs(entry["expected_chord_tones"])
     actual = _pcs_of(chord.chord_tones)
+    print(f"\n  produced: {_fmt(actual)}")
+    print(f"  expected: {_fmt(expected)}")
     assert actual == expected, (
-        f"{entry['chord']} (beat {entry['start_beat']}): "
-        f"chord tones {actual} != expected {expected}"
+        f"{entry['chord']} beat {entry['start_beat']}\n"
+        f"  produced: {_fmt(actual)}\n"
+        f"  expected: {_fmt(expected)}"
     )
 
 
@@ -137,7 +170,10 @@ def test_guide_tones(piece: str, entry: dict, analyzed_leadsheets):
     chord = analyzed_leadsheets[piece][entry["start_beat"]]
     expected = _names_to_pcs(entry["expected_guide_tones"])
     actual = _pcs_of(chord.guide_tones)
+    print(f"\n  produced: {_fmt(actual)}")
+    print(f"  expected: {_fmt(expected)}")
     assert actual == expected, (
-        f"{entry['chord']} (beat {entry['start_beat']}): "
-        f"guide tones {actual} != expected {expected}"
+        f"{entry['chord']} beat {entry['start_beat']}\n"
+        f"  produced: {_fmt(actual)}\n"
+        f"  expected: {_fmt(expected)}"
     )
