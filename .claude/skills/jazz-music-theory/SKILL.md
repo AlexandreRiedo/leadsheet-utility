@@ -96,7 +96,6 @@ Several important jazz scales are modes of the melodic minor scale:
 | Mode | Parent Relationship | Used Over |
 |------|-------------------|-----------|
 | Melodic minor | 1st mode | minmaj7 (alternative — brighter, no b6) |
-| Phrygian dominant | 5th mode of harmonic minor | V7 → minor |
 | Lydian dominant | 4th mode of melodic minor | Tritone subs, 7(#11) |
 | Altered | 7th mode of melodic minor | V7(#9), V7(b9,b13) |
 | Locrian natural 2 | 6th mode of melodic minor | hdim7 (alternative; has natural 2/9 but b13, unlike Locrian ♮6) |
@@ -257,17 +256,17 @@ Secondary dominants (7 chords within the chain that resolve to a minor chord) ge
 
 **Why**: This is a descending-fifths cycle — the most common harmonic motion in jazz. Recognizing the full chain (not just isolated ii-V pairs) helps identify secondary dominants and confirms the key center for all chords.
 
-**Detection**: Starting from a ii-V pair (Rule 3), walk backwards through preceding chords. Each preceding chord is part of the chain if `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND `prev_chord.quality.startswith("min")` or `prev_chord.quality.startswith("7")`.
+**Detection**: Identify a ii-V pair (a `min*` chord followed by a `7*` chord with roots a P4 apart), then walk backwards. Each preceding chord is part of the chain if `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND `prev_chord.quality.startswith("min")` or `prev_chord.quality.startswith("7")`.
 
 ### Rule 4: I-vi-ii-V Turnaround
 
-**Pattern**: `W:maj7` → `X:min7` → `Y:min7` → `Z:7` where the I chord's root is a minor 3rd above the vi chord's root, followed by a descending-fifths chain (Rule 4).
+**Pattern**: `W:maj7` → `X:min7` → `Y:min7` → `Z:7` where the I chord's root is a minor 3rd above the vi chord's root, followed by a descending-fifths chain (Rule 3).
 
 ```
 C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
 ```
 
-**Scale**: Same key-center logic as Rule 4. The I chord confirms the key unambiguously:
+**Scale**: Same key-center logic as Rule 3. The I chord confirms the key unambiguously:
 
 | Degree | Example (in C) | Scale | Layer 1 default |
 |--------|----------------|-------|-----------------|
@@ -278,7 +277,7 @@ C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
 
 **Why**: The I-vi-ii-V turnaround is one of the most common progressions in jazz standards. The I chord anchors the key center, making it the strongest confirmation that vi should get Aeolian (not the default Dorian).
 
-**Detection**: A Rule 4 chain is preceded by a chord where `prev_chord.quality.startswith("maj")` AND `(prev_chord.root_pc - current_chord.root_pc) % 12 == 3`. The I → vi root motion is a minor 3rd down (3 semitones), unlike the P4 motion within the chain.
+**Detection**: A Rule 3 chain is preceded by a chord where `prev_chord.quality.startswith("maj")` AND `(prev_chord.root_pc - current_chord.root_pc) % 12 == 3`. The I → vi root motion is a minor 3rd down (3 semitones), unlike the P4 motion within the chain.
 
 ### Rule 5: IV Chord in Major Context
 
@@ -288,7 +287,7 @@ C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
 
 **Why**: The #4 of Lydian avoids the clash between the natural 4 and the major 3rd of the chord. When a maj7 chord is clearly functioning as a IV chord, Lydian is the idiomatic jazz choice.
 
-**Detection**: If `prev_chord` root is a 5th below (i.e., current root minus prev root = 5 semitones), and both are maj7, the current chord is likely IV.
+**Detection**: `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND both `prev_chord.quality.startswith("maj")` AND `current_chord.quality.startswith("maj")`.
 
 ### Resolution Priority
 
@@ -453,7 +452,7 @@ BASS = "/" ROOT
 | `sus` | suspended | `sus4`, `sus2`, `sus` |
 | `7`, `9`, `11`, `13` | dominant | `7`, `9`, `7sus4`, `13` |
 
-Check prefixes in the order listed — `hdim` before `min` (since `hdim` also starts with... actually it doesn't, but keep `hdim` first to avoid any future ambiguity). Within a family, use the full quality string to look up the exact default scale from Layer 1; fall back to the family's base quality if no exact match.
+No prefix collisions exist in the current set, but check in the order listed for clarity. Within a family, use the full quality string to look up the exact default scale from Layer 1; fall back to the family's base quality if no exact match.
 
 ### Enharmonic Normalization
 
@@ -466,7 +465,7 @@ These patterns appear frequently in the lead sheet corpus and inform context-awa
 | Progression | Example | Key Insight |
 |-------------|---------|-------------|
 | ii-V-I major | Dm7 → G7 → Cmaj7 | G7 gets Mixolydian |
-| ii-V-i minor | Dm7b5 → G7 → Cm7 | G7 gets Phrygian dominant |
+| ii-V-i minor | D:hdim7 → G:7 → C:min7 | G:7 gets Phrygian dominant |
 | I-vi-ii-V | Cmaj7 → Am7 → Dm7 → G7 | Am7=Aeolian, all in C major |
 | iii-vi-ii-V | Em7 → Am7 → Dm7 → G7 | Em7=Phrygian, Am7=Aeolian, all in C major |
 | Tritone sub | Dm7 → Db7 → Cmaj7 | Db7 gets Lydian dominant |
