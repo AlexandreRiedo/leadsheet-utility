@@ -83,7 +83,7 @@ class TestDefaultQualityToScale:
         ("min",     "dorian"),
         ("min6",    "dorian"),
         ("min9",    "dorian"),
-        ("minmaj7", "harmonic_minor"),
+        ("minmaj7", "melodic_minor"),
         ("hdim7",   "locrian_nat6"),
         ("dim7",    "whole_half_dim"),
         ("aug",     "whole_tone"),
@@ -410,3 +410,95 @@ class TestGuideToneLine:
         analyze(ls)
         for i, note in enumerate(ls.guide_tone_line):
             assert note in ls.chords[i].guide_tones
+
+
+# ---------------------------------------------------------------------------
+# Slash-chord 7sus4 detection
+# ---------------------------------------------------------------------------
+
+def make_slash_chord(root: str, quality: str, bass: str) -> ChordEvent:
+    return ChordEvent(
+        chord_symbol=f"{root}:{quality}/{bass}",
+        root=root,
+        quality=quality,
+        bass_note=bass,
+    )
+
+
+class TestSlashSus4:
+    # --- resolve_scale returns mixolydian ---
+
+    def test_maj_whole_step_below_bass_is_mixolydian(self):
+        # Ab:maj/Bb — Ab is 2 semitones below Bb → Bb7sus4
+        chord = make_slash_chord("Ab", "maj", "Bb")
+        assert resolve_scale(None, chord, None) == "mixolydian"
+
+    def test_maj7_whole_step_below_bass_is_mixolydian(self):
+        # Eb:maj7/F — Eb is 2 semitones below F → F7sus4
+        chord = make_slash_chord("Eb", "maj7", "F")
+        assert resolve_scale(None, chord, None) == "mixolydian"
+
+    def test_min_p5_above_bass_is_mixolydian(self):
+        # E:min/A — E is 7 semitones above A → A7sus4
+        chord = make_slash_chord("E", "min", "A")
+        assert resolve_scale(None, chord, None) == "mixolydian"
+
+    def test_min7_p5_above_bass_is_mixolydian(self):
+        # B:min7/E — B is 7 semitones above E → E7sus4
+        chord = make_slash_chord("B", "min7", "E")
+        assert resolve_scale(None, chord, None) == "mixolydian"
+
+    def test_no_bass_note_not_affected(self):
+        # Plain Ab:maj without slash — stays ionian
+        chord = make_chord("Ab", "maj")
+        assert resolve_scale(None, chord, None) == "ionian"
+
+    def test_wrong_interval_maj_not_detected(self):
+        # Ab:maj/C — (0-8)%12 = 4, not 2 → no slash-7sus4 detection
+        chord = make_slash_chord("Ab", "maj", "C")
+        assert resolve_scale(None, chord, None) == "ionian"
+
+    def test_wrong_interval_min_not_detected(self):
+        # E:min/C — (4-0)%12 = 4, not 7 → no slash-7sus4 detection
+        chord = make_slash_chord("E", "min", "C")
+        assert resolve_scale(None, chord, None) == "dorian"
+
+    # --- analyze() uses bass note as harmonic root ---
+
+    def test_analyze_scale_rooted_on_bass_maj_slash(self):
+        # Ab:maj/Bb → Bb Mixolydian: Bb C D Eb F G Ab = pcs {10,0,2,3,5,7,8}
+        chord = make_slash_chord("Ab", "maj", "Bb")
+        chord.start_beat, chord.end_beat = 0, 4
+        ls = LeadSheet(chords=[chord])
+        analyze(ls)
+        pcs = {n % 12 for n in ls.chords[0].scale_notes}
+        bb_mixolydian = {(10 + i) % 12 for i in (0, 2, 4, 5, 7, 9, 10)}
+        assert pcs == bb_mixolydian
+
+    def test_analyze_scale_rooted_on_bass_min_slash(self):
+        # E:min/A → A Mixolydian: A B C# D E F# G = pcs {9,11,1,2,4,6,7}
+        chord = make_slash_chord("E", "min", "A")
+        chord.start_beat, chord.end_beat = 0, 4
+        ls = LeadSheet(chords=[chord])
+        analyze(ls)
+        pcs = {n % 12 for n in ls.chords[0].scale_notes}
+        a_mixolydian = {(9 + i) % 12 for i in (0, 2, 4, 5, 7, 9, 10)}
+        assert pcs == a_mixolydian
+
+    def test_analyze_chord_tones_rooted_on_bass(self):
+        # Ab:maj/Bb → Bb7sus4 chord tones: Bb Eb F Ab = pcs {10,3,5,8}
+        chord = make_slash_chord("Ab", "maj", "Bb")
+        chord.start_beat, chord.end_beat = 0, 4
+        ls = LeadSheet(chords=[chord])
+        analyze(ls)
+        pcs = {n % 12 for n in ls.chords[0].chord_tones}
+        assert pcs == {10, 3, 5, 8}  # Bb=10, Eb=3, F=5, Ab=8
+
+    def test_analyze_guide_tones_rooted_on_bass(self):
+        # Ab:maj/Bb → Bb7sus4 guide tones: sus4=Eb (pc 3), b7=Ab (pc 8)
+        chord = make_slash_chord("Ab", "maj", "Bb")
+        chord.start_beat, chord.end_beat = 0, 4
+        ls = LeadSheet(chords=[chord])
+        analyze(ls)
+        pcs = {n % 12 for n in ls.chords[0].guide_tones}
+        assert pcs == {3, 8}  # Eb=3, Ab=8

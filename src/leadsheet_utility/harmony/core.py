@@ -25,6 +25,32 @@ def get_scale_midi_notes(
 
 
 # ---------------------------------------------------------------------------
+# Slash-chord 7sus4 detection
+# ---------------------------------------------------------------------------
+
+def _slash_sus4_effective(chord: ChordEvent) -> tuple[int, str] | None:
+    """If *chord* is a slash-chord spelling of a 7sus4, return (bass_pc, '7sus4').
+
+    Two patterns are recognised:
+    - **Major upper structure a whole step below the bass** (2 semitones):
+      e.g. ``Ab:maj/Bb`` → ``Bb7sus4`` (Ab is the b7, C is the 9, Eb is the sus4)
+    - **Minor upper structure a perfect fifth above the bass** (7 semitones):
+      e.g. ``E:min/A`` → ``A7sus4`` (E is the 5th, G is the b7, B is the 9)
+
+    Returns *None* when the chord has no bass note or does not match either pattern.
+    """
+    if chord.bass_note is None:
+        return None
+    root_pc = NOTE_TO_PC[chord.root]
+    bass_pc = NOTE_TO_PC[chord.bass_note]
+    if (bass_pc - root_pc) % 12 == 2:
+        return (bass_pc, "7sus4")
+    if chord.quality.startswith("min") and (root_pc - bass_pc) % 12 == 7:
+        return (bass_pc, "7sus4")
+    return None
+
+
+# ---------------------------------------------------------------------------
 # Extension override (Priority 1)
 # ---------------------------------------------------------------------------
 
@@ -151,6 +177,11 @@ def resolve_scale(
     if ext_scale:
         return ext_scale
 
+    # Slash-chord 7sus4 (e.g. Ab:maj/Bb → Bb Mixolydian)
+    if _slash_sus4_effective(current_chord):
+        return "mixolydian"
+
+    # Priority 2: Rule based overrides (usually based on the before/after chord context)
     # Rule 1: V7 resolving to minor  (e.g. G:7 → C:min7 → phrygian_dom)
     if (current_chord.quality == "7"
             and next_chord is not None
@@ -273,32 +304,39 @@ def analyze(lead_sheet: LeadSheet) -> LeadSheet:
         prev_chord = chords[i - 1] if i > 0 else None
         next_chord = chords[i + 1] if i < len(chords) - 1 else None
 
+        # Slash-chord 7sus4: use bass note as the harmonic root for all MIDI generation
+        slash_sus4 = _slash_sus4_effective(chord)
+        if slash_sus4:
+            effective_root_pc, effective_quality = slash_sus4
+        else:
+            effective_root_pc, effective_quality = root_pc, chord.quality
+
         # Resolve scale
         scale_name = resolve_scale(prev_chord, chord, next_chord, chain_overrides.get(i))
         scale_intervals = SCALES[scale_name]
-        chord.scale_notes = get_scale_midi_notes(root_pc, scale_intervals)
+        chord.scale_notes = get_scale_midi_notes(effective_root_pc, scale_intervals)
 
         # Chord tones
-        ct_intervals = CHORD_TONES.get(chord.quality)
+        ct_intervals = CHORD_TONES.get(effective_quality)
         if ct_intervals is None:
-            if chord.quality.startswith("maj"):
+            if effective_quality.startswith("maj"):
                 ct_intervals = CHORD_TONES["maj7"]
-            elif chord.quality.startswith("min"):
+            elif effective_quality.startswith("min"):
                 ct_intervals = CHORD_TONES["min7"]
-            elif chord.quality.startswith("hdim"):
+            elif effective_quality.startswith("hdim"):
                 ct_intervals = CHORD_TONES["hdim7"]
-            elif chord.quality.startswith("dim"):
+            elif effective_quality.startswith("dim"):
                 ct_intervals = CHORD_TONES["dim7"]
             else:
                 ct_intervals = CHORD_TONES["7"]
-        chord.chord_tones = get_scale_midi_notes(root_pc, ct_intervals)
+        chord.chord_tones = get_scale_midi_notes(effective_root_pc, ct_intervals)
 
         # Guide tones (3rd and 7th)
-        gt_intervals = _guide_tone_intervals(chord.quality)
-        chord.guide_tones = get_scale_midi_notes(root_pc, gt_intervals)
+        gt_intervals = _guide_tone_intervals(effective_quality)
+        chord.guide_tones = get_scale_midi_notes(effective_root_pc, gt_intervals)
 
         # Available tensions: scale notes whose PC is not a chord tone
-        ct_pcs = {(root_pc + iv) % 12 for iv in ct_intervals}
+        ct_pcs = {(effective_root_pc + iv) % 12 for iv in ct_intervals}
         chord.available_tensions = [n for n in chord.scale_notes if n % 12 not in ct_pcs]
 
     lead_sheet.guide_tone_line = _compute_guide_tone_line(chords)

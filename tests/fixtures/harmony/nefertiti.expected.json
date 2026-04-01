@@ -80,8 +80,8 @@
     "start_beat": 44.0,
     "chord": "Db:add9/Eb",
     "expected_scale_notes": ["Eb", "F", "G", "Ab", "Bb", "C", "Db"],
-    "expected_chord_tones": ["Eb", "F", "Ab", "Db"],
-    "expected_guide_tones": ["F", "Db"]
+    "expected_chord_tones": ["Eb", "Ab", "Bb", "Db"],
+    "expected_guide_tones": ["Ab", "Db"]
   },
   {
     "start_beat": 48.0,
