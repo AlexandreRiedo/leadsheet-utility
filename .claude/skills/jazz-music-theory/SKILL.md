@@ -206,7 +206,7 @@ These rules override the default scale when the harmonic context is clear. Each 
 
 ### Rule 1: V7 Resolving to Minor
 
-**Pattern**: `X:7` → `Y:min7` (or `Y:minmaj7`) where X is a 5th above Y.
+**Pattern**: `X:7` → `Y:<minor>` where X is a 5th above Y (i.e. `(X_root - Y_root) % 12 == 7`), and `<minor>` is any quality starting with `min` (i.e. `min7`, `min`, `minmaj7`, `min6`, `min9`, `min11`, `min13`, etc.).
 
 **Scale**: Phrygian dominant (5th mode of harmonic minor)
 
@@ -217,7 +217,7 @@ G:7 → C:min7   →  G Phrygian dominant (G Ab B C D Eb F)
                    = C harmonic minor starting on G
 ```
 
-**Detection**: `next_chord.root` is a 5th below (7 semitones) `current_chord.root`, AND `next_chord.quality` is `min7` or `minmaj7` or `min`.
+**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 7` AND `next_chord.quality.startswith("min")`.
 
 ### Rule 2: Tritone Substitution
 
@@ -232,30 +232,53 @@ Db:7 → C:maj7  →  Db Lydian dominant (Db Eb F G Ab Bb Cb)
                    The G (= #11 of Db) is the 5th of C, linking the resolution
 ```
 
-**Detection**: `(current_root - next_root) % 12 == 1` AND `current_quality == "7"`.
+**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 1` AND `current_chord.quality.startswith("7")`.
 
-### Rule 3: ii-V Pair
+### Rule 3: Extended ii-V Chain (iii-vi-ii-V)
 
-**Pattern**: `X:min7` → `Y:7` where Y root is a 4th above X (or equivalently, a 5th below).
-
-**Scale**: Both chords share the key center of the V7's resolution target.
-
-**Why**: In a ii-V-I, the ii and V belong to the same key. The min7 is Dorian (which is the default anyway), but recognizing the pair helps when the V7 needs a non-default scale (e.g., if it resolves to minor).
+**Pattern**: A chain of chords whose roots each ascend by P4 (5 semitones), ending with a ii-V pair. Common forms:
 
 ```
-D:min7 → G:7 → C:maj7   →  All in C major
-A:min7 → D:7 → G:min7   →  D:7 gets Phrygian dominant (ii-V in G minor)
+vi-ii-V:     A:min7 → D:min7 → G:7        (roots: 9→2→7, each +5 mod 12)
+iii-vi-ii-V: E:min7 → A:min7 → D:min7 → G:7
+iii-VI7-ii-V: E:min7 → A:7 → D:min7 → G:7  (A:7 is a secondary dominant V/ii)
 ```
 
-**Detection**: `(next_root - current_root) % 12 == 5` AND `current_quality == "min7"` AND `next_quality == "7"`.
+**Scale**: All chords in the chain share the key center of the final resolution target. Each chord gets the diatonic mode for its degree — this **overrides the Layer 1 default of Dorian** for iii and vi:
 
-### Rule 4: Diminished Passing Chord
+| Degree | Example (in C) | Scale | Layer 1 default |
+|--------|----------------|-------|-----------------|
+| iii | E:min7 | Phrygian | ~~Dorian~~ |
+| vi | A:min7 | Aeolian | ~~Dorian~~ |
+| ii | D:min7 | Dorian | Dorian (no change) |
+| V | G:7 | Mixolydian | Mixolydian (no change) |
 
-**Pattern**: `X:dim7` appears between two chords whose roots are a whole step apart.
+Secondary dominants (7 chords within the chain that resolve to a minor chord) get Phrygian dominant via Rule 1.
 
-**Scale**: Whole-half diminished (the default for dim7 anyway)
+**Why**: This is a descending-fifths cycle — the most common harmonic motion in jazz. Recognizing the full chain (not just isolated ii-V pairs) helps identify secondary dominants and confirms the key center for all chords.
 
-**Why**: Diminished chords often function as chromatic connectors. The whole-half diminished scale works because dim7 is symmetric — every note is 3 semitones apart, so any of the 4 chord tones can be heard as the root.
+**Detection**: Starting from a ii-V pair (Rule 3), walk backwards through preceding chords. Each preceding chord is part of the chain if `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND `prev_chord.quality.startswith("min")` or `prev_chord.quality.startswith("7")`.
+
+### Rule 4: I-vi-ii-V Turnaround
+
+**Pattern**: `W:maj7` → `X:min7` → `Y:min7` → `Z:7` where the I chord's root is a minor 3rd above the vi chord's root, followed by a descending-fifths chain (Rule 4).
+
+```
+C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
+```
+
+**Scale**: Same key-center logic as Rule 4. The I chord confirms the key unambiguously:
+
+| Degree | Example (in C) | Scale | Layer 1 default |
+|--------|----------------|-------|-----------------|
+| I | C:maj7 | Ionian | Ionian (no change) |
+| vi | A:min7 | Aeolian | ~~Dorian~~ |
+| ii | D:min7 | Dorian | Dorian (no change) |
+| V | G:7 | Mixolydian | Mixolydian (no change) |
+
+**Why**: The I-vi-ii-V turnaround is one of the most common progressions in jazz standards. The I chord anchors the key center, making it the strongest confirmation that vi should get Aeolian (not the default Dorian).
+
+**Detection**: A Rule 4 chain is preceded by a chord where `prev_chord.quality.startswith("maj")` AND `(prev_chord.root_pc - current_chord.root_pc) % 12 == 3`. The I → vi root motion is a minor 3rd down (3 semitones), unlike the P4 motion within the chain.
 
 ### Rule 5: IV Chord in Major Context
 
