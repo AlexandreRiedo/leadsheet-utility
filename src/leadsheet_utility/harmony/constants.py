@@ -85,7 +85,7 @@ QUALITY_TO_SCALE: dict[str, str] = {
     "min9":    "dorian",
     "min11":   "dorian",
     "min13":   "dorian",
-    "minmaj7": "harmonic_minor",
+    "minmaj7": "melodic_minor",
     "hdim7":   "locrian_nat6",
     "dim7":    "whole_half_dim",
     "aug":     "whole_tone",

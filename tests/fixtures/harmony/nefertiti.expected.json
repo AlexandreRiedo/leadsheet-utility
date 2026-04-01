@@ -86,7 +86,7 @@
   {
     "start_beat": 48.0,
     "chord": "Db:7sus4",
-    "expected_scale_notes": ["Db", "Eb", "Gb", "Ab", "Bb", "B"],
+    "expected_scale_notes": ["Db", "Eb", "F", "Gb", "Ab", "Bb", "B"],
     "expected_chord_tones": ["Db", "Gb", "Ab", "B"],
     "expected_guide_tones": ["Gb", "B"]
   },

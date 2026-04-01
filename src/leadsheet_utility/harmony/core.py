@@ -33,6 +33,8 @@ def _resolve_extension_scale(quality: str, extensions: list[str]) -> str | None:
 
     Only applies to dominant ``7`` chords. Returns *None* if no override.
     """
+    if quality == "minmaj7":
+        return "melodic_minor"
     if quality != "7" or not extensions:
         return None
     ext = set(extensions)
