@@ -81,7 +81,7 @@ def _fmt(pcs: frozenset[int], root_pc: int = 0) -> str:
 
 @pytest.fixture(scope="module")
 def analyzed_leadsheets() -> dict[str, dict[float, object]]:
-    """Return {piece_stem: {start_beat: ChordEvent}} for all three pieces."""
+    """Return {piece_stem: {start_beat: ChordEvent}} for all pieces."""
     result: dict[str, dict[float, object]] = {}
     for stem in PIECES:
         ls = parse_leadsheet(DATA_DIR / f"{stem}.tsv")

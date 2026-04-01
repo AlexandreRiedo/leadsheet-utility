@@ -159,7 +159,7 @@ def resolve_scale(
         return "phrygian_dom"
 
     # Rule 2: tritone substitution  (e.g. Db:7 → C:maj7 → lydian_dominant)
-    if (current_chord.quality.startswith("7")
+    if (current_chord.quality == "7"
             and next_chord is not None
             and (root_pc - NOTE_TO_PC[next_chord.root]) % 12 == 1):
         return "lydian_dominant"
