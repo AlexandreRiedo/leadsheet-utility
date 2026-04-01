@@ -236,6 +236,23 @@ No prefix collisions exist in the current set, but check in the order listed for
 
 The parser must handle both sharp and flat spellings. Both `F#:min7` and `Gb:min7` refer to the same pitch class (6). Normalize to a canonical spelling when computing pitch classes, but preserve the original spelling for display.
 
+### Slash-Chord Spellings of 7sus4
+
+Two common notational shorthands write a 7sus4 as a slash chord. The parser detects these and reclassifies them as `7sus4` rooted on the bass note:
+
+| Written | Detected as | Interval rule |
+|---------|------------|---------------|
+| `Ab:maj/Bb` | `Bb:7sus4` | maj upper structure, bass is a whole step below root (2 semitones up from root to bass) |
+| `Eb:maj7/F` | `F:7sus4` | same pattern (maj7 variant) |
+| `E:min/A` | `A:7sus4` | min upper structure, root is a perfect 5th above bass (7 semitones up) |
+| `B:min7/E` | `E:7sus4` | same pattern (min7 variant) |
+
+**Detection rules** (applied after extracting the slash bass note):
+- If `(bass_pc - root_pc) % 12 == 2` AND quality does NOT start with `"7"` → reclassify as `(bass_pc, "7sus4")`. The `not startswith("7")` guard prevents misclassifying `E:7/F#` as F# dominant.
+- If `quality.startswith("min")` AND `(root_pc - bass_pc) % 12 == 7` → reclassify as `(bass_pc, "7sus4")`.
+
+Scale and chord tones are then computed with the **bass note as the harmonic root** using Mixolydian.
+
 ### Metadata Sidecar (Optional)
 
 Since the TSV format contains only chord data, metadata is stored in a companion `.meta.json` file with the same base name:
@@ -258,19 +275,20 @@ If no `.meta.json` exists, the system uses defaults (4/4, tempo 120, unknown tit
 ```python
 @dataclass
 class ChordEvent:
-    chord_symbol: str        # raw from file, e.g. "F:min7"
-    root: str                # "F"
-    quality: str             # "min7"
-    extensions: list[str]    # e.g. ["b9"], ["#9"], [] if none
-    bass_note: str | None    # slash chord bass, or None
-    start_beat: float        # absolute beat position (0-indexed)
-    end_beat: float          # absolute beat position where chord ends
-    duration_beats: float    # end_beat - start_beat
-    bar_number: int          # derived: floor(start_beat / beats_per_bar) + 1
-    beat_in_bar: float       # derived: start_beat % beats_per_bar
-    scale_notes: list[int]   # MIDI note numbers for the chord-scale (full 88-key range, MIDI 21–108)
-    chord_tones: list[int]   # MIDI note numbers of chord tones (R, 3, 5, 7)
-    guide_tones: list[int]   # typically 3rd and 7th
+    chord_symbol: str           # raw from file, e.g. "F:min7"
+    root: str                   # "F"
+    quality: str                # "min7"
+    extensions: list[str]       # e.g. ["b9"], ["#9"], [] if none
+    bass_note: str | None       # slash chord bass, or None
+    start_beat: float           # absolute beat position (0-indexed)
+    end_beat: float             # absolute beat position where chord ends
+    duration_beats: float       # end_beat - start_beat
+    bar_number: int             # derived: floor(start_beat / beats_per_bar) + 1
+    beat_in_bar: float          # derived: start_beat % beats_per_bar
+    scale_notes: list[int]      # MIDI note numbers for the chord-scale (full 88-key range, MIDI 21–108)
+    chord_tones: list[int]      # MIDI note numbers of chord tones (R, 3, 5, 7)
+    guide_tones: list[int]      # 3rd and 7th (MIDI 21–108)
+    available_tensions: list[int]  # scale tones that are not chord tones (MIDI 21–108)
 
 @dataclass
 class LeadSheet:
@@ -281,8 +299,9 @@ class LeadSheet:
     default_tempo: int
     form_repeats: int
     chords: list[ChordEvent]
-    total_beats: float               # end_beat of the last chord
-    total_bars: int                  # derived from total_beats / beats_per_bar
+    total_beats: float                # end_beat of the last chord
+    total_bars: int                   # derived from total_beats / beats_per_bar
+    guide_tone_line: list[int]        # voice-led guide tone (MIDI) per chord, parallel to chords
 ```
 
 ---
@@ -327,6 +346,7 @@ SCALES = {
     "locrian_nat6":        (0, 1, 3, 5, 6, 9, 10),
     "phrygian_dom":        (0, 1, 4, 5, 7, 8, 10),
     "melodic_minor":       (0, 2, 3, 5, 7, 9, 11),
+    "locrian_nat9":        (0, 2, 3, 5, 6, 8, 10),
     "lydian_dominant":     (0, 2, 4, 6, 7, 9, 10),
     "altered":             (0, 1, 3, 4, 6, 8, 10),
     "half_whole_dim":      (0, 1, 3, 4, 6, 7, 9, 10),
@@ -358,7 +378,7 @@ Key scale relationships:
 | Melodic minor | 1st mode | minmaj7 (alternative — brighter, no b6) |
 | Lydian dominant | 4th mode of melodic minor | Tritone subs, 7(#11) |
 | Altered | 7th mode of melodic minor | V7(#9), V7(b9,b13) |
-| Locrian natural 2 | 6th mode of melodic minor | hdim7 (alternative; has natural 2/9 but b13, unlike Locrian ♮6) |
+| Locrian ♮9 (`locrian_nat9`) | 6th mode of melodic minor | hdim7 standalone (natural 9 but b5 and b13; used when hdim7 is NOT ii° of a minor ii°-V) |
 
 ##### Generating Scale Notes
 
@@ -443,7 +463,7 @@ Db:7 → C:maj7  →  Db Lydian dominant (Db Eb F G Ab Bb Cb)
                    The G (= #11 of Db) is the 5th of C, linking the resolution
 ```
 
-**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 1` AND `current_chord.quality.startswith("7")`.
+**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 1` AND `current_chord.quality == "7"` (exact match — excludes `7sus4` slash-chord spellings).
 
 ##### Rule 3: Extended ii-V Chain (iii-vi-ii-V)
 
@@ -494,6 +514,21 @@ C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
 **Scale**: Lydian (instead of default Ionian). The #4 of Lydian avoids the clash between the natural 4 and the major 3rd of the chord.
 
 **Detection**: `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND both `prev_chord.quality.startswith("maj")` AND `current_chord.quality.startswith("maj")`.
+
+##### Rule 6: Half-Diminished Standalone
+
+**Pattern**: `X:hdim7` where the next chord is NOT a dominant-function chord (its default scale is not in `{mixolydian, lydian_dominant, phrygian_dom, altered}`).
+
+**Scale**: Locrian ♮9 (`locrian_nat9`, 6th mode of melodic minor). The natural 9 (♮2) is idiomatic when the half-diminished chord is not acting as ii° in a ii°–V progression.
+
+```
+G:hdim7 (isolated) → G Locrian ♮9  (G A Bb C Db Eb F)
+G:hdim7 → C:7      → G Locrian ♮6  (via default, ii° of minor ii°-V)
+```
+
+**Contrast with default**: The default (`locrian_nat6`) has a natural 6 (natural 13), idiomatic as ii° in a minor ii°–V–i. `locrian_nat9` has a natural 9 instead, fitting a standalone or non-ii°-function context.
+
+**Detection**: `current_chord.quality.startswith("hdim")` AND NOT (`next_chord is not None` AND `QUALITY_TO_SCALE.get(next_chord.quality) in DOMINANT_SCALES`).
 
 ##### Resolution Priority
 
@@ -1142,14 +1177,12 @@ leadsheet-utility/
 │       ├── leadsheet/
 │       │   ├── __init__.py
 │       │   ├── parser.py           # Parse MIR-style .tsv chord annotation files
-│       │   ├── models.py           # ChordEvent, LeadSheet dataclasses
-│       │   └── normalizer.py       # Chord symbol parsing (ROOT:QUALITY(ext) → fields)
+│       │   └── models.py           # ChordEvent, LeadSheet dataclasses
 │       │
 │       ├── harmony/
 │       │   ├── __init__.py
-│       │   ├── analyzer.py         # Chord → scale, chord tones, guide tones
-│       │   ├── scales.py           # Scale definitions and mappings
-│       │   └── voiceleading.py     # Guide-tone line computation
+│       │   ├── core.py             # resolve_scale(), chord tones, guide tones, slash-sus4 detection
+│       │   └── constants.py        # SCALES, QUALITY_TO_SCALE, CHORD_TONES, DOMINANT_SCALES
 │       │
 │       ├── timeline/
 │       │   ├── __init__.py
@@ -1190,18 +1223,33 @@ leadsheet-utility/
 ├── data/
 │   ├── soundfonts/                 # User places .sf2 SoundFont files here
 │   │   └── .gitkeep
-│   └── leadsheets/                 # Example .tsv chord annotation files
-│       ├── all_the_things.tsv
-│       └── all_the_things.meta.json
+│   └── leadsheets/                 # 13 example lead sheets (.tsv + .meta.json pairs)
+│       ├── all_the_things_you_are.{tsv,meta.json}
+│       ├── autumn_leaves.{tsv,meta.json}
+│       ├── fly_me_to_the_moon.{tsv,meta.json}
+│       ├── inner_urge.{tsv,meta.json}
+│       ├── misty.{tsv,meta.json}
+│       ├── nefertiti.{tsv,meta.json}
+│       ├── oleo.{tsv,meta.json}
+│       ├── sandu.{tsv,meta.json}
+│       ├── satin_doll.{tsv,meta.json}
+│       ├── stella_by_starlight.{tsv,meta.json}
+│       ├── summertime.{tsv,meta.json}
+│       ├── sunny_side_of_the_street.{tsv,meta.json}
+│       ├── take_the_a_train.{tsv,meta.json}
+│       └── 26_2.{tsv,meta.json}
 │
 └── tests/
     ├── test_parser.py
     ├── test_harmony.py
-    ├── test_bass.py
-    ├── test_drums.py
-    ├── test_renderer.py          # FluidSynth offline rendering integration test
-    ├── test_exercises.py
-    └── test_timeline.py
+    ├── test_harmony_fixtures.py  # Fixture-based full-form harmony regression tests
+    ├── fixtures/
+    │   └── harmony/              # Per-tune expected JSON: scale, chord tones, guide tones per chord
+    ├── test_bass.py              # (planned)
+    ├── test_drums.py             # (planned)
+    ├── test_renderer.py          # (planned) FluidSynth offline rendering integration test
+    ├── test_exercises.py         # (planned)
+    └── test_timeline.py          # (planned)
 ```
 
 ---

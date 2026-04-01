@@ -73,6 +73,7 @@ Each scale is a tuple of semitone intervals from the root. These are the scales 
 | Locrian ♮6 | `(0,1,3,5,6,9,10)` | 1 b2 b3 4 b5 6 b7 | C Db Eb F Gb A Bb |
 | Phrygian dominant | `(0,1,4,5,7,8,10)` | 1 b2 3 4 5 b6 b7 | C Db E F G Ab Bb |
 | Melodic minor | `(0,2,3,5,7,9,11)` | 1 2 b3 4 5 6 7 | C D Eb F G A B |
+| Locrian ♮9 | `(0,2,3,5,6,8,10)` | 1 2 b3 4 b5 b6 b7 | C D Eb F Gb Ab Bb |
 | Lydian dominant | `(0,2,4,6,7,9,10)` | 1 2 3 #4 5 6 b7 | C D E F# G A Bb |
 | Altered | `(0,1,3,4,6,8,10)` | 1 b2 #2 3 #4 b6 b7 | C Db D# E F# Ab Bb |
 | Half-whole diminished | `(0,1,3,4,6,7,9,10)` | 1 b2 #2 3 #4 5 6 b7 | C Db D# E F# G A Bb |
@@ -98,7 +99,7 @@ Several important jazz scales are modes of the melodic minor scale:
 | Melodic minor | 1st mode | minmaj7 (alternative — brighter, no b6) |
 | Lydian dominant | 4th mode of melodic minor | Tritone subs, 7(#11) |
 | Altered | 7th mode of melodic minor | V7(#9), V7(b9,b13) |
-| Locrian natural 2 | 6th mode of melodic minor | hdim7 (alternative; has natural 2/9 but b13, unlike Locrian ♮6) |
+| Locrian ♮9 (`locrian_nat9`) | 6th mode of melodic minor | hdim7 standalone (natural 9 but b5 and b13; used when hdim7 is NOT ii° of a minor ii°-V) |
 
 ## 3. Chord-Scale Theory
 
@@ -231,7 +232,7 @@ Db:7 → C:maj7  →  Db Lydian dominant (Db Eb F G Ab Bb Cb)
                    The G (= #11 of Db) is the 5th of C, linking the resolution
 ```
 
-**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 1` AND `current_chord.quality.startswith("7")`.
+**Detection**: `(current_chord.root_pc - next_chord.root_pc) % 12 == 1` AND `current_chord.quality == "7"` (exact match — excludes `7sus4` slash-chord spellings from tritone sub detection).
 
 ### Rule 3: Extended ii-V Chain (iii-vi-ii-V)
 
@@ -288,6 +289,18 @@ C:maj7 → A:min7 → D:min7 → G:7   (I-vi-ii-V in C major)
 **Why**: The #4 of Lydian avoids the clash between the natural 4 and the major 3rd of the chord. When a maj7 chord is clearly functioning as a IV chord, Lydian is the idiomatic jazz choice.
 
 **Detection**: `(current_chord.root_pc - prev_chord.root_pc) % 12 == 5` AND both `prev_chord.quality.startswith("maj")` AND `current_chord.quality.startswith("maj")`.
+
+### Rule 6: Half-Diminished Standalone
+
+**Pattern**: `X:hdim7` where the next chord is NOT dominant-function (its default scale ∉ `{mixolydian, lydian_dominant, phrygian_dom, altered}`).
+
+**Scale**: Locrian ♮9 (`locrian_nat9`)
+
+**Why**: When hdim7 is not resolving to a dominant (not acting as ii° in a minor ii°–V), the natural 9 is idiomatic. Contrast:
+- `hdim7 → dominant` → Locrian ♮6 (natural 13, ii° of minor ii°-V-i)
+- `hdim7 standalone` → Locrian ♮9 (natural 9, 6th mode of melodic minor)
+
+**Detection**: `current_chord.quality.startswith("hdim")` AND `next_chord` is None or its default scale is not in `DOMINANT_SCALES`.
 
 ### Resolution Priority
 
@@ -457,6 +470,17 @@ No prefix collisions exist in the current set, but check in the order listed for
 ### Enharmonic Normalization
 
 The parser must handle both sharp and flat spellings. Both `F#:min7` and `Gb:min7` refer to the same pitch class (6). Normalize to a canonical spelling when computing pitch classes, but preserve the original spelling for display.
+
+### Slash-Chord Spellings of 7sus4
+
+Two patterns are recognized and reclassified as `7sus4` rooted on the bass note:
+
+| Pattern | Interval condition | Example | Becomes |
+|---------|--------------------|---------|---------|
+| Major upper, bass a whole step below | `(bass_pc - root_pc) % 12 == 2`, quality not `"7*"` | `Ab:maj/Bb` | `Bb:7sus4` |
+| Minor upper, root a P5 above bass | `quality.startswith("min")` AND `(root_pc - bass_pc) % 12 == 7` | `E:min/A` | `A:7sus4` |
+
+The `quality not startswith("7")` guard on the first pattern prevents mis-detecting `E:7/F#` as a dominant sus4. After reclassification, all chord tones and scale notes use the **bass note as root**, Mixolydian scale.
 
 ## 10. Common Jazz Progressions (Reference)
 
