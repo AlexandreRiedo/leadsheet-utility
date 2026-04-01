@@ -101,10 +101,3 @@ Chord symbols use colon notation: `Root:quality` with optional parenthesized ext
 Stored in `~/.leadsheet-utility/`:
 - `config.json` — SoundFont path
 - `calibration.json` — projector resolution, marker positions, homography matrix
-
-## Development Approach
-
-- **Test-Driven Development (TDD)** — write tests first, then implement. Critical for harmony analysis and walking bass correctness.
-- The `python-testing-patterns` and `python-design-patterns` skills are available for guidance.
-- **Look up docs before writing code** — use the `DocsExplorer` agent (`.claude/agents/DocsExplorer.md`) to fetch current documentation for any library or API before using it. Do not rely on training data alone; always verify against up-to-date docs.
-- SPEC.md sections contain detailed contracts, data structures, and edge cases for each module — consult them before implementing.
