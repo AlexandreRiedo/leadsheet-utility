@@ -352,7 +352,9 @@ class TestAnalyze:
             ("C", "maj7", 8, 12),
         )
         analyze(ls)
-        assert len(ls.guide_tone_line) == 3
+        assert len(ls.guide_tone_line) == 2
+        for path in ls.guide_tone_line:
+            assert len(path) == 3
 
     def test_guide_tone_line_midi_in_range(self):
         ls = _make_leadsheet(
@@ -361,8 +363,9 @@ class TestAnalyze:
             ("C", "maj7", 8, 12),
         )
         analyze(ls)
-        for note in ls.guide_tone_line:
-            assert 21 <= note <= 108
+        for path in ls.guide_tone_line:
+            for note in path:
+                assert 21 <= note <= 108
 
     def test_ii_v_i_rule1_applied(self):
         # G:7 → C:min7: G should get phrygian_dom
@@ -386,20 +389,43 @@ class TestAnalyze:
 # ---------------------------------------------------------------------------
 
 class TestGuideToneLine:
-    def test_ii_v_i_voice_leading_smooth(self):
-        """F (3rd of Dm7) → F (7th of G7) → E (3rd of Cmaj7) is the classic line."""
+    def test_two_paths_returned(self):
+        """Two paths are returned, one per guide tone (quality-dependent) of the first chord."""
         ls = _make_leadsheet(
             ("D", "min7", 0, 4),
             ("G", "7",    4, 8),
             ("C", "maj7", 8, 12),
         )
         analyze(ls)
-        line = ls.guide_tone_line
-        # Each step should be at most a minor 3rd (3 semitones) for smooth voice-leading
-        for i in range(1, len(line)):
-            assert abs(line[i] - line[i - 1]) <= 3, (
-                f"Step {i}: {line[i-1]} → {line[i]} is not smooth"
-            )
+        assert len(ls.guide_tone_line) == 2
+        # The two paths must start from different notes
+        assert ls.guide_tone_line[0][0] != ls.guide_tone_line[1][0]
+
+    def test_ii_v_i_voice_leading_smooth(self):
+        """Both paths should move smoothly (≤ 3 semitones per step)."""
+        ls = _make_leadsheet(
+            ("D", "min7", 0, 4),
+            ("G", "7",    4, 8),
+            ("C", "maj7", 8, 12),
+        )
+        analyze(ls)
+        for path in ls.guide_tone_line:
+            for i in range(1, len(path)):
+                assert abs(path[i] - path[i - 1]) <= 3, (
+                    f"Step {i}: {path[i-1]} → {path[i]} is not smooth"
+                )
+
+    def test_7sus4_starting_chord_uses_4th_and_7th(self):
+        """For 7sus4 the guide tones are the 4th and 7th, not 3rd and 7th."""
+        ls = _make_leadsheet(
+            ("G", "7sus4", 0, 4),
+            ("C", "maj7",  4, 8),
+        )
+        analyze(ls)
+        assert len(ls.guide_tone_line) == 2
+        # G7sus4 guide tones: 4th = C (PC 0), 7th = F (PC 5)
+        start_pcs = {ls.guide_tone_line[0][0] % 12, ls.guide_tone_line[1][0] % 12}
+        assert start_pcs == {0, 5}
 
     def test_guide_tone_line_notes_are_guide_tones_of_respective_chord(self):
         ls = _make_leadsheet(
@@ -408,8 +434,9 @@ class TestGuideToneLine:
             ("C", "maj7", 8, 12),
         )
         analyze(ls)
-        for i, note in enumerate(ls.guide_tone_line):
-            assert note in ls.chords[i].guide_tones
+        for path in ls.guide_tone_line:
+            for i, note in enumerate(path):
+                assert note in ls.chords[i].guide_tones
 
 
 # ---------------------------------------------------------------------------

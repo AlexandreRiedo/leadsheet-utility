@@ -30,4 +30,4 @@ class LeadSheet:
     chords: list[ChordEvent] = field(default_factory=list)
     total_beats: float = 0.0  # end_beat of the last chord
     total_bars: int = 0  # derived from total_beats / beats_per_bar
-    guide_tone_line: list[int] = field(default_factory=list)  # voice-led guide tone per chord (MIDI)
+    guide_tone_line: list[list[int]] = field(default_factory=list)  # two voice-led guide-tone paths (MIDI), one per starting guide tone

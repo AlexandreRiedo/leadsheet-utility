@@ -249,38 +249,50 @@ def _guide_tone_intervals(quality: str) -> tuple[int, ...]:
     return tuple(intervals)
 
 
-def _compute_guide_tone_line(chords: list[ChordEvent]) -> list[int]:
-    """Return one MIDI note per chord: the voice-led guide tone.
+def _compute_guide_tone_line(chords: list[ChordEvent]) -> list[list[int]]:
+    """Return two voice-led guide-tone paths (one MIDI note per chord each).
 
-    Starts in the middle register (around C4) and at each step picks whichever
-    available guide-tone MIDI note is closest to the previous choice.
+    Each path starts from a different guide tone of the first chord in the middle
+    register (MIDI 48–72) and greedily picks the closest available guide-tone note
+    at each subsequent chord.  The guide tones are quality-dependent (e.g. 3rd+7th
+    for most chords, 4th+7th for 7sus4).
     """
     if not chords:
         return []
 
-    line: list[int] = []
-    prev_note: int | None = None
+    first_candidates = chords[0].guide_tones
+    if not first_candidates:
+        return []
 
-    for chord in chords:
-        candidates = chord.guide_tones
-        if not candidates:
-            chosen = prev_note if prev_note is not None else 60
+    # Collect the (up to two) distinct pitch classes present in the first chord's guide tones
+    seen_pcs: list[int] = []
+    for n in first_candidates:
+        pc = n % 12
+        if pc not in seen_pcs:
+            seen_pcs.append(pc)
+        if len(seen_pcs) == 2:
+            break
+
+    def _pick_start(pc: int, candidates: list[int]) -> int:
+        same_pc = [n for n in candidates if n % 12 == pc]
+        mid = [n for n in same_pc if 48 <= n <= 72]
+        pool = mid if mid else same_pc
+        return pool[len(pool) // 2]
+
+    def _build_path(start: int) -> list[int]:
+        line: list[int] = []
+        prev_note = start
+        for chord in chords:
+            candidates = chord.guide_tones
+            if not candidates:
+                line.append(prev_note)
+                continue
+            chosen = min(candidates, key=lambda n: abs(n - prev_note))  # type: ignore
             line.append(chosen)
             prev_note = chosen
-            continue
+        return line
 
-        if prev_note is None:
-            # Start in the middle register (MIDI 48–72, roughly C3–C5)
-            mid = [n for n in candidates if 48 <= n <= 72]
-            pool = mid if mid else candidates
-            chosen = pool[len(pool) // 2]
-        else:
-            chosen = min(candidates, key=lambda n: abs(n - prev_note)) # type: ignore
-
-        line.append(chosen)
-        prev_note = chosen
-
-    return line
+    return [_build_path(_pick_start(pc, first_candidates)) for pc in seen_pcs]
 
 
 # ---------------------------------------------------------------------------
@@ -299,7 +311,7 @@ def analyze(lead_sheet: LeadSheet) -> LeadSheet:
     - ``available_tensions``— MIDI 21-108 for scale tones that are not chord tones
 
     Populated on LeadSheet:
-    - ``guide_tone_line``   — one MIDI note per chord, voice-led across the form
+    - ``guide_tone_line``   — two voice-led paths (list[list[int]]), one per starting guide tone
     """
     chords = lead_sheet.chords
     if not chords:
