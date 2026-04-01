@@ -6,6 +6,9 @@ Each entry in tests/fixtures/harmony/<piece>.expected.json specifies a chord
   - chord_tones
   - guide_tones
 
+Guide-tone line fixtures (<piece>.guide_tone_line.expected.json) specify the
+expected two-voice MIDI paths across the full form.
+
 The corresponding lead sheet is parsed from data/leadsheets/<piece>.tsv,
 analyzed once per module, and then checked against every fixture entry.
 """
@@ -179,3 +182,67 @@ def test_guide_tones(piece: str, entry: dict, analyzed_leadsheets):
         f"  produced: {_fmt(actual, root_pc)}\n"
         f"  expected: {_fmt(expected, root_pc)}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Guide-tone line tests
+# ---------------------------------------------------------------------------
+
+_GUIDE_TONE_LINE_PIECES = [
+    stem for stem in PIECES
+    if (FIXTURES_DIR / f"{stem}.guide_tone_line.expected.json").exists()
+]
+
+
+def _guide_tone_line_cases() -> list:
+    cases = []
+    for stem in _GUIDE_TONE_LINE_PIECES:
+        path = FIXTURES_DIR / f"{stem}.guide_tone_line.expected.json"
+        fixture = json.loads(path.read_text(encoding="utf-8"))
+        cases.append(pytest.param(stem, fixture, id=stem))
+    return cases
+
+
+@pytest.mark.parametrize("piece,fixture", _guide_tone_line_cases())
+def test_guide_tone_line_paths(piece: str, fixture: dict, analyzed_leadsheets):
+    """The two voice-led guide-tone paths must match the expected MIDI notes."""
+    # Reconstruct the analyzed LeadSheet to access guide_tone_line
+    ls = parse_leadsheet(DATA_DIR / f"{piece}.tsv")
+    analyze(ls)
+
+    expected = fixture["expected_guide_tone_line"]
+    actual = ls.guide_tone_line
+
+    assert len(actual) == len(expected), (
+        f"Expected {len(expected)} paths, got {len(actual)}"
+    )
+
+    print(f"\n[{piece}] Guide-tone line ({len(ls.chords)} chords)")
+    for chord_idx, entry in enumerate(fixture["per_chord"]):
+        a0 = actual[0][chord_idx] if chord_idx < len(actual[0]) else None
+        a1 = actual[1][chord_idx] if len(actual) > 1 and chord_idx < len(actual[1]) else None
+        e0 = expected[0][chord_idx] if chord_idx < len(expected[0]) else None
+        e1 = expected[1][chord_idx] if len(expected) > 1 and chord_idx < len(expected[1]) else None
+        def _n(m): return f"{_PC_NAME[m % 12]}{m // 12 - 1}({m})" if m is not None else "---"
+        ok0 = " " if a0 == e0 else "X"
+        ok1 = " " if a1 == e1 else "X"
+        print(f"  {entry['start_beat']:6.1f}  {entry['chord']:12s}"
+              f"  P0: {_n(a0):>10s} {ok0} {_n(e0):>10s}"
+              f"  P1: {_n(a1):>10s} {ok1} {_n(e1):>10s}")
+
+    for path_idx in range(len(expected)):
+        assert len(actual[path_idx]) == len(expected[path_idx]), (
+            f"Path {path_idx}: expected {len(expected[path_idx])} notes, "
+            f"got {len(actual[path_idx])}"
+        )
+
+        for chord_idx, (act, exp) in enumerate(
+            zip(actual[path_idx], expected[path_idx])
+        ):
+            entry = fixture["per_chord"][chord_idx]
+            assert act == exp, (
+                f"Path {path_idx}, chord {chord_idx} "
+                f"({entry['chord']} @ beat {entry['start_beat']}): "
+                f"got MIDI {act} ({_PC_NAME[act % 12]}{act // 12 - 1}), "
+                f"expected MIDI {exp} ({_PC_NAME[exp % 12]}{exp // 12 - 1})"
+            )

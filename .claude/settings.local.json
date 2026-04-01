@@ -4,7 +4,8 @@
       "mcp__claude_ai_Context7__resolve-library-id",
       "Bash(python -m pytest tests/test_parser.py --no-header -q)",
       "Bash(poetry install:*)",
-      "Bash(poetry run:*)"
+      "Bash(poetry run:*)",
+      "Bash(PYTHONPATH=src poetry run python)"
     ]
   }
 }

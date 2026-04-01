@@ -252,10 +252,11 @@ def _guide_tone_intervals(quality: str) -> tuple[int, ...]:
 def _compute_guide_tone_line(chords: list[ChordEvent]) -> list[list[int]]:
     """Return two voice-led guide-tone paths (one MIDI note per chord each).
 
-    Each path starts from a different guide tone of the first chord in the middle
-    register (MIDI 48–72) and greedily picks the closest available guide-tone note
-    at each subsequent chord.  The guide tones are quality-dependent (e.g. 3rd+7th
-    for most chords, 4th+7th for 7sus4).
+    Each path starts from a different guide tone of the first chord in the lower-
+    middle register (MIDI 48–72) and uses optimal assignment at each chord to
+    minimise total voice movement while keeping the two voices on different pitch
+    classes.  The guide tones are quality-dependent (e.g. 3rd+7th for most chords,
+    4th+7th for 7sus4).
     """
     if not chords:
         return []
@@ -277,22 +278,84 @@ def _compute_guide_tone_line(chords: list[ChordEvent]) -> list[list[int]]:
         same_pc = [n for n in candidates if n % 12 == pc]
         mid = [n for n in same_pc if 48 <= n <= 72]
         pool = mid if mid else same_pc
-        return pool[len(pool) // 2]
+        return pool[(len(pool) - 1) // 2]
 
-    def _build_path(start: int) -> list[int]:
+    def _closest(target: int, pc: int, candidates: list[int],
+                 low: int = 48, high: int = 72) -> int:
+        same_pc = [n for n in candidates if n % 12 == pc]
+        in_range = [n for n in same_pc if low <= n <= high]
+        pool = in_range if in_range else same_pc
+        return min(pool, key=lambda n: abs(n - target))
+
+    def _distinct_pcs(candidates: list[int]) -> list[int]:
+        pcs: list[int] = []
+        for n in candidates:
+            pc = n % 12
+            if pc not in pcs:
+                pcs.append(pc)
+            if len(pcs) == 2:
+                break
+        return pcs
+
+    if len(seen_pcs) < 2:
+        # Only one guide-tone PC — single path
+        start = _pick_start(seen_pcs[0], first_candidates)
         line: list[int] = []
-        prev_note = start
+        prev = start
         for chord in chords:
-            candidates = chord.guide_tones
-            if not candidates:
-                line.append(prev_note)
+            cands = chord.guide_tones
+            if not cands:
+                line.append(prev)
                 continue
-            chosen = min(candidates, key=lambda n: abs(n - prev_note))  # type: ignore
+            in_range = [n for n in cands if 48 <= n <= 72]
+            pool = in_range if in_range else cands
+            chosen = min(pool, key=lambda n: abs(n - prev))
             line.append(chosen)
-            prev_note = chosen
-        return line
+            prev = chosen
+        return [line]
 
-    return [_build_path(_pick_start(pc, first_candidates)) for pc in seen_pcs]
+    # Two distinct PCs — build paired paths with optimal assignment
+    v0 = _pick_start(seen_pcs[0], first_candidates)
+    v1 = _pick_start(seen_pcs[1], first_candidates)
+    path0: list[int] = [v0]
+    path1: list[int] = [v1]
+
+    for chord in chords[1:]:
+        cands = chord.guide_tones
+        if not cands:
+            path0.append(v0)
+            path1.append(v1)
+            continue
+
+        pcs = _distinct_pcs(cands)
+
+        if len(pcs) < 2:
+            # Only one GT pitch class — both voices converge
+            path0.append(_closest(v0, pcs[0], cands))
+            path1.append(_closest(v1, pcs[0], cands))
+            v0, v1 = path0[-1], path1[-1]
+            continue
+
+        # Try both assignments, pick minimum total movement
+        pc_a, pc_b = pcs[0], pcs[1]
+        v0_a = _closest(v0, pc_a, cands)
+        v1_b = _closest(v1, pc_b, cands)
+        v0_b = _closest(v0, pc_b, cands)
+        v1_a = _closest(v1, pc_a, cands)
+
+        cost_ab = abs(v0_a - v0) + abs(v1_b - v1)
+        cost_ba = abs(v0_b - v0) + abs(v1_a - v1)
+
+        if cost_ab <= cost_ba:
+            path0.append(v0_a)
+            path1.append(v1_b)
+            v0, v1 = v0_a, v1_b
+        else:
+            path0.append(v0_b)
+            path1.append(v1_a)
+            v0, v1 = v0_b, v1_a
+
+    return [path0, path1]
 
 
 # ---------------------------------------------------------------------------
