@@ -33,28 +33,11 @@ PIECES = ["all_the_things_you_are", "oleo", "stella_by_starlight"]
 
 # ---------------------------------------------------------------------------
 # Known scale-notes failures (chord_tones / guide_tones still pass)
-#
-# These cases require Layer 2 rules not yet in the SPEC:
-#
-#  all_the_things beat 120 — C:min7 after Gb:7(13).
-#    Expected: Dorian b2 (0,1,3,5,7,9,10).  Actual: Dorian (default).
-#    Rule needed: minor chord following a tritone-sub dominant (root ±6) may
-#    get Dorian b2 when the tritone-sub resolves deceptively to minor.
-#    (Dorian b2 is also not yet in SCALES.)
-#
-#  stella beat 40 — D:min7.
-#    Expected: Phrygian (D as iii in Bb major).  Actual: Dorian (default).
-#    Rule needed: chain detection fails because the connecting G:min7 (vi in Bb)
-#    is absent from this TSV; with it the full iii-vi-ii-V would be recognised.
 # ---------------------------------------------------------------------------
 
 _KNOWN_SCALE_FAILURES: dict[tuple[str, float], str] = {
     ("all_the_things_you_are", 120.0): (
-        "Is actually a iii phrygian, not a dorian chord."
-    ),
-    ("stella_by_starlight", 40.0): (
-        "D:min7 is iii in Bb major but the intervening G:min7 (vi) is omitted "
-        "from this TSV, so the P4-chain back-walk cannot extend to D."
+        "The Cm7 here is a iii phrygian, not a ii dorian chord."
     ),
 }
 
@@ -87,9 +70,11 @@ def _pcs_of(midi_list: list[int]) -> frozenset[int]:
     return frozenset(n % 12 for n in midi_list)
 
 
-def _fmt(pcs: frozenset[int]) -> str:
-    """Render a pitch-class set as space-separated note names."""
-    return "  ".join(_PC_NAME[pc] for pc in sorted(pcs))
+def _fmt(pcs: frozenset[int], root_pc: int = 0) -> str:
+    """Render a pitch-class set as space-separated note names, starting from root."""
+    # Sort based on the distance from the root (0 to 11 half-steps)
+    sorted_pcs = sorted(pcs, key=lambda pc: (pc - root_pc) % 12)
+    return "  ".join(_PC_NAME[pc] for pc in sorted_pcs)
 
 
 # ---------------------------------------------------------------------------
@@ -135,19 +120,27 @@ def _fixture_cases() -> list:
 
 @pytest.mark.parametrize("piece,entry", _fixture_cases())
 def test_scale_notes(piece: str, entry: dict, analyzed_leadsheets):
+    chord = analyzed_leadsheets[piece][entry["start_beat"]]
+    expected = _names_to_pcs(entry["expected_scale_notes"])
+    actual = _pcs_of(chord.scale_notes)
+
+    # Extract root string (e.g., "Bb" from "Bb:min7") and get its pitch class
+    root_str = entry["chord"].split(":")[0]
+    root_pc = NOTE_TO_PC[root_str]
+
+    print(f"\n[{piece}] Beat {entry['start_beat']} - {entry['chord']}")
+    print(f"  produced: {_fmt(actual, root_pc)}")
+    print(f"  expected: {_fmt(expected, root_pc)}")
+
+    # For known errors, skip them to avoid breaking the test suite
     key = (piece, entry["start_beat"])
     if key in _KNOWN_SCALE_FAILURES:
         pytest.xfail(_KNOWN_SCALE_FAILURES[key])
 
-    chord = analyzed_leadsheets[piece][entry["start_beat"]]
-    expected = _names_to_pcs(entry["expected_scale_notes"])
-    actual = _pcs_of(chord.scale_notes)
-    print(f"\n  produced: {_fmt(actual)}")
-    print(f"  expected: {_fmt(expected)}")
     assert actual == expected, (
         f"{entry['chord']} beat {entry['start_beat']}\n"
-        f"  produced: {_fmt(actual)}\n"
-        f"  expected: {_fmt(expected)}"
+        f"  produced: {_fmt(actual, root_pc)}\n"
+        f"  expected: {_fmt(expected, root_pc)}"
     )
 
 
@@ -156,12 +149,18 @@ def test_chord_tones(piece: str, entry: dict, analyzed_leadsheets):
     chord = analyzed_leadsheets[piece][entry["start_beat"]]
     expected = _names_to_pcs(entry["expected_chord_tones"])
     actual = _pcs_of(chord.chord_tones)
-    print(f"\n  produced: {_fmt(actual)}")
-    print(f"  expected: {_fmt(expected)}")
+
+    root_str = entry["chord"].split(":")[0]
+    root_pc = NOTE_TO_PC[root_str]
+
+    print(f"\n[{piece}] Beat {entry['start_beat']} - {entry['chord']}")
+    print(f"  produced: {_fmt(actual, root_pc)}")
+    print(f"  expected: {_fmt(expected, root_pc)}")
+
     assert actual == expected, (
         f"{entry['chord']} beat {entry['start_beat']}\n"
-        f"  produced: {_fmt(actual)}\n"
-        f"  expected: {_fmt(expected)}"
+        f"  produced: {_fmt(actual, root_pc)}\n"
+        f"  expected: {_fmt(expected, root_pc)}"
     )
 
 
@@ -170,10 +169,16 @@ def test_guide_tones(piece: str, entry: dict, analyzed_leadsheets):
     chord = analyzed_leadsheets[piece][entry["start_beat"]]
     expected = _names_to_pcs(entry["expected_guide_tones"])
     actual = _pcs_of(chord.guide_tones)
-    print(f"\n  produced: {_fmt(actual)}")
-    print(f"  expected: {_fmt(expected)}")
+
+    root_str = entry["chord"].split(":")[0]
+    root_pc = NOTE_TO_PC[root_str]
+
+    print(f"\n[{piece}] Beat {entry['start_beat']} - {entry['chord']}")
+    print(f"  produced: {_fmt(actual, root_pc)}")
+    print(f"  expected: {_fmt(expected, root_pc)}")
+
     assert actual == expected, (
         f"{entry['chord']} beat {entry['start_beat']}\n"
-        f"  produced: {_fmt(actual)}\n"
-        f"  expected: {_fmt(expected)}"
+        f"  produced: {_fmt(actual, root_pc)}\n"
+        f"  expected: {_fmt(expected, root_pc)}"
     )
