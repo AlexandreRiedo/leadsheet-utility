@@ -430,10 +430,9 @@ def apply_swing(beat_position: float, swing_ratio: float = 0.67) -> float:
 ```
 SYMBOL = ROOT ":" QUALITY [EXTENSION] [BASS]
 ROOT = C | C# | Db | D | D# | Eb | E | F | F# | Gb | G | G# | Ab | A | A# | Bb | B
-QUALITY = maj7 | min7 | 7 | hdim7 | dim7 | maj | min | aug | sus4 | sus2
-        | min9 | maj9 | 9 | min6 | 6 | minmaj7
+QUALITY = <string> — matched by prefix family (see Parsing Strategy below)
 EXTENSION = "(" ALTERATION {"," ALTERATION} ")"
-ALTERATION = b5 | #5 | b9 | #9 | #11 | b13 | 13
+ALTERATION = b5 | b6 | #5 | b9 | #9 | #11 | b13 | 13
 BASS = "/" ROOT
 ```
 
@@ -442,7 +441,19 @@ BASS = "/" ROOT
 1. Split on `:` to separate root from the rest
 2. Extract parenthesized extensions with regex: `\(([^)]+)\)`
 3. Extract slash bass note: `/[A-G][#b]?$`
-4. What remains is the quality string
+4. What remains is the quality string — classify by **prefix family** rather than exact match:
+
+| Prefix | Family | Examples |
+|--------|--------|---------|
+| `hdim` | half-diminished | `hdim7` |
+| `min` | minor | `min7`, `min`, `minmaj7`, `min6`, `min(b6)` |
+| `maj` | major | `maj7`, `maj`, `maj9`, `maj7#11` |
+| `dim` | diminished | `dim7` |
+| `aug` | augmented | `aug` |
+| `sus` | suspended | `sus4`, `sus2`, `sus` |
+| `7`, `9`, `11`, `13` | dominant | `7`, `9`, `7sus4`, `13` |
+
+Check prefixes in the order listed — `hdim` before `min` (since `hdim` also starts with... actually it doesn't, but keep `hdim` first to avoid any future ambiguity). Within a family, use the full quality string to look up the exact default scale from Layer 1; fall back to the family's base quality if no exact match.
 
 ### Enharmonic Normalization
 
@@ -456,7 +467,8 @@ These patterns appear frequently in the lead sheet corpus and inform context-awa
 |-------------|---------|-------------|
 | ii-V-I major | Dm7 → G7 → Cmaj7 | G7 gets Mixolydian |
 | ii-V-i minor | Dm7b5 → G7 → Cm7 | G7 gets Phrygian dominant |
-| I-vi-ii-V | Cmaj7 → Am7 → Dm7 → G7 | All in C major |
+| I-vi-ii-V | Cmaj7 → Am7 → Dm7 → G7 | Am7=Aeolian, all in C major |
+| iii-vi-ii-V | Em7 → Am7 → Dm7 → G7 | Em7=Phrygian, Am7=Aeolian, all in C major |
 | Tritone sub | Dm7 → Db7 → Cmaj7 | Db7 gets Lydian dominant |
 | Backdoor ii-V | Fm7 → Bb7 → Cmaj7 | bVII7 resolving up to I |
 | Rhythm changes bridge | D7 → G7 → C7 → F7 | Circle of dominants, each Mixolydian |
