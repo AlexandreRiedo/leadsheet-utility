@@ -26,7 +26,7 @@ from leadsheet_utility.leadsheet.parser import parse_leadsheet
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures" / "harmony"
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "leadsheets"
 
-PIECES = ["all_the_things_you_are", "oleo", "stella_by_starlight", "nefertiti", "inner_urge"]
+PIECES = ["all_the_things_you_are", "oleo", "stella_by_starlight", "nefertiti", "inner_urge", "26_2"]
 
 # ---------------------------------------------------------------------------
 # Known scale-notes failures (chord_tones / guide_tones still pass)

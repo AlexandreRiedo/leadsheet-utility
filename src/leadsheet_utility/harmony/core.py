@@ -44,7 +44,7 @@ def _slash_sus4_effective(chord: ChordEvent) -> tuple[int, str] | None:
         return None
     root_pc = NOTE_TO_PC[chord.root]
     bass_pc = NOTE_TO_PC[chord.bass_note]
-    if (bass_pc - root_pc) % 12 == 2:
+    if not (chord.quality.startswith("7")) and (bass_pc - root_pc) % 12 == 2: # "7" rule to catch that wacky E7/F# in 26-2
         return (bass_pc, "7sus4")
     if chord.quality.startswith("min") and (root_pc - bass_pc) % 12 == 7:
         return (bass_pc, "7sus4")
