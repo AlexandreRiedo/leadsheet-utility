@@ -276,12 +276,12 @@ def _compute_guide_tone_line(chords: list[ChordEvent]) -> list[list[int]]:
 
     def _pick_start(pc: int, candidates: list[int]) -> int:
         same_pc = [n for n in candidates if n % 12 == pc]
-        mid = [n for n in same_pc if 48 <= n <= 72]
+        mid = [n for n in same_pc if 52 <= n <= 76]
         pool = mid if mid else same_pc
         return pool[(len(pool) - 1) // 2]
 
     def _closest(target: int, pc: int, candidates: list[int],
-                 low: int = 48, high: int = 72) -> int:
+                 low: int = 52, high: int = 76) -> int:
         same_pc = [n for n in candidates if n % 12 == pc]
         in_range = [n for n in same_pc if low <= n <= high]
         pool = in_range if in_range else same_pc
@@ -307,7 +307,7 @@ def _compute_guide_tone_line(chords: list[ChordEvent]) -> list[list[int]]:
             if not cands:
                 line.append(prev)
                 continue
-            in_range = [n for n in cands if 48 <= n <= 72]
+            in_range = [n for n in cands if 52 <= n <= 76]
             pool = in_range if in_range else cands
             chosen = min(pool, key=lambda n: abs(n - prev))
             line.append(chosen)

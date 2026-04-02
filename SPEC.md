@@ -301,7 +301,7 @@ class LeadSheet:
     chords: list[ChordEvent]
     total_beats: float                # end_beat of the last chord
     total_bars: int                   # derived from total_beats / beats_per_bar
-    guide_tone_line: list[int]        # voice-led guide tone (MIDI) per chord, parallel to chords
+    guide_tone_line: list[list[int]]  # two voice-led guide-tone paths (MIDI), one per starting guide tone
 ```
 
 ---
@@ -613,7 +613,14 @@ For each `ChordEvent`, the analyzer populates:
 
 ### Voice-Leading for Guide Tones
 
-The analyzer pre-computes a **guide-tone line** across the entire form: for each chord transition, pick the guide tone (3rd or 7th) that is closest in pitch to the previous guide tone. Store this as a list parallel to `chords`.
+The analyzer pre-computes **two** voice-led guide-tone paths across the entire form, stored in `LeadSheet.guide_tone_line` as `[path_0, path_1]`.
+
+**Algorithm** (`_compute_guide_tone_line` in `harmony/core.py`):
+1. **Start**: path 0 begins on the first guide-tone PC of chord 1, path 1 on the second, both picked from the lower-middle register (E3–E5, MIDI 52–76).
+2. **Step**: at each chord, try both assignments of the two voice-to-PC pairings and pick the one with minimum total semitone movement across both voices.
+3. **Range clamp**: candidates are restricted to E3–E5 (MIDI 52–76) at every step, preventing voices from drifting to the extremes of the piano over a long form.
+
+The optimal-assignment step (vs. two independent greedy paths) is essential: without it both voices converge to the same pitch class after the first chord and drift in unison, which is musically useless.
 
 Key voice-leading connections in jazz:
 - **3rd of ii → 7th of V** (same note or half step): e.g., Dm7 3rd (F) = G7 7th (F)
@@ -627,7 +634,8 @@ Dm7    → G7     → Cmaj7
 3rd=F    3rd=B     3rd=E
 7th=C    7th=F     7th=B
 
-Guide-tone line: F → F → E  (7th of G7 = F, same as 3rd of Dm7; then 3rd of Cmaj7 = E, half step down)
+Path 0: F → F → E  (3rd of Dm7 → 7th of G7 → 3rd of Cmaj7, smooth descent)
+Path 1: C → B → B  (7th of Dm7 → 3rd of G7 → 7th of Cmaj7, half-step descent)
 ```
 
 ---
@@ -1238,6 +1246,9 @@ leadsheet-utility/
 │       ├── sunny_side_of_the_street.{tsv,meta.json}
 │       ├── take_the_a_train.{tsv,meta.json}
 │       └── 26_2.{tsv,meta.json}
+│
+├── playground/
+│   └── show_guide_tone_line.py  # Print guide-tone paths for any lead sheet (manual exploration)
 │
 └── tests/
     ├── test_parser.py
