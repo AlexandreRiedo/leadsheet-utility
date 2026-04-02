@@ -1,11 +1,11 @@
 """Print the guide-tone line for a lead sheet.
 
 Usage:
-    poetry run python scripts/show_guide_tone_line.py <piece>
+    poetry run python playground/show_guide_tone_line.py <piece>
 
 Examples:
-    poetry run python scripts/show_guide_tone_line.py 26_2
-    poetry run python scripts/show_guide_tone_line.py all_the_things_you_are
+    poetry run python playground/show_guide_tone_line.py 26_2
+    poetry run python playground/show_guide_tone_line.py all_the_things_you_are
 
 <piece> is the stem of a .tsv file in data/leadsheets/.
 """
@@ -16,8 +16,8 @@ from pathlib import Path
 # Allow running from the project root without installing the package
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from leadsheet_utility.leadsheet.parser import parse_leadsheet
 from leadsheet_utility.harmony import analyze
+from leadsheet_utility.leadsheet.parser import parse_leadsheet
 
 PC_NAME = {
     0: "C", 1: "Db", 2: "D", 3: "Eb", 4: "E", 5: "F",
