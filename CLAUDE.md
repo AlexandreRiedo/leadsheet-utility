@@ -8,9 +8,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SPEC.md is the authoritative design reference (treat it as a living document that can evolve, but don't change it casually).
 
-## Project Status: Greenfield
+## Project Status: Early Development
 
-This project is currently in the initial setup phase. Many of the files, modules, tests, and directories mentioned in this document represent the **target architecture** and do not exist yet. If a referenced file is missing, do not assume it's an error; assume we need to create it.
+Core pipeline is functional end-to-end: lead sheets can be loaded, harmony analyzed, a metronome backing track rendered via FluidSynth, and playback driven from a shared timeline with a HUD window. The `exercises`, `projection`, and `calibration` modules are **not yet implemented** — if a referenced file for these is missing, assume we need to create it.
 
 ## Commands
 
@@ -60,7 +60,7 @@ Backing track:
     -> FluidSynth offline render -> numpy audio buffer
     -> pygame.mixer playback
 
-Sync: timeline reads pygame.mixer playback position -> drives both projection and HUD
+Sync: timeline uses wall-clock elapsed time (perf_counter) -> drives both projection and HUD
 ```
 
 ### 8 Core Modules
@@ -78,11 +78,20 @@ Sync: timeline reads pygame.mixer playback position -> drives both projection an
 
 ### What Exists Now (implemented modules)
 
-Only `leadsheet` and `harmony` are implemented. Everything else is target architecture.
-
 - **`src/leadsheet_utility/leadsheet/`** — `parser.py` (TSV + sidecar parsing), `models.py` (ChordEvent/LeadSheet dataclasses)
 - **`src/leadsheet_utility/harmony/`** — `constants.py` (scale/chord-tone tables, quality-to-scale map), `core.py` (scale resolver with 6 context rules, guide-tone line computation, `analyze()` entry point)
+- **`src/leadsheet_utility/timeline/`** — `engine.py`: wall-clock-based musical clock with play/pause/stop transport. Uses `ClockSource` protocol for testability. Binary-searches chord list to resolve current chord each frame.
+- **`src/leadsheet_utility/backing/`** — `events.py` (MidiEvent dataclass, metronome click generator), `renderer.py` (offline FluidSynth rendering to numpy int16 buffer for pygame.mixer)
+- **`src/leadsheet_utility/gui/`** — `hud.py` (HUD rendering: song info, current/next chord, exercise selector, progress bar, shortcuts), `input.py` (key-to-action mapping via enum)
+- **`src/leadsheet_utility/main.py`** — `App` class: two-window pygame-ce loop (projection + HUD), transport controls, file dialog, audio rendering orchestration
 - **`data/leadsheets/`** — 14 lead sheets as `.tsv` + `.meta.json` pairs
+- **`data/soundfonts/GeneralUser-GS.sf2`** — bundled GM SoundFont for FluidSynth rendering
+
+### What Does NOT Exist Yet
+
+- **`exercises`** — highlight logic per exercise mode (Free, Guide Tone, Contour, Flow, Start & End Note)
+- **`projection`** — keyboard rendering + homography warp for projector output
+- **`calibration`** — 4-point marker UI for projector alignment
 
 Harmony integration tests are fixture-driven: JSON files in `tests/fixtures/harmony/` define expected pitch-class sets per chord for real lead sheets — update these when adding pieces or changing scale resolution.
 
