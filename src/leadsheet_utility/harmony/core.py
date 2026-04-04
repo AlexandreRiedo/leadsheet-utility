@@ -385,7 +385,7 @@ def analyze(lead_sheet: LeadSheet) -> LeadSheet:
     for i, chord in enumerate(chords):
         root_pc = NOTE_TO_PC[chord.root]
         prev_chord = chords[i - 1] if i > 0 else None
-        next_chord = chords[i + 1] if i < len(chords) - 1 else None
+        next_chord = chords[i + 1] if i < len(chords) - 1 else chords[0]
 
         # Slash-chord 7sus4: use bass note as the harmonic root for all MIDI generation
         slash_sus4 = _slash_sus4_effective(chord)
