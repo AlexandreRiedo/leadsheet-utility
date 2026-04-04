@@ -3,12 +3,20 @@
 Public API::
 
     from leadsheet_utility.harmony import analyze, resolve_scale, get_scale_midi_notes
+    from leadsheet_utility.harmony import midi_note_name, pc_name
 """
 
+from leadsheet_utility.harmony.constants import midi_note_name, pc_name
 from leadsheet_utility.harmony.core import (
     analyze,
     get_scale_midi_notes,
     resolve_scale,
 )
 
-__all__ = ["analyze", "get_scale_midi_notes", "resolve_scale"]
+__all__ = [
+    "analyze",
+    "get_scale_midi_notes",
+    "midi_note_name",
+    "pc_name",
+    "resolve_scale",
+]

@@ -94,3 +94,19 @@ QUALITY_TO_SCALE: dict[str, str] = {
 
 # Scale names considered dominant-function for contextual half-diminished checks.
 DOMINANT_SCALES: set[str] = {"mixolydian", "lydian_dominant", "phrygian_dom", "altered"}
+
+# Reverse mapping: pitch class → display name (flat spelling).
+PC_TO_NAME: dict[int, str] = {
+    0: "C", 1: "Db", 2: "D", 3: "Eb", 4: "E", 5: "F",
+    6: "Gb", 7: "G", 8: "Ab", 9: "A", 10: "Bb", 11: "B",
+}
+
+
+def midi_note_name(midi: int) -> str:
+    """Return a human-readable name for a MIDI note, e.g. ``60`` → ``'C4'``."""
+    return f"{PC_TO_NAME[midi % 12]}{midi // 12 - 1}"
+
+
+def pc_name(midi: int) -> str:
+    """Return just the pitch-class name (no octave), e.g. ``60`` → ``'C'``."""
+    return PC_TO_NAME[midi % 12]

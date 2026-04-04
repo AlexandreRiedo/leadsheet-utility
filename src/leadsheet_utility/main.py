@@ -14,8 +14,8 @@ import pygame
 
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
-from leadsheet_utility.harmony import analyze
-from leadsheet_utility.leadsheet.models import LeadSheet
+from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
+from leadsheet_utility.leadsheet.models import ChordEvent, LeadSheet
 from leadsheet_utility.leadsheet.parser import parse_leadsheet
 from leadsheet_utility.timeline import PlaybackState, Timeline, TimelineState
 
@@ -30,6 +30,71 @@ _FPS = 60
 _TEMPO_STEP = 5
 _TEMPO_MIN = 40
 _TEMPO_MAX = 320
+
+
+# ---------------------------------------------------------------------------
+# Harmony logging helpers
+# ---------------------------------------------------------------------------
+
+
+def _scale_pcs(chord: ChordEvent) -> str:
+    """Deduplicated pitch-class names for the chord-scale, rooted on the chord root."""
+    from leadsheet_utility.harmony.constants import NOTE_TO_PC
+
+    root_pc = NOTE_TO_PC[chord.root]
+    pcs: list[int] = []
+    for n in chord.scale_notes:
+        pc = n % 12
+        if pc not in pcs:
+            pcs.append(pc)
+    pcs.sort(key=lambda pc: (pc - root_pc) % 12)
+    return " ".join(pc_name(p) for p in pcs)
+
+
+def _log_harmony_summary(ls: LeadSheet) -> None:
+    """Print the full harmony analysis for every chord in the lead sheet."""
+    logger.info("--- Harmony analysis: %s ---", ls.title)
+    header = f"  {'Beat':>6}  {'Chord':14s}  {'Scale':44s}  {'Guide tones'}"
+    logger.info(header)
+    for chord in ls.chords:
+        gt_pcs: list[str] = []
+        for n in chord.guide_tones:
+            name = pc_name(n)
+            if name not in gt_pcs:
+                gt_pcs.append(name)
+            if len(gt_pcs) == 2:
+                break
+        logger.info(
+            "  %6.1f  %-14s  %-44s  %s",
+            chord.start_beat,
+            chord.chord_symbol,
+            _scale_pcs(chord),
+            " ".join(gt_pcs),
+        )
+
+    if ls.guide_tone_line:
+        logger.info("--- Guide-tone line paths ---")
+        for i, path in enumerate(ls.guide_tone_line):
+            notes = " ".join(midi_note_name(n) for n in path)
+            logger.info("  Path %d: %s", i, notes)
+
+
+def _log_chord_change(chord: ChordEvent) -> None:
+    """Log when the active chord changes during playback."""
+    gt_pcs: list[str] = []
+    for n in chord.guide_tones:
+        name = pc_name(n)
+        if name not in gt_pcs:
+            gt_pcs.append(name)
+        if len(gt_pcs) == 2:
+            break
+    logger.info(
+        "Beat %6.1f | %-14s | scale: %-30s | GT: %s",
+        chord.start_beat,
+        chord.chord_symbol,
+        _scale_pcs(chord),
+        " ".join(gt_pcs),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -80,6 +145,7 @@ class App:
         self._tempo: int = 120
         self._exercise_idx: int = 0  # 0-indexed into EXERCISE_NAMES
         self._running: bool = True
+        self._prev_chord_symbol: str | None = None  # for chord-change logging
         self._clock = pygame.time.Clock()
 
     # -- public interface ----------------------------------------------------
@@ -90,6 +156,7 @@ class App:
             while self._running:
                 self._process_events()
                 tl_state = self._get_timeline_state()
+                self._check_chord_change(tl_state)
                 self._render_projection()
                 self._render_hud(tl_state)
                 self._clock.tick(_FPS)
@@ -180,7 +247,8 @@ class App:
             self._lead_sheet = ls
             self._tempo = ls.default_tempo
             self._rebuild_timeline()
-            logger.info("Loaded %s", ls.title)
+            self._prev_chord_symbol = None  # reset chord-change tracker
+            _log_harmony_summary(ls)
         except Exception:
             logger.exception("Failed to load %s", path)
 
@@ -195,6 +263,16 @@ class App:
         self._timeline = Timeline(self._lead_sheet, self._tempo)
         if was_playing:
             self._timeline.play()
+
+    # -- chord-change detection ----------------------------------------------
+
+    def _check_chord_change(self, tl_state: TimelineState | None) -> None:
+        if tl_state is None:
+            return
+        sym = tl_state.current_chord.chord_symbol
+        if sym != self._prev_chord_symbol:
+            self._prev_chord_symbol = sym
+            _log_chord_change(tl_state.current_chord)
 
     # -- rendering -----------------------------------------------------------
 
