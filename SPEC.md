@@ -1115,17 +1115,17 @@ For MVP, the control interface is primarily keyboard-driven with a simple heads-
 
 ```
 ┌──────────────────────────────────────────────┐
-│  leadsheet-utility                                      │
+│  leadsheet-utility                           │
 │                                              │
 │  ♫ All The Things You Are — Jerome Kern      │
 │  Key: Ab    Time: 4/4    Tempo: 140 BPM      │
 │                                              │
-│  Current: Bb:min7  (bar 2/36)  [Form 1/3]   │
+│  Current: Bb:min7  (bar 2/36)  [Form 1/3]    │
 │  Next:    Eb:7                               │
 │                                              │
 │  Exercise: [1] Free  [2] Guide  [3] Contour  │
-│            [4] Flow  [5] Start/End            │
-│  Active: ▶ Guide Tone                        │
+│            [4] Flow  [5] Start/End           │
+│  Active: ▶ Guide Tone                       │
 │                                              │
 │  [SPACE] Play/Pause   [S] Stop   [L] Loop    │
 │  [+/-] Tempo          [O] Open file          │
