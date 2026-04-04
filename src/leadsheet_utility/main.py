@@ -12,6 +12,8 @@ from pathlib import Path
 
 import pygame
 
+from leadsheet_utility.backing.events import generate_metronome
+from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
 from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
@@ -30,6 +32,7 @@ _FPS = 60
 _TEMPO_STEP = 5
 _TEMPO_MIN = 40
 _TEMPO_MAX = 320
+_DEFAULT_SF_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "soundfonts" / "GeneralUser-GS.sf2"
 
 
 # ---------------------------------------------------------------------------
@@ -107,7 +110,7 @@ class App:
 
     def __init__(self) -> None:
         pygame.init()
-        pygame.mixer.init()
+        pygame.mixer.init(frequency=44100, size=-16, channels=2)
 
         # -- Query displays ---------------------------------------------------
         desktop_sizes = pygame.display.get_desktop_sizes()
@@ -148,6 +151,13 @@ class App:
         self._prev_chord_symbol: str | None = None  # for chord-change logging
         self._clock = pygame.time.Clock()
 
+        # -- Audio state ------------------------------------------------------
+        self._sf_path: str | None = str(_DEFAULT_SF_PATH) if _DEFAULT_SF_PATH.exists() else None
+        self._sound: pygame.mixer.Sound | None = None
+        self._channel: pygame.mixer.Channel | None = None
+        self._audio_dirty: bool = True  # re-render needed
+        self._metronome_on: bool = False
+
     # -- public interface ----------------------------------------------------
 
     def run(self) -> None:
@@ -185,22 +195,32 @@ class App:
             self._toggle_play_pause()
 
         elif action is Action.STOP:
-            if self._timeline:
-                self._timeline.stop()
+            self._stop_playback()
 
         elif action is Action.OPEN_FILE:
             self._open_file_dialog()
 
         elif action is Action.TEMPO_UP:
             self._tempo = min(_TEMPO_MAX, self._tempo + _TEMPO_STEP)
+            self._stop_playback()
+            self._audio_dirty = True
             self._rebuild_timeline()
 
         elif action is Action.TEMPO_DOWN:
             self._tempo = max(_TEMPO_MIN, self._tempo - _TEMPO_STEP)
+            self._stop_playback()
+            self._audio_dirty = True
             self._rebuild_timeline()
 
         elif action is Action.CALIBRATE:
             logger.info("Calibration mode not yet implemented")
+
+        elif action is Action.TOGGLE_METRONOME:
+            self._metronome_on = not self._metronome_on
+            self._audio_dirty = True
+            self._stop_playback()
+            self._rebuild_timeline()
+            logger.info("Metronome %s", "ON" if self._metronome_on else "OFF")
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -210,13 +230,85 @@ class App:
     # -- transport -----------------------------------------------------------
 
     def _toggle_play_pause(self) -> None:
-        if self._timeline is None:
+        if self._timeline is None or self._lead_sheet is None:
             return
         state = self._timeline.playback_state
         if state is PlaybackState.PLAYING:
             self._timeline.pause()
+            if self._channel and self._channel.get_busy():
+                self._channel.pause()
         else:
-            self._timeline.play()
+            # Render audio if needed
+            if self._metronome_on and self._audio_dirty:
+                if not self._ensure_soundfont():
+                    return
+                self._render_audio()
+            if state is PlaybackState.PAUSED:
+                self._timeline.play()
+                if self._channel:
+                    self._channel.unpause()
+            else:
+                # STOPPED → start fresh
+                if self._metronome_on and self._sound is not None:
+                    self._channel = self._sound.play()
+                self._timeline.play()
+
+    def _stop_playback(self) -> None:
+        if self._channel and self._channel.get_busy():
+            self._channel.stop()
+        if self._timeline:
+            self._timeline.stop()
+
+    def _ensure_soundfont(self) -> bool:
+        """Prompt for SoundFont path if not set. Returns True if available."""
+        if self._sf_path and Path(self._sf_path).exists():
+            return True
+        try:
+            import tkinter as tk
+            from tkinter import filedialog
+
+            root = tk.Tk()
+            root.withdraw()
+            path = filedialog.askopenfilename(
+                title="Select a GM SoundFont (.sf2)",
+                filetypes=[("SoundFont files", "*.sf2"), ("All files", "*.*")],
+            )
+            root.destroy()
+        except Exception:
+            logger.exception("SoundFont dialog failed")
+            return False
+
+        if not path:
+            return False
+        self._sf_path = path
+        logger.info("SoundFont: %s", path)
+        return True
+
+    def _render_audio(self) -> None:
+        """Pre-render the metronome click track into a pygame Sound."""
+        if self._lead_sheet is None or self._sf_path is None:
+            return
+
+        # Show "Rendering..." on the HUD before blocking
+        self._show_status("Rendering audio...")
+
+        total_beats = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
+        logger.info("Rendering metronome (%.0f beats at %d BPM)...", total_beats, self._tempo)
+        events = generate_metronome(total_beats, self._tempo)
+        buf = render_backing_track(events, self._sf_path, total_beats, self._tempo)
+        self._sound = pygame.mixer.Sound(buffer=buf)
+        self._audio_dirty = False
+        logger.info("Render complete.")
+
+    def _show_status(self, message: str) -> None:
+        """Flash a status message on the HUD for one frame."""
+        surface = self._hud_window.get_surface()
+        surface.fill((30, 30, 30))
+        font = pygame.font.SysFont("consolas", 22)
+        text = font.render(message, True, (220, 220, 220))
+        w, h = surface.get_size()
+        surface.blit(text, ((w - text.get_width()) // 2, (h - text.get_height()) // 2))
+        self._hud_window.flip()
 
     # -- file loading --------------------------------------------------------
 
@@ -246,6 +338,7 @@ class App:
             analyze(ls)
             self._lead_sheet = ls
             self._tempo = ls.default_tempo
+            self._audio_dirty = True
             self._rebuild_timeline()
             self._prev_chord_symbol = None  # reset chord-change tracker
             _log_harmony_summary(ls)
@@ -303,6 +396,7 @@ class App:
             pb_state,
             self._exercise_idx,
             self._tempo,
+            self._metronome_on,
         )
         self._hud_window.flip()
 

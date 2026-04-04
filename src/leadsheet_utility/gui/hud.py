@@ -63,6 +63,7 @@ def render_hud(
     playback_state: PlaybackState,
     exercise_idx: int,
     tempo: int,
+    metronome_on: bool = False,
 ) -> None:
     """Draw the full HUD onto *surface*.  Called once per frame."""
     fonts = _get_fonts()
@@ -134,7 +135,8 @@ def render_hud(
         PlaybackState.PLAYING: "PLAYING",
         PlaybackState.PAUSED: "PAUSED",
     }[playback_state]
-    _blit(surface, fonts["body"], f"Status: {status_label}", 14, y, _ACCENT)
+    met_label = "ON" if metronome_on else "OFF"
+    _blit(surface, fonts["body"], f"Status: {status_label}    Metronome: {met_label}", 14, y, _ACCENT)
     y += 30
 
     # Progress bar
@@ -208,7 +210,8 @@ def _render_shortcuts(
     shortcuts = [
         "[SPACE] Play/Pause    [S] Stop",
         "[+/-] Tempo           [O] Open file",
-        "[C] Calibrate         [Q] Quit",
+        "[M] Metronome         [C] Calibrate",
+        "[Q] Quit",
     ]
     for line in shortcuts:
         _blit(surface, font, line, 14, y, _DIM)

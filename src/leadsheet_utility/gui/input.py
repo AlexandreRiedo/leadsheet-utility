@@ -26,6 +26,7 @@ class Action(Enum):
     EXERCISE_3 = auto()
     EXERCISE_4 = auto()
     EXERCISE_5 = auto()
+    TOGGLE_METRONOME = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -40,6 +41,7 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_MINUS: Action.TEMPO_DOWN,
     pygame.K_KP_MINUS: Action.TEMPO_DOWN,
     pygame.K_c: Action.CALIBRATE,
+    pygame.K_m: Action.TOGGLE_METRONOME,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,
