@@ -1,0 +1,1 @@
+- [No chromatic approach notes](feedback_no_chromatic_approach.md) — walking bass should use diatonic approaches, not chromatic

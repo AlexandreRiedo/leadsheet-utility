@@ -14,6 +14,7 @@ import pygame
 
 from leadsheet_utility.backing.events import generate_metronome
 from leadsheet_utility.backing.renderer import render_backing_track
+from leadsheet_utility.backing.walking_bass import generate_walking_bass
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
 from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
@@ -239,7 +240,7 @@ class App:
                 self._channel.pause()
         else:
             # Render audio if needed
-            if self._metronome_on and self._audio_dirty:
+            if self._audio_dirty:
                 if not self._ensure_soundfont():
                     return
                 self._render_audio()
@@ -249,7 +250,7 @@ class App:
                     self._channel.unpause()
             else:
                 # STOPPED → start fresh
-                if self._metronome_on and self._sound is not None:
+                if self._sound is not None:
                     self._channel = self._sound.play()
                 self._timeline.play()
 
@@ -285,7 +286,7 @@ class App:
         return True
 
     def _render_audio(self) -> None:
-        """Pre-render the metronome click track into a pygame Sound."""
+        """Pre-render the backing track (walking bass + optional metronome)."""
         if self._lead_sheet is None or self._sf_path is None:
             return
 
@@ -293,8 +294,16 @@ class App:
         self._show_status("Rendering audio...")
 
         total_beats = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
-        logger.info("Rendering metronome (%.0f beats at %d BPM)...", total_beats, self._tempo)
-        events = generate_metronome(total_beats, self._tempo)
+        logger.info("Rendering backing track (%.0f beats at %d BPM)...", total_beats, self._tempo)
+
+        events = generate_walking_bass(
+            self._lead_sheet.chords,
+            self._tempo,
+            form_repeats=self._lead_sheet.form_repeats,
+        )
+        if self._metronome_on:
+            events.extend(generate_metronome(total_beats, self._tempo))
+
         buf = render_backing_track(events, self._sf_path, total_beats, self._tempo)
         self._sound = pygame.mixer.Sound(buffer=buf)
         self._audio_dirty = False
