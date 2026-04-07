@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from leadsheet_utility.backing.events import (
+    GHOST_SNARE,
     HI_HAT_PEDAL,
     KICK,
     RIDE_CYMBAL,
@@ -23,9 +24,9 @@ TEMPO = 120
 class TestNoteNumbers:
     """Only expected GM drum notes should appear."""
 
-    def test_only_ride_hihat_kick(self):
+    def test_only_expected_notes(self):
         events = generate_drums(TOTAL_BEATS, TEMPO)
-        allowed = {RIDE_CYMBAL, HI_HAT_PEDAL, KICK}
+        allowed = {RIDE_CYMBAL, HI_HAT_PEDAL, KICK, GHOST_SNARE}
         for e in _on_events(events):
             assert e.note in allowed, f"Unexpected drum note {e.note}"
 
@@ -100,6 +101,23 @@ class TestSwingRatio:
         events = generate_drums(TOTAL_BEATS, TEMPO, swing_ratio=0.75)
         ride_ons = sorted(_on_events(events, RIDE_CYMBAL), key=lambda e: e.time_samples)
         assert len(ride_ons) == 24
+
+
+class TestGhostSnare:
+    """Ghost snare: soft, occasional, only on offbeats."""
+
+    def test_appears_over_many_bars(self):
+        # 64 bars = 256 beats → 256 offbeat chances at 25 % ≈ 64 expected.
+        # Vanishingly unlikely to get 0.
+        events = generate_drums(256.0, TEMPO)
+        snare_ons = _on_events(events, GHOST_SNARE)
+        assert len(snare_ons) > 0
+
+    def test_soft_velocity(self):
+        events = generate_drums(256.0, TEMPO)
+        for e in _on_events(events, GHOST_SNARE):
+            # Base 35 ± 10 humanization
+            assert e.velocity <= 55, f"Ghost snare too loud: {e.velocity}"
 
 
 class TestEmpty:

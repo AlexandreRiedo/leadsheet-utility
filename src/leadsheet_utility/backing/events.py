@@ -21,6 +21,7 @@ class MidiEvent:
 RIDE_CYMBAL = 51
 HI_HAT_PEDAL = 44
 KICK = 36
+GHOST_SNARE = 38
 SIDE_STICK = 37
 
 _DRUM_CHANNEL = 9
@@ -101,6 +102,7 @@ def generate_drums(
       the "and" of 2 and 4.
     - **Hi-hat pedal**: beats 2 and 4.
     - **Kick**: beat 1 (soft).
+    - **Ghost snare**: ~25 % chance on each swung offbeat (very soft).
     - Minor humanization on all hits (±5 ms, ±10 velocity).
 
     *swing_ratio* controls the placement of skip notes:
@@ -137,6 +139,13 @@ def generate_drums(
         if beat_in_bar == 0:
             events.extend(
                 _hit(beat, KICK, 50, spb, sample_rate, humanize=True),
+            )
+
+        # -- Ghost snare on random offbeats (~25 % chance) --------------------
+        ghost_beat = beat + swing_ratio  # same swung position as ride skip
+        if random.random() < 0.25 and ghost_beat < total_beats:
+            events.extend(
+                _hit(ghost_beat, GHOST_SNARE, 60, spb, sample_rate, humanize=True),
             )
 
         beat += 1

@@ -323,7 +323,7 @@ def generate_walking_bass(
             notes.append(beat1)
             prev_note = beat1
 
-        ascending = _update_direction(prev_note, ascending)
+        ascending = _update_direction(prev_note, ascending) # type: ignore
 
         # --- Emit MidiEvents -------------------------------------------------
         for i, note in enumerate(notes):
