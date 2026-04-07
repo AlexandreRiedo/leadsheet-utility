@@ -1,17 +1,17 @@
 """Algorithmic walking bass line generator.
 
-Produces one quarter-note bass event per beat.  Each bar picks a random
-*contour shape* for beats 2–3 (walk up, walk down, arch up, arch down)
-and mixes chord-tone leaps with scale-tone steps, so the line varies
-from bar to bar like a real player.
+Produces one quarter-note bass event per beat.  Direction persists for
+1–2 bar *phrases* before flipping, creating long ascending or descending
+arcs.  Within each bar, beats 2–3 follow the phrase direction (with an
+occasional mid-bar arch for variety) and mix chord-tone leaps with
+scale-tone steps.
 
 - **Beat 1**: Root (or 5th/3rd for repeated chords).
-- **Beats 2–3**: Contour-driven mix of chord tones and scale tones.
+- **Beats 2–3**: Phrase-direction mix of chord tones and scale tones.
 - **Beat 4**: Diatonic approach note targeting the next chord's root.
 - **2-beat chords**: Root + approach note.
 
-Range: MIDI 28 (E1) – 48 (C3).  Direction alternates across bars,
-clamped to stay within range.
+Range: MIDI 28 (E1) – 48 (C3).
 """
 
 from __future__ import annotations
@@ -32,14 +32,7 @@ BASS_MID = 38  # approximate centre of range
 BASS_CHANNEL = 0
 BASS_VELOCITY = 100
 LEGATO = 0.95  # fraction of a beat the note rings
-
-# Contour shapes for beats 2–3.  Each tuple is (go_up_beat2, go_up_beat3).
-_CONTOURS: list[tuple[bool, bool]] = [
-    (True, True),  # walk up
-    (False, False),  # walk down
-    (True, False),  # arch up
-    (False, True),  # arch down
-]
+_ARCH_CHANCE = 0.1  # probability of mid-bar direction reversal on beat 3
 
 
 # ---------------------------------------------------------------------------
@@ -115,7 +108,19 @@ def _pick_approach(
     target: int, scale_notes_bass: list[int], ascending: bool,
     avoid: int | None = None,
 ) -> int:
-    """Diatonic approach note to *target* — nearest scale tone above or below."""
+    """Approach note to *target* — diatonic step or a 4th/5th below.
+
+    ~25 % of the time uses a "dominant approach" (P4 or P5 below the
+    target), giving the line a stronger pull into the next root.
+    """
+    # Dominant approach: P4 below (5 semitones) or P5 above (7 semitones)
+    if random.random() < 0.25:
+        candidates = [target - 5, target + 7]
+        valid = [n for n in candidates if BASS_LOW <= n <= BASS_HIGH and n != avoid]
+        if valid:
+            return random.choice(valid)
+
+    # Diatonic step approach
     pool = [n for n in scale_notes_bass if n != target]
     if avoid is not None:
         preferred = [n for n in pool if n != avoid]
@@ -152,13 +157,13 @@ def _deduplicate(
     return result
 
 
-def _update_direction(note: int, ascending: bool) -> bool:
-    """Flip direction at range boundaries, otherwise alternate."""
+def _at_boundary(note: int) -> int | None:
+    """Return forced direction if *note* is near a range boundary, else None."""
     if note >= BASS_HIGH - 3:
-        return False
+        return False  # must descend
     if note <= BASS_LOW + 3:
-        return True
-    return not ascending
+        return True  # must ascend
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -178,8 +183,9 @@ def _walk_four(
 ) -> list[int]:
     """Generate 4 walking-bass notes for a single bar.
 
-    Picks a random contour shape and mixes chord-tone leaps with
-    scale-tone steps so consecutive bars don't sound identical.
+    Beats 2–3 follow the phrase *ascending* direction.  ~10 % of the
+    time beat 3 reverses (an "arch"), adding occasional variety without
+    chopping the phrase up.
     """
     # -- Beat 1 ---------------------------------------------------------------
     if use_alternate_root:
@@ -191,8 +197,9 @@ def _walk_four(
     else:
         beat1 = _pick_root(roots, prev_note, ascending)
 
-    # -- Contour for beats 2–3 ------------------------------------------------
-    dir2, dir3 = random.choice(_CONTOURS)
+    # -- Beats 2–3: follow phrase direction, occasional arch ------------------
+    dir2 = ascending
+    dir3 = (not ascending) if random.random() < _ARCH_CHANCE else ascending
 
     # Beat 2: ~30 % chance of a chord-tone leap, otherwise scale step
     if random.random() < 0.3 and ct_bass:
@@ -200,7 +207,7 @@ def _walk_four(
     else:
         beat2 = _pick_in_direction(sn_bass, beat1, dir2, avoid=beat1)
 
-    # Beat 3: mix it up again
+    # Beat 3
     if random.random() < 0.35 and ct_bass:
         beat3 = _pick_in_direction(ct_bass, beat2, dir3, avoid=beat2)
     else:
@@ -258,7 +265,23 @@ def generate_walking_bass(
             expanded.append((c, c.start_beat + offset, c.end_beat + offset))
 
     prev_note: int | None = None
-    ascending = True  # alternation gives natural ebb-and-flow
+    ascending = True  # start ascending — phrases flip after 1-2 bars
+    bars_in_phrase = 0
+    phrase_length = random.randint(1, 2)
+
+    def _advance_phrase() -> None:
+        """Flip direction at phrase boundaries or range limits."""
+        nonlocal ascending, bars_in_phrase, phrase_length
+        bars_in_phrase += 1
+        forced = _at_boundary(prev_note) if prev_note is not None else None
+        if forced is not None:
+            ascending = forced
+            bars_in_phrase = 0
+            phrase_length = random.randint(1, 2)
+        elif bars_in_phrase >= phrase_length:
+            ascending = not ascending
+            bars_in_phrase = 0
+            phrase_length = random.randint(1, 2)
 
     for idx, (chord, abs_start, abs_end) in enumerate(expanded):
         num_beats = int(round(abs_end - abs_start))
@@ -301,7 +324,7 @@ def generate_walking_bass(
             )
             notes.extend(bar_notes)
             prev_note = bar_notes[-1]
-            ascending = _update_direction(prev_note, ascending)
+            _advance_phrase()
             beats_left -= 4
             bar_idx += 1
 
@@ -312,8 +335,7 @@ def generate_walking_bass(
             prev_note = pair[-1]
         elif beats_left == 3:
             beat1 = _pick_root(roots, prev_note, ascending)
-            go_up = random.choice([True, False])
-            beat2 = _pick_in_direction(sn_bass, beat1, go_up, avoid=beat1)
+            beat2 = _pick_in_direction(sn_bass, beat1, ascending, avoid=beat1)
             beat3 = _pick_approach(next_target, sn_bass, ascending, avoid=beat2)
             trio = _deduplicate([beat1, beat2, beat3], sn_bass, prev_note)
             notes.extend(trio)
@@ -322,8 +344,6 @@ def generate_walking_bass(
             beat1 = _pick_root(roots, prev_note, ascending)
             notes.append(beat1)
             prev_note = beat1
-
-        ascending = _update_direction(prev_note, ascending) # type: ignore
 
         # --- Emit MidiEvents -------------------------------------------------
         for i, note in enumerate(notes):

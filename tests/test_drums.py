@@ -116,8 +116,8 @@ class TestGhostSnare:
     def test_soft_velocity(self):
         events = generate_drums(256.0, TEMPO)
         for e in _on_events(events, GHOST_SNARE):
-            # Base 35 ± 10 humanization
-            assert e.velocity <= 55, f"Ghost snare too loud: {e.velocity}"
+            # Base 60 ± 10 humanization
+            assert e.velocity <= 80, f"Ghost snare too loud: {e.velocity}"
 
 
 class TestEmpty:

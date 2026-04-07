@@ -187,7 +187,8 @@ class TestApproachNotes:
                 key=lambda n: abs(n - approach.note),
             )
             distance = abs(approach.note - next_root_midi)
-            assert distance <= 4, (
+            # Diatonic step ≤ 4, dominant approach (P4/P5) ≤ 7
+            assert distance <= 7, (
                 f"Approach note {approach.note} too far from next root "
                 f"{next_root} ({next_root_midi}): distance={distance}"
             )
