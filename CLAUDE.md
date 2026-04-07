@@ -81,7 +81,7 @@ Sync: timeline uses wall-clock elapsed time (perf_counter) -> drives both projec
 - **`src/leadsheet_utility/leadsheet/`** — `parser.py` (TSV + sidecar parsing), `models.py` (ChordEvent/LeadSheet dataclasses)
 - **`src/leadsheet_utility/harmony/`** — `constants.py` (scale/chord-tone tables, quality-to-scale map), `core.py` (scale resolver with 6 context rules, guide-tone line computation, `analyze()` entry point)
 - **`src/leadsheet_utility/timeline/`** — `engine.py`: wall-clock-based musical clock with play/pause/stop transport. Uses `ClockSource` protocol for testability. Binary-searches chord list to resolve current chord each frame.
-- **`src/leadsheet_utility/backing/`** — `events.py` (MidiEvent dataclass, metronome click generator), `renderer.py` (offline FluidSynth rendering to numpy int16 buffer for pygame.mixer)
+- **`src/leadsheet_utility/backing/`** — `events.py` (MidiEvent dataclass, metronome, count-in, and swing drum pattern generators), `walking_bass.py` (algorithmic walking bass with phrase-direction arcs, chord-tone variation, approach notes), `renderer.py` (offline FluidSynth rendering to numpy int16 buffer for pygame.mixer)
 - **`src/leadsheet_utility/gui/`** — `hud.py` (HUD rendering: song info, current/next chord, exercise selector, progress bar, shortcuts), `input.py` (key-to-action mapping via enum)
 - **`src/leadsheet_utility/main.py`** — `App` class: two-window pygame-ce loop (projection + HUD), transport controls, file dialog, audio rendering orchestration
 - **`data/leadsheets/`** — 14 lead sheets as `.tsv` + `.meta.json` pairs

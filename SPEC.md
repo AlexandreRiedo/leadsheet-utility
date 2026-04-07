@@ -106,7 +106,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `leadsheet` | **Done** | Parse MIR-style `.tsv` + `.meta.json` into `LeadSheet`/`ChordEvent` dataclasses |
 | `harmony` | **Done** | Chord symbol → scale pitches, chord tones, guide tones (lookup + 6 context rules) |
 | `timeline` | **Done** | Musical clock deriving beat position from audio playback, resolving current chord |
-| `backing` | **Partial** | Currently: metronome clicks + FluidSynth offline rendering. TODO: walking bass + drums |
+| `backing` | **Done** | Walking bass generator + swing drum pattern + metronome + count-in + FluidSynth offline rendering |
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar |
 | `exercises` | **Not started** | 5 exercise modes computing colored highlights per beat |
 | `projection` | **Not started** | Render canonical keyboard image, warp with homography, display on projector |
@@ -361,7 +361,7 @@ Target **60 FPS**. Per-frame work: ~7–15 filled rectangles into a small canoni
 
 ### Current State
 
-`backing/events.py` has the `MidiEvent` dataclass and a metronome click generator. `backing/renderer.py` does offline FluidSynth rendering to a NumPy int16 buffer for `pygame.mixer`. **Walking bass and drum generators are not yet implemented.**
+Fully implemented. `backing/events.py` has the `MidiEvent` dataclass, metronome click generator, count-in generator, and swing drum pattern (`generate_drums`). `backing/walking_bass.py` implements the full algorithmic walking bass (`generate_walking_bass`). `backing/renderer.py` does offline FluidSynth rendering to a NumPy int16 buffer for `pygame.mixer`.
 
 ### Architecture: Generate Events → Offline FluidSynth Render → Play
 
@@ -373,33 +373,35 @@ Target **60 FPS**. Per-frame work: ~7–15 filled rectangles into a small canoni
 
 GM SoundFont (`.sf2`) required. The bundled `data/soundfonts/GeneralUser-GS.sf2` is used by default. Path configurable in `~/.leadsheet-utility/config.json`.
 
-### Walking Bass Generator — Not Implemented
+### Walking Bass Generator — Implemented
 
-Algorithmic walking bass: for each bar, generate a 4-note (quarter-note) bass line as `MidiEvent` objects on channel 0 (GM Acoustic Bass, program 33).
+Algorithmic walking bass in `backing/walking_bass.py`. Generates a 4-note (quarter-note) bass line per bar as `MidiEvent` objects on channel 0 (GM Acoustic Bass, program 33).
 
 **Algorithm:**
-1. **Beat 1**: Root of the chord (in bass range). If repeating same chord, may use 5th or 3rd.
-2. **Beat 2**: Scale tone between beat 1 and beat 3 (stepwise motion).
-3. **Beat 3**: 5th or another chord tone. Should differ from beat 1.
-4. **Beat 4**: Approach note targeting next bar's beat 1 — chromatic half step above/below next root (strongest), whole step (diatonic), or 5th of next chord (dominant approach).
-5. **Range**: MIDI 28 (E1) to MIDI 48 (C3).
-6. Quarter-note duration (legato). Notes generally move by step or small skip.
+1. **Beat 1**: Root of the chord (in bass range). Alternate chord tones (5th/3rd) for repeated chords.
+2. **Beats 2–3**: Phrase-direction mix of chord tones and scale tones. ~5% chance of a mid-bar arch (direction reversal on beat 3) for variety. Occasionally enters "chord-tones-only" streaks for a more harmonic, outlined sound.
+3. **Beat 4**: Diatonic approach note targeting next bar's beat 1. ~25% chance of a "dominant approach" (P4 below or P5 above target).
+4. **Range**: MIDI 28 (E1) to MIDI 48 (C3).
+5. Legato duration (0.95 × beat). Consecutive repeats replaced by nearest scale tone.
 
-**Direction**: Alternate ascending/descending across bars. If near range ceiling (48), walk down. Near floor (28), walk up.
+**Direction**: Ascending/descending phrases of 1–2 bars that flip at boundaries. Range limits (within 3 semitones of ceiling/floor) force a direction reversal.
 
-**Two-beat chords**: Beat 1 = root, Beat 2 = approach note to next chord.
+**Two-beat chords**: Root + approach note. Three-beat chords: root + scale step + approach.
 
-### Drum Pattern Generator — Not Implemented
+### Drum Pattern Generator — Implemented
 
-Swing ride pattern per bar, as `MidiEvent` objects on channel 9 (GM drums).
+Swing ride pattern per bar in `backing/events.py` (`generate_drums`). `MidiEvent` objects on channel 9 (GM drums).
 
-**GM drum mapping**: Ride=51, Hi-hat pedal=44, Kick=36, Ghost snare=38 (low velocity).
+**GM drum mapping**: Ride=51, Hi-hat pedal=44, Kick=36, Ghost snare=38 (low velocity), Side-stick=37 (metronome/count-in).
 
 **Pattern per bar:**
-- Ride: quarter notes on 1, 2, 3, 4 + swing eighth "skip" on the and of 2 and 4
+- Ride: quarter notes on 1, 2, 3, 4 + swing-eighth skip on the "and" of 2 and 4
 - Hi-hat pedal: beats 2 and 4
 - Kick: beat 1 (velocity ~50)
+- Ghost snare: ~25% chance on each swung offbeat (velocity ~60, humanized)
 - Minor humanization: velocity ±10, timing ±5ms (±220 samples at 44.1kHz)
+
+**Count-in**: `generate_count_in` produces side-stick metronome clicks for N bars before playback, with visual grid feedback in the HUD.
 
 ### Swing Timing
 
@@ -480,6 +482,9 @@ ruff = ">=0.4"
 - [x] Harmony analyzer (chord → scale, 6 context rules, guide-tone voice-leading)
 - [x] Timeline engine (audio-clock-synced, play/pause/stop, form looping)
 - [x] Offline FluidSynth rendering + `pygame.mixer` playback
+- [x] Walking bass generator (algorithmic, quarter notes, phrase-direction arcs)
+- [x] Drum pattern (swing ride + hi-hat on 2 & 4, ghost snares, humanization)
+- [x] Count-in (visual grid in HUD + side-stick audio)
 - [x] Keyboard-shortcut-driven Pygame UI with HUD
 - [x] Metronome (toggleable)
 - [x] 14 example lead sheet files
@@ -490,8 +495,6 @@ ruff = ">=0.4"
 - [ ] Calibration (4-point marker drag UI)
 - [ ] Free Mode exercise
 - [ ] Guide Tone exercise
-- [ ] Walking bass generator (algorithmic, quarter notes)
-- [ ] Drum pattern (swing ride + hi-hat on 2 & 4)
 
 ### Stretch Goals
 
@@ -499,12 +502,7 @@ ruff = ">=0.4"
 - [ ] Flow exercise
 - [ ] Start & End Note exercise
 - [ ] Camera-based automatic calibration
-- [ ] Humanized bass lines (rhythmic variation, chromatic approaches)
-- [ ] Chord chart scrolling display in HUD
-- [ ] MIDI input from the piano
-- [ ] Swing ratio control in GUI
 - [ ] Piano comping track
-- [ ] Real-time FluidSynth playback via PortAudio/ASIO
 
 ---
 
@@ -518,12 +516,12 @@ Test-driven development. Tests define expected behavior before implementation. T
 - `test_harmony.py` — scale resolution per quality, extension overrides, context rules
 - `test_harmony_fixtures.py` — fixture-based full-form harmony regression (parametrized per piece per chord)
 - `test_timeline.py` — musical clock, transport, chord resolution
+- `test_walking_bass.py` — voice-leading, valid MIDI range (28–48), approach notes at chord boundaries
+- `test_drums.py` — correct GM note numbers, swing timing offsets, humanization
 - `test_main.py` — app integration
 
 ### Planned Tests
 
-- Walking bass — voice-leading, valid MIDI range (28–48), approach notes at chord boundaries
-- Drums — correct GM note numbers, swing timing offsets
 - Exercises — highlight outputs for known chord sequences
 - FluidSynth rendering (integration) — valid stereo int16 buffer of expected length
 
