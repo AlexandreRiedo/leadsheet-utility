@@ -22,6 +22,9 @@ _ACCENT = (100, 200, 120)
 _BAR_BG = (60, 60, 60)
 _BAR_FILL = (80, 180, 100)
 _TITLE_BG = (45, 45, 45)
+_COUNT_IN_EMPTY = (60, 60, 60)
+_COUNT_IN_FILL = (60, 160, 80)
+_COUNT_IN_ACCENT = (100, 200, 120)
 
 # ---------------------------------------------------------------------------
 # Exercise names
@@ -64,12 +67,19 @@ def render_hud(
     exercise_idx: int,
     tempo: int,
     metronome_on: bool = False,
+    count_in_beat: float | None = None,
+    count_in_total_beats: int = 0,
 ) -> None:
     """Draw the full HUD onto *surface*.  Called once per frame."""
     fonts = _get_fonts()
     surface.fill(_BG)
-    w = surface.get_width()
+    w, h = surface.get_size()
     y = 0
+
+    # -- Count-in overlay (covers the whole HUD) -----------------------------
+    if count_in_beat is not None and count_in_total_beats > 0:
+        _render_count_in(surface, fonts, count_in_beat, count_in_total_beats)
+        return
 
     # -- Title bar -----------------------------------------------------------
     pygame.draw.rect(surface, _TITLE_BG, (0, 0, w, 40))
@@ -166,6 +176,53 @@ def _blit(
 ) -> None:
     rendered = font.render(text, True, color)
     surface.blit(rendered, (x, y))
+
+
+def _render_count_in(
+    surface: pygame.Surface,
+    fonts: dict[str, pygame.font.Font],
+    count_in_beat: float,
+    total_count_in_beats: int,
+) -> None:
+    """Draw a two-row grid of squares that fill in one-by-one during count-in."""
+    w, h = surface.get_size()
+    filled = min(int(count_in_beat) + 1, total_count_in_beats)  # +1: fill on the beat, not after
+
+    beats_per_bar = total_count_in_beats // 2
+    sq_size = 60
+    gap = 16
+
+    # Two rows, beats_per_bar squares each
+    grid_w = beats_per_bar * sq_size + (beats_per_bar - 1) * gap
+    row_h = sq_size * 2 + gap
+    x_start = (w - grid_w) // 2
+    y_start = (h - row_h) // 2
+
+    # Title
+    title = "Get Ready..."
+    _blit(surface, fonts["heading"], title, (w - fonts["heading"].size(title)[0]) // 2, y_start - 50, _TEXT)
+
+    for i in range(total_count_in_beats):
+        row = i // beats_per_bar
+        col = i % beats_per_bar
+        x = x_start + col * (sq_size + gap)
+        y = y_start + row * (sq_size + gap)
+        if i < filled:
+            color = _COUNT_IN_ACCENT if col == 0 else _COUNT_IN_FILL
+            pygame.draw.rect(surface, color, (x, y, sq_size, sq_size))
+        else:
+            pygame.draw.rect(surface, _COUNT_IN_EMPTY, (x, y, sq_size, sq_size))
+        pygame.draw.rect(surface, _DIM, (x, y, sq_size, sq_size), 2)
+
+    # Beat number below the grid
+    beat_label = str(filled) if filled <= total_count_in_beats else ""
+    if beat_label:
+        _blit(
+            surface, fonts["heading"], beat_label,
+            (w - fonts["heading"].size(beat_label)[0]) // 2,
+            y_start + row_h + 14,
+            _ACCENT,
+        )
 
 
 def _render_exercises(

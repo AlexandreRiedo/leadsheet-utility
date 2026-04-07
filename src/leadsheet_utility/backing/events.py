@@ -61,6 +61,17 @@ def _hit(
 # ---------------------------------------------------------------------------
 
 
+def generate_count_in(
+    tempo: int,
+    beats_per_bar: int = 4,
+    num_bars: int = 2,
+    sample_rate: int = 44100,
+) -> list[MidiEvent]:
+    """Generate count-in metronome clicks (side-stick) for *num_bars* bars."""
+    total_beats = beats_per_bar * num_bars
+    return generate_metronome(total_beats, tempo, sample_rate)
+
+
 def generate_metronome(
     total_beats: float,
     tempo: int,

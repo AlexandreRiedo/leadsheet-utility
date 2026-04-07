@@ -8,11 +8,12 @@ the same :class:`~leadsheet_utility.timeline.Timeline` state.
 from __future__ import annotations
 
 import logging
+import time
 from pathlib import Path
 
 import pygame
 
-from leadsheet_utility.backing.events import generate_drums, generate_metronome
+from leadsheet_utility.backing.events import generate_count_in, generate_drums, generate_metronome
 from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
@@ -159,6 +160,13 @@ class App:
         self._audio_dirty: bool = True  # re-render needed
         self._metronome_on: bool = False
 
+        # -- Count-in state ----------------------------------------------------
+        self._count_in_active: bool = False
+        self._count_in_start: float = 0.0  # perf_counter timestamp
+        self._count_in_total_beats: int = 0
+        self._count_in_spb: float = 0.0  # seconds per beat at current tempo
+        self._count_in_channel: pygame.mixer.Channel | None = None
+
     # -- public interface ----------------------------------------------------
 
     def run(self) -> None:
@@ -166,6 +174,7 @@ class App:
         try:
             while self._running:
                 self._process_events()
+                self._update_count_in()
                 tl_state = self._get_timeline_state()
                 self._check_chord_change(tl_state)
                 self._render_projection()
@@ -233,32 +242,90 @@ class App:
     def _toggle_play_pause(self) -> None:
         if self._timeline is None or self._lead_sheet is None:
             return
+
+        # During count-in, treat play/pause as stop
+        if self._count_in_active:
+            self._stop_count_in()
+            return
+
         state = self._timeline.playback_state
         if state is PlaybackState.PLAYING:
             self._timeline.pause()
             if self._channel and self._channel.get_busy():
                 self._channel.pause()
-        else:
+        elif state is PlaybackState.PAUSED:
             # Render audio if needed
             if self._audio_dirty:
                 if not self._ensure_soundfont():
                     return
                 self._render_audio()
-            if state is PlaybackState.PAUSED:
-                self._timeline.play()
-                if self._channel:
-                    self._channel.unpause()
-            else:
-                # STOPPED → start fresh
-                if self._sound is not None:
-                    self._channel = self._sound.play()
-                self._timeline.play()
+            self._timeline.play()
+            if self._channel:
+                self._channel.unpause()
+        else:
+            # STOPPED → start count-in, then play
+            if self._audio_dirty:
+                if not self._ensure_soundfont():
+                    return
+                self._render_audio()
+            self._start_count_in()
 
     def _stop_playback(self) -> None:
+        self._stop_count_in()
         if self._channel and self._channel.get_busy():
             self._channel.stop()
         if self._timeline:
             self._timeline.stop()
+
+    # -- count-in --------------------------------------------------------------
+
+    def _start_count_in(self) -> None:
+        """Render and play a count-in, then transition to real playback."""
+        if self._lead_sheet is None or self._sf_path is None:
+            return
+
+        beats_per_bar = self._lead_sheet.time_signature[0]
+        self._count_in_total_beats = beats_per_bar * 2
+        self._count_in_spb = 60.0 / self._tempo
+
+        events = generate_count_in(self._tempo, beats_per_bar, num_bars=2)
+        buf = render_backing_track(
+            events, self._sf_path, self._count_in_total_beats, self._tempo,
+        )
+        sound = pygame.mixer.Sound(buffer=buf)
+        self._count_in_channel = sound.play()
+        # Keep a reference so the Sound isn't garbage-collected
+        self._count_in_sound_obj = sound
+        self._count_in_start = time.perf_counter()
+        self._count_in_active = True
+
+    def _stop_count_in(self) -> None:
+        if not self._count_in_active:
+            return
+        if self._count_in_channel and self._count_in_channel.get_busy():
+            self._count_in_channel.stop()
+        self._count_in_active = False
+
+    def _update_count_in(self) -> None:
+        """Check if the count-in has finished; if so, start real playback."""
+        if not self._count_in_active:
+            return
+        elapsed = time.perf_counter() - self._count_in_start
+        beat = elapsed / self._count_in_spb
+        if beat >= self._count_in_total_beats:
+            self._count_in_active = False
+            # Start real playback
+            if self._sound is not None:
+                self._channel = self._sound.play()
+            if self._timeline:
+                self._timeline.play()
+
+    def _get_count_in_beat(self) -> float | None:
+        """Return current beat within count-in, or None if not counting in."""
+        if not self._count_in_active:
+            return None
+        elapsed = time.perf_counter() - self._count_in_start
+        return elapsed / self._count_in_spb
 
     def _ensure_soundfont(self) -> bool:
         """Prompt for SoundFont path if not set. Returns True if available."""
@@ -407,6 +474,8 @@ class App:
             self._exercise_idx,
             self._tempo,
             self._metronome_on,
+            count_in_beat=self._get_count_in_beat(),
+            count_in_total_beats=self._count_in_total_beats,
         )
         self._hud_window.flip()
 

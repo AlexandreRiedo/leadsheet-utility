@@ -61,6 +61,7 @@ class TimelineState(NamedTuple):
     """0-indexed repeat counter."""
 
 
+
 # ---------------------------------------------------------------------------
 # Timeline engine
 # ---------------------------------------------------------------------------
@@ -196,7 +197,7 @@ class Timeline:
 
     @property
     def total_beats(self) -> float:
-        """Total beats across all form repeats."""
+        """Total beats across all form repeats (excluding count-in)."""
         return self._total_beats
 
     @property
