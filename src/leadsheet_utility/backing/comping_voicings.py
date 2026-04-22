@@ -36,6 +36,12 @@ def _chord_interval_tuple(chord: ChordEvent) -> tuple[int, ...]:
     Returns ``(0, i2, i3)`` for triads or ``(0, i2, i3, i4)`` for 7th chords.
     Operates on ``chord.chord_tones`` (MIDI notes) relative to the effective
     root pitch class.
+
+    Substitutes the natural 5th based on chord context:
+
+    - ``#11`` / ``b5`` extensions or ``maj7#11`` quality → replace 5 with #11 (6)
+    - ``b9`` / ``b13`` extensions (phrygian-dominant / harmonic-minor V feel,
+      without a natural 13) → replace 5 with b6 (8)
     """
     root_pc = _effective_root_pc(chord)
     seen: set[int] = set()
@@ -46,6 +52,20 @@ def _chord_interval_tuple(chord: ChordEvent) -> tuple[int, ...]:
             seen.add(interval)
             intervals.append(interval)
     intervals.sort()
+
+    if 7 in intervals:
+        exts = set(chord.extensions)
+        use_sharp11 = "#11" in exts or "b5" in exts or chord.quality == "maj7#11"
+        use_flat13 = (
+            ("b9" in exts or "b13" in exts)
+            and "13" not in exts
+            and not use_sharp11
+        )
+        if use_sharp11:
+            intervals = [6 if i == 7 else i for i in intervals]
+        elif use_flat13:
+            intervals = [8 if i == 7 else i for i in intervals]
+
     return tuple(intervals)
 
 
