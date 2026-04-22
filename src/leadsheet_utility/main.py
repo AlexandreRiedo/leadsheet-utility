@@ -160,6 +160,7 @@ class App:
         self._channel: pygame.mixer.Channel | None = None
         self._audio_dirty: bool = True  # re-render needed
         self._metronome_on: bool = False
+        self._comping_on: bool = True
 
         # -- Count-in state ----------------------------------------------------
         self._count_in_active: bool = False
@@ -232,6 +233,13 @@ class App:
             self._stop_playback()
             self._rebuild_timeline()
             logger.info("Metronome %s", "ON" if self._metronome_on else "OFF")
+
+        elif action is Action.TOGGLE_COMPING:
+            self._comping_on = not self._comping_on
+            self._audio_dirty = True
+            self._stop_playback()
+            self._rebuild_timeline()
+            logger.info("Comping %s", "ON" if self._comping_on else "OFF")
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -370,11 +378,12 @@ class App:
             form_repeats=self._lead_sheet.form_repeats,
         )
         events.extend(generate_drums(total_beats, self._tempo))
-        events.extend(generate_comping(
-            self._lead_sheet.chords,
-            self._tempo,
-            form_repeats=self._lead_sheet.form_repeats,
-        ))
+        if self._comping_on:
+            events.extend(generate_comping(
+                self._lead_sheet.chords,
+                self._tempo,
+                form_repeats=self._lead_sheet.form_repeats,
+            ))
         if self._metronome_on:
             events.extend(generate_metronome(total_beats, self._tempo))
 
@@ -480,6 +489,7 @@ class App:
             self._exercise_idx,
             self._tempo,
             self._metronome_on,
+            comping_on=self._comping_on,
             count_in_beat=self._get_count_in_beat(),
             count_in_total_beats=self._count_in_total_beats,
         )

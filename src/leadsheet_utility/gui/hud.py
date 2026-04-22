@@ -67,6 +67,7 @@ def render_hud(
     exercise_idx: int,
     tempo: int,
     metronome_on: bool = False,
+    comping_on: bool = True,
     count_in_beat: float | None = None,
     count_in_total_beats: int = 0,
 ) -> None:
@@ -146,7 +147,13 @@ def render_hud(
         PlaybackState.PAUSED: "PAUSED",
     }[playback_state]
     met_label = "ON" if metronome_on else "OFF"
-    _blit(surface, fonts["body"], f"Status: {status_label}    Metronome: {met_label}", 14, y, _ACCENT)
+    comp_label = "ON" if comping_on else "OFF"
+    _blit(
+        surface,
+        fonts["body"],
+        f"Status: {status_label}    Metronome: {met_label}    Comping: {comp_label}",
+        14, y, _ACCENT,
+    )
     y += 30
 
     # Progress bar
@@ -267,8 +274,8 @@ def _render_shortcuts(
     shortcuts = [
         "[SPACE] Play/Pause    [S] Stop",
         "[+/-] Tempo           [O] Open file",
-        "[M] Metronome         [C] Calibrate",
-        "[Q] Quit",
+        "[M] Metronome         [G] Comping",
+        "[C] Calibrate         [Q] Quit",
     ]
     for line in shortcuts:
         _blit(surface, font, line, 14, y, _DIM)
