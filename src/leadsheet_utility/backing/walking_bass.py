@@ -33,7 +33,7 @@ BASS_CHANNEL = 0
 BASS_VELOCITY = 100
 LEGATO = 0.95  # fraction of a beat the note rings
 _ARCH_CHANCE = 0.05  # probability of mid-bar direction reversal on beat 3
-_CHORD_TONE_CHANCE = 0.5  # probability of starting a chord-tone-only phrase
+_CHORD_TONE_CHANCE = 0.6  # probability of starting a chord-tone-only phrase
 
 
 # ---------------------------------------------------------------------------

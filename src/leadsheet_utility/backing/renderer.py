@@ -31,6 +31,7 @@ def render_backing_track(
     synth = fluidsynth.Synth(samplerate=float(sample_rate), gain=0.2)
     sfid = synth.sfload(sf_path)
     synth.program_select(0, sfid, 0, 33)   # channel 0 → Acoustic Bass (GM #34)
+    synth.program_select(1, sfid, 0, 26)   # channel 1 → Electric Guitar Jazz (GM #27)
     synth.program_select(9, sfid, 128, 0)  # channel 9 → GM drums
 
     total_samples = int((total_beats * 60.0 / tempo) * sample_rate)

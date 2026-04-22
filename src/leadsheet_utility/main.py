@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pygame
 
+from leadsheet_utility.backing.comping import generate_comping
 from leadsheet_utility.backing.events import generate_count_in, generate_drums, generate_metronome
 from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
@@ -369,6 +370,11 @@ class App:
             form_repeats=self._lead_sheet.form_repeats,
         )
         events.extend(generate_drums(total_beats, self._tempo))
+        events.extend(generate_comping(
+            self._lead_sheet.chords,
+            self._tempo,
+            form_repeats=self._lead_sheet.form_repeats,
+        ))
         if self._metronome_on:
             events.extend(generate_metronome(total_beats, self._tempo))
 
