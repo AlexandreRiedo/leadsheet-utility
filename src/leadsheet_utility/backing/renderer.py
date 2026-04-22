@@ -28,11 +28,16 @@ def render_backing_track(
     Returns an array shaped ``(total_samples * 2,)`` with interleaved L/R
     samples, ready for ``pygame.mixer.Sound``.
     """
-    synth = fluidsynth.Synth(samplerate=float(sample_rate), gain=0.2)
+    synth = fluidsynth.Synth(samplerate=float(sample_rate), gain=0.5)
     sfid = synth.sfload(sf_path)
     synth.program_select(0, sfid, 0, 33)   # channel 0 → Acoustic Bass (GM #34)
     synth.program_select(1, sfid, 0, 26)   # channel 1 → Electric Guitar Jazz (GM #27)
     synth.program_select(9, sfid, 128, 0)  # channel 9 → GM drums
+
+    # Per-channel volume balance (MIDI CC7, 0-127).
+    synth.cc(0, 7, 110)  # bass: full
+    synth.cc(1, 7, 100)   # guitar: full
+    synth.cc(9, 7, 115)  # drums: near full
 
     total_samples = int((total_beats * 60.0 / tempo) * sample_rate)
     buf = np.zeros(total_samples * 2, dtype=np.float32)
@@ -59,8 +64,10 @@ def render_backing_track(
 
     synth.delete()
 
-    # Normalize to ~80% of int16 range to avoid clipping
-    peak = np.max(np.abs(buf))
-    if peak > 0:
-        buf = buf / peak * 0.8
+    # Clip-only: scale down if we would overflow int16, never amplify.
+    # Amplifying the whole mix made bass loudness depend on whether comping was
+    # active, because adding voices raised the peak.
+    peak = float(np.max(np.abs(buf))) if buf.size else 0.0
+    if peak > 0.95:
+        buf = buf * (0.95 / peak)
     return (buf * 32767).astype(np.int16)
