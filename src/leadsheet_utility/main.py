@@ -8,13 +8,15 @@ the same :class:`~leadsheet_utility.timeline.Timeline` state.
 from __future__ import annotations
 
 import logging
+import threading
 import time
 from pathlib import Path
 
+import numpy as np
 import pygame
 
 from leadsheet_utility.backing.comping import generate_comping
-from leadsheet_utility.backing.events import generate_count_in, generate_drums, generate_metronome
+from leadsheet_utility.backing.events import MidiEvent, generate_count_in, generate_drums, generate_metronome
 from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
@@ -162,6 +164,11 @@ class App:
         self._metronome_on: bool = False
         self._comping_on: bool = True
 
+        # -- Async render state ----------------------------------------------
+        self._render_thread: threading.Thread | None = None
+        self._render_result: np.ndarray | None = None
+        self._render_pending_action: str | None = None  # "count_in" or "resume"
+
         # -- Count-in state ----------------------------------------------------
         self._count_in_active: bool = False
         self._count_in_start: float = 0.0  # perf_counter timestamp
@@ -176,6 +183,7 @@ class App:
         try:
             while self._running:
                 self._process_events()
+                self._update_render()
                 self._update_count_in()
                 tl_state = self._get_timeline_state()
                 self._check_chord_change(tl_state)
@@ -257,26 +265,32 @@ class App:
             self._stop_count_in()
             return
 
+        # Ignore input while an async render is in flight
+        if self._rendering:
+            return
+
         state = self._timeline.playback_state
         if state is PlaybackState.PLAYING:
             self._timeline.pause()
             if self._channel and self._channel.get_busy():
                 self._channel.pause()
         elif state is PlaybackState.PAUSED:
-            # Render audio if needed
+            # Render asynchronously if needed; resume once it completes
             if self._audio_dirty:
                 if not self._ensure_soundfont():
                     return
-                self._render_audio()
+                self._start_render_async("resume")
+                return
             self._timeline.play()
             if self._channel:
                 self._channel.unpause()
         else:
-            # STOPPED → start count-in, then play
+            # STOPPED → render if needed, then start count-in
             if self._audio_dirty:
                 if not self._ensure_soundfont():
                     return
-                self._render_audio()
+                self._start_render_async("count_in")
+                return
             self._start_count_in()
 
     def _stop_playback(self) -> None:
@@ -361,13 +375,18 @@ class App:
         logger.info("SoundFont: %s", path)
         return True
 
-    def _render_audio(self) -> None:
-        """Pre-render the backing track (walking bass + optional metronome)."""
+    def _start_render_async(self, after_done: str) -> None:
+        """Kick off a background thread to render the backing track.
+
+        *after_done* is the action to trigger once the render finishes:
+        ``"count_in"`` (fresh start → play count-in then song) or
+        ``"resume"`` (coming back from a tempo/comping change).
+        The main loop polls via :meth:`_update_render`.
+        """
         if self._lead_sheet is None or self._sf_path is None:
             return
-
-        # Show "Rendering..." on the HUD before blocking
-        self._show_status("Rendering audio...")
+        if self._render_thread is not None and self._render_thread.is_alive():
+            return
 
         total_beats = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
         logger.info("Rendering backing track (%.0f beats at %d BPM)...", total_beats, self._tempo)
@@ -387,17 +406,71 @@ class App:
         if self._metronome_on:
             events.extend(generate_metronome(total_beats, self._tempo))
 
-        buf = render_backing_track(events, self._sf_path, total_beats, self._tempo)
+        self._render_pending_action = after_done
+        self._render_result = None
+        self._render_thread = threading.Thread(
+            target=self._render_worker,
+            args=(events, total_beats, self._tempo, self._sf_path),
+            daemon=True,
+        )
+        self._render_thread.start()
+
+    def _render_worker(
+        self,
+        events: list[MidiEvent],
+        total_beats: float,
+        tempo: int,
+        sf_path: str,
+    ) -> None:
+        """Run on a background thread: render events to a stereo int16 buffer."""
+        try:
+            self._render_result = render_backing_track(events, sf_path, total_beats, tempo)
+        except Exception:
+            logger.exception("Backing-track render failed")
+            self._render_result = None
+
+    def _update_render(self) -> None:
+        """Finalise an async render when the thread completes."""
+        if self._render_thread is None:
+            return
+        if self._render_thread.is_alive():
+            return
+
+        self._render_thread.join()
+        self._render_thread = None
+
+        buf = self._render_result
+        self._render_result = None
+        action = self._render_pending_action
+        self._render_pending_action = None
+
+        if buf is None:
+            return
+
         self._sound = pygame.mixer.Sound(buffer=buf)
         self._audio_dirty = False
         logger.info("Render complete.")
 
-    def _show_status(self, message: str) -> None:
-        """Flash a status message on the HUD for one frame."""
+        if action == "count_in":
+            self._start_count_in()
+        elif action == "resume":
+            if self._timeline is not None:
+                self._timeline.play()
+            if self._sound is not None:
+                self._channel = self._sound.play()
+
+    @property
+    def _rendering(self) -> bool:
+        """True while the async render thread is running."""
+        return self._render_thread is not None and self._render_thread.is_alive()
+
+    def _render_loading_screen(self, message: str) -> None:
+        """Draw an animated 'Rendering audio...' screen while the render thread runs."""
         surface = self._hud_window.get_surface()
         surface.fill((30, 30, 30))
         font = pygame.font.SysFont("consolas", 22)
-        text = font.render(message, True, (220, 220, 220))
+        n_dots = 1 + (int(time.perf_counter() * 3) % 3)
+        text = font.render(f"{message}{'.' * n_dots}", True, (220, 220, 220))
         w, h = surface.get_size()
         surface.blit(text, ((w - text.get_width()) // 2, (h - text.get_height()) // 2))
         self._hud_window.flip()
@@ -475,6 +548,9 @@ class App:
 
     def _render_hud(self, tl_state: TimelineState | None) -> None:
         """Render the HUD window."""
+        if self._rendering:
+            self._render_loading_screen("Rendering audio")
+            return
         surface = self._hud_window.get_surface()
         pb_state = (
             self._timeline.playback_state
