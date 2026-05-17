@@ -1,5 +1,4 @@
 # WIP
-- Update CLAUDE.md, SPEC.md
 - Ask about how the projection will work
 - Setup Init calibration
 
