@@ -10,7 +10,7 @@ SPEC.md is the authoritative design reference (treat it as a living document tha
 
 ## Project Status: Early Development
 
-Core pipeline is functional end-to-end: lead sheets can be loaded, harmony analyzed, a metronome backing track rendered via FluidSynth, and playback driven from a shared timeline with a HUD window. The `exercises`, `projection`, and `calibration` modules are **not yet implemented** — if a referenced file for these is missing, assume we need to create it.
+Core pipeline is functional end-to-end: lead sheets can be loaded, harmony analyzed, a full backing track (walking bass + swing drums + jazz guitar comping) rendered via FluidSynth, and playback driven from a shared timeline with a HUD window. Backing track rendering happens on a background thread with a "Rendering audio..." loading screen on the HUD, followed by a 2-bar count-in before playback begins. The `exercises`, `projection`, and `calibration` modules are **not yet implemented** — if a referenced file for these is missing, assume we need to create it. The projector hardware has been acquired and projection is the next module to be built.
 
 ## Commands
 
@@ -81,9 +81,9 @@ Sync: timeline uses wall-clock elapsed time (perf_counter) -> drives both projec
 - **`src/leadsheet_utility/leadsheet/`** — `parser.py` (TSV + sidecar parsing), `models.py` (ChordEvent/LeadSheet dataclasses)
 - **`src/leadsheet_utility/harmony/`** — `constants.py` (scale/chord-tone tables, quality-to-scale map), `core.py` (scale resolver with 6 context rules, guide-tone line computation, `analyze()` entry point)
 - **`src/leadsheet_utility/timeline/`** — `engine.py`: wall-clock-based musical clock with play/pause/stop transport. Uses `ClockSource` protocol for testability. Binary-searches chord list to resolve current chord each frame.
-- **`src/leadsheet_utility/backing/`** — `events.py` (MidiEvent dataclass, metronome, count-in, and swing drum pattern generators), `walking_bass.py` (algorithmic walking bass with phrase-direction arcs, chord-tone variation, approach notes), `renderer.py` (offline FluidSynth rendering to numpy int16 buffer for pygame.mixer)
+- **`src/leadsheet_utility/backing/`** — `events.py` (MidiEvent dataclass, metronome, count-in, and swing drum pattern generators), `walking_bass.py` (algorithmic walking bass with phrase-direction arcs, chord-tone variation, approach notes), `comping.py` + `comping_voicings.py` + `comping_rhythms.py` (jazz guitar comping: drop-2/drop-3 voicings with voice-leading optimisation, 12 one-bar + 4 two-bar Phil DeGreg swing rhythm patterns with anticipations), `renderer.py` (offline FluidSynth rendering to numpy int16 buffer for pygame.mixer)
 - **`src/leadsheet_utility/gui/`** — `hud.py` (HUD rendering: song info, current/next chord, exercise selector, progress bar, shortcuts), `input.py` (key-to-action mapping via enum)
-- **`src/leadsheet_utility/main.py`** — `App` class: two-window pygame-ce loop (projection + HUD), transport controls, file dialog, audio rendering orchestration
+- **`src/leadsheet_utility/main.py`** — `App` class: two-window pygame-ce loop (projection + HUD), transport controls, file dialog, async background-thread audio rendering with loading screen, 2-bar count-in before playback. Toggleable metronome (`M`) and guitar comping (`G`).
 - **`data/leadsheets/`** — 14 lead sheets as `.tsv` + `.meta.json` pairs
 - **`data/soundfonts/GeneralUser-GS.sf2`** — bundled GM SoundFont for FluidSynth rendering
 

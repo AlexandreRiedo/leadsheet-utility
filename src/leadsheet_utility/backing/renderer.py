@@ -28,7 +28,7 @@ def render_backing_track(
     Returns an array shaped ``(total_samples * 2,)`` with interleaved L/R
     samples, ready for ``pygame.mixer.Sound``.
     """
-    synth = fluidsynth.Synth(samplerate=float(sample_rate), gain=0.5)
+    synth = fluidsynth.Synth(samplerate=float(sample_rate), gain=0.5) # type: ignore
     sfid = synth.sfload(sf_path)
     synth.program_select(0, sfid, 0, 33)   # channel 0 → Acoustic Bass (GM #34)
     synth.program_select(1, sfid, 0, 26)   # channel 1 → Electric Guitar Jazz (GM #27)

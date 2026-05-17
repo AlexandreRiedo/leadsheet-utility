@@ -29,8 +29,9 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
 4. The HUD shows: title, chord chart, tempo, exercise selection.
 5. User selects an exercise with keys `1`–`5` (default: Free Mode) and adjusts tempo with `+`/`-`.
 6. User presses `Space` to play:
-   - The backing track is pre-rendered via FluidSynth (~0.5–1s for a 32-bar form). A brief "Rendering..." indicator shows on the HUD.
-   - Once ready, `pygame.mixer` starts playing the audio buffer.
+   - The backing track is rendered via FluidSynth on a background thread. The HUD shows an animated "Rendering audio..." indicator while the render is in flight.
+   - Once the render completes, a 2-bar count-in plays (side-stick clicks with a visual grid in the HUD).
+   - After the count-in, `pygame.mixer` starts the backing-track buffer and the timeline starts.
    - The projector lights up the appropriate keys on the piano, updating in sync with the audio.
    - The HUD shows the current chord, bar number, and a progress bar.
 7. The user improvises on the piano, guided by the colored lights.
@@ -106,7 +107,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `leadsheet` | **Done** | Parse MIR-style `.tsv` + `.meta.json` into `LeadSheet`/`ChordEvent` dataclasses |
 | `harmony` | **Done** | Chord symbol → scale pitches, chord tones, guide tones (lookup + 6 context rules) |
 | `timeline` | **Done** | Musical clock deriving beat position from audio playback, resolving current chord |
-| `backing` | **Done** | Walking bass generator + swing drum pattern + metronome + count-in + FluidSynth offline rendering |
+| `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering |
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar |
 | `exercises` | **Not started** | 5 exercise modes computing colored highlights per beat |
 | `projection` | **Not started** | Render canonical keyboard image, warp with homography, display on projector |
@@ -361,7 +362,7 @@ Target **60 FPS**. Per-frame work: ~7–15 filled rectangles into a small canoni
 
 ### Current State
 
-Fully implemented. `backing/events.py` has the `MidiEvent` dataclass, metronome click generator, count-in generator, and swing drum pattern (`generate_drums`). `backing/walking_bass.py` implements the full algorithmic walking bass (`generate_walking_bass`). `backing/renderer.py` does offline FluidSynth rendering to a NumPy int16 buffer for `pygame.mixer`.
+Fully implemented. `backing/events.py` has the `MidiEvent` dataclass, metronome click generator, count-in generator, and swing drum pattern (`generate_drums`). `backing/walking_bass.py` implements the full algorithmic walking bass (`generate_walking_bass`). `backing/comping.py` + `comping_voicings.py` + `comping_rhythms.py` implement jazz guitar comping with drop-2/drop-3 voicings and a pool of Phil DeGreg swing rhythm patterns. `backing/renderer.py` does offline FluidSynth rendering to a NumPy int16 buffer for `pygame.mixer`.
 
 ### Architecture: Generate Events → Offline FluidSynth Render → Play
 
@@ -410,9 +411,18 @@ Applied during event generation. The "and" of each beat is shifted later:
 - Swung: ride skips, offbeat bass notes, ghost snares
 - Not swung: quarter-note hits, hi-hat, chord changes, the timeline clock
 
-### Tempo Changes
+### Guitar Comping Generator — Implemented
 
-Tempo change → re-render the buffer (<1 second for 32 bars). User is stopped when changing tempo.
+Algorithmic jazz guitar comping in `backing/comping.py`. Generates `MidiEvent` objects on channel 1 (GM nylon/electric guitar). Two-layer design:
+
+- **Voicings** (`comping_voicings.py`): drop-2 and drop-3 root-bass voicings built from `chord.chord_tones`. 4-note drop-2 = `[R, 5, 7, 3+12]`, drop-3 = `[R, 7, 3+12, 5+12]`; triads use a 3-note drop-2 analog. Root register clamped to A2–A3, top voice ≤ G5. The natural 5th is substituted with `#11` when the chord has `#11`/`b5`/`maj7#11`, or with `b6` when the chord has `b9`/`b13` without a natural 13 (phrygian-dominant / harmonic-minor V feel). `best_voicing()` picks the candidate that minimises total semitone movement from the previous voicing.
+- **Rhythm patterns** (`comping_rhythms.py`): 12 one-bar and 4 two-bar swing patterns transcribed from Phil DeGreg's *Jazz Keyboard Harmony* comping-rhythms page. Two-bar patterns include anticipations (hits in bar 1 that ring into bar 2 using bar 2's harmony). `pick_pattern()` chooses randomly per 2-bar window.
+
+Each hit emits note-on/off pairs with swing applied to offbeat 8ths, ±8 velocity humanization, ±180 sample timing humanization, accent on marked hits, and a `COMP_SKIP_PROBABILITY = 0.2` for sparseness. Toggle with `G` in the HUD.
+
+### Tempo / Toggle Changes
+
+Tempo, metronome toggle, and comping toggle → re-render the buffer on a background thread. The HUD shows an animated "Rendering audio..." screen during the render. User is stopped when triggering a re-render.
 
 ---
 
@@ -438,6 +448,7 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `1`–`5` | Select exercise mode |
 | `+` / `-` | Tempo up/down by 5 BPM |
 | `M` | Toggle metronome |
+| `G` | Toggle guitar comping |
 | `C` | Enter calibration mode |
 | `Q` / `Esc` | Quit |
 
@@ -484,9 +495,12 @@ ruff = ">=0.4"
 - [x] Offline FluidSynth rendering + `pygame.mixer` playback
 - [x] Walking bass generator (algorithmic, quarter notes, phrase-direction arcs)
 - [x] Drum pattern (swing ride + hi-hat on 2 & 4, ghost snares, humanization)
+- [x] Jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing rhythm patterns, anticipations)
+- [x] Async background-thread audio rendering with HUD loading animation
 - [x] Count-in (visual grid in HUD + side-stick audio)
 - [x] Keyboard-shortcut-driven Pygame UI with HUD
-- [x] Metronome (toggleable)
+- [x] Metronome (toggleable, `M`)
+- [x] Guitar comping (toggleable, `G`)
 - [x] 14 example lead sheet files
 
 ### TODO (MVP)
