@@ -109,9 +109,9 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `timeline` | **Done** | Musical clock deriving beat position from audio playback, resolving current chord |
 | `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering |
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar |
+| `projection` | **Done (not wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; exercised via `scripts/preview_projector.py` |
+| `calibration` | **Done (not wired into main)** | 4-point marker drag UI + ratio tuning + JSON persistence; exercised via `scripts/preview_calibration.py` |
 | `exercises` | **Not started** | 5 exercise modes computing colored highlights per beat |
-| `projection` | **Not started** | Render canonical keyboard image, warp with homography, display on projector |
-| `calibration` | **Not started** | 4-point marker drag UI + `cv2.getPerspectiveTransform` |
 
 ### Application States
 
@@ -298,7 +298,11 @@ Black background is critical: the projector emits no light for black pixels, so 
 
 ---
 
-## 7. Projection Engine — Not Implemented
+## 7. Projection Engine — Implemented (not yet wired into main)
+
+Implemented in `projection/layout.py` (88-key `KeyRect` geometry with configurable MIDI range and per-instrument `black_width_ratio`/`black_height_ratio`), `projection/renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), and `projection/warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`). Default range is **F2–E6** so both edges align to the left side of an F-key — a single physical landmark for both calibration corners. Range endpoints are validated to be white keys. The standalone `scripts/preview_projector.py` exercises the full render → warp → blit pipeline on the projector display. Wiring into `main.py` (replacing the `_render_projection()` stub) is the next step.
+
+### Reference Specification
 
 ### Rendering Principle
 
@@ -327,9 +331,13 @@ The canonical image is a fixed-size buffer (e.g., 1920×200 pixels) containing a
 2. `cv2.warpPerspective(canonical, H, projector_size)` — one call warps the entire frame
 3. Convert BGR→RGB, blit to the projection `pygame.Window`
 
-### Calibration
+### Calibration — Implemented (not yet wired into main)
 
-Calibration is a **mode within the main app** (not a separate script). Entered on first launch (no `calibration.json`) or when user presses `C`.
+The calibration module lives in `calibration/models.py` (`Calibration` dataclass + `homography()` via `cv2.getPerspectiveTransform`), `calibration/persistence.py` (JSON load/save, legacy-file fallback for the ratio fields), and `calibration/ui.py` (`CalibrationUI` state machine handling marker drag, Tab/1-4 selection, arrow-key nudge with Shift=×10, Q/W width and A/S height ratio tuning with Shift=×5, R reset, Enter/Esc confirm/cancel). The overlay renders the warped keyboard with green-filled white keys and pink-filled black keys for clear visibility against the piano. Currently exercised via `scripts/preview_calibration.py`; entering calibration mode from within the main app (on first launch when `calibration.json` is missing, or via `C` keypress) is not yet wired.
+
+A single planar homography cannot fully correct black-key parallax (black-key tops sit on a higher physical plane than whites). The per-instrument `black_width_ratio`/`black_height_ratio` knobs are a pragmatic mitigation: they don't fix parallax but let the canonical proportions match the specific piano. A small residual black-key drift is expected and accepted.
+
+#### Calibration Flow (original spec, for reference once wired into main)
 
 #### Calibration Flow
 
@@ -503,10 +511,12 @@ ruff = ">=0.4"
 - [x] Guitar comping (toggleable, `G`)
 - [x] 14 example lead sheet files
 
+- [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, standalone preview script)
+- [x] Calibration (4-point marker drag UI + Q/W/A/S per-instrument black-key ratio tuning + JSON persistence, standalone preview script)
+
 ### TODO (MVP)
 
-- [ ] Projection engine (Pygame fullscreen, 88-key range, OpenCV homography warp)
-- [ ] Calibration (4-point marker drag UI)
+- [ ] Wire projection + calibration into `main.py` (load on startup, `C` to re-enter, render highlights through saved homography during playback)
 - [ ] Free Mode exercise
 - [ ] Guide Tone exercise
 

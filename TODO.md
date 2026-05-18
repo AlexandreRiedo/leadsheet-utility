@@ -1,6 +1,6 @@
 # WIP
-- Ask about how the projection will work
-- Setup Init calibration
+- Connect it to pygame, work on the basic free mode
+- Think about getting white tape?
 
 # MAYBE
 - Fix brief flash after "Rendering..."
