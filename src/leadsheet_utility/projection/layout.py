@@ -19,10 +19,12 @@ MIDI_HIGH = 108
 NUM_KEYS = MIDI_HIGH - MIDI_LOW + 1  # 88
 NUM_WHITE_KEYS = 52
 
-# Default projected range: D2..G6. This is what fits the projector's throw
-# on the test piano (see proto-img/). Adjust as the setup evolves.
-MIDI_DEFAULT_LOW = 38  # D2
-MIDI_DEFAULT_HIGH = 91  # G6
+# Default projected range: F2..E6. The band starts at the left edge of F2
+# and ends at the right edge of E6 — i.e. both projected edges line up with
+# the left edge of an F key on the piano, giving the user a single physical
+# landmark to align both corners against during calibration.
+MIDI_DEFAULT_LOW = 41  # F2
+MIDI_DEFAULT_HIGH = 88  # E6
 
 # Pitch classes that correspond to black keys (C=0).
 _BLACK_PCS = frozenset({1, 3, 6, 8, 10})

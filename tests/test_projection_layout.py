@@ -40,10 +40,10 @@ def test_full_range_white_and_black_counts():
 # --- default range (D2..G6) --------------------------------------------------
 
 
-def test_default_range_is_d2_to_g6():
+def test_default_range_is_f2_to_e6():
     layout = build_keyboard_layout()
-    assert layout[0].midi_note == MIDI_DEFAULT_LOW == 38  # D2
-    assert layout[-1].midi_note == MIDI_DEFAULT_HIGH == 91  # G6
+    assert layout[0].midi_note == MIDI_DEFAULT_LOW == 41  # F2
+    assert layout[-1].midi_note == MIDI_DEFAULT_HIGH == 88  # E6
 
 
 def test_default_range_key_count():
