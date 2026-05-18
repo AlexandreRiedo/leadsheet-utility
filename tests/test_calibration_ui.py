@@ -148,3 +148,66 @@ def test_homography_matches_built_calibration():
     H_ui = ui.homography()
     H_cal = ui.build_calibration().homography()
     assert (H_ui == H_cal).all()
+
+
+# --- black-key proportion live adjustments ----------------------------------
+
+
+def test_qw_keys_adjust_black_width_ratio():
+    ui = _ui()
+    base = ui.black_width_ratio
+    ui.handle_event(_kd(pygame.K_w))
+    assert ui.black_width_ratio == pytest.approx(base + 0.01)
+    ui.handle_event(_kd(pygame.K_q))
+    assert ui.black_width_ratio == pytest.approx(base)
+
+
+def test_as_keys_adjust_black_height_ratio():
+    ui = _ui()
+    base = ui.black_height_ratio
+    ui.handle_event(_kd(pygame.K_s))
+    assert ui.black_height_ratio == pytest.approx(base + 0.01)
+    ui.handle_event(_kd(pygame.K_a))
+    assert ui.black_height_ratio == pytest.approx(base)
+
+
+def test_shift_ratio_keys_use_big_step():
+    ui = _ui()
+    base_w = ui.black_width_ratio
+    ui.handle_event(_kd(pygame.K_w, mod=pygame.KMOD_SHIFT))
+    assert ui.black_width_ratio == pytest.approx(base_w + 0.05)
+
+
+def test_black_width_ratio_clamped_to_max():
+    ui = _ui()
+    for _ in range(200):
+        ui.handle_event(_kd(pygame.K_w, mod=pygame.KMOD_SHIFT))
+    assert ui.black_width_ratio <= 1.20
+
+
+def test_black_height_ratio_clamped_to_min():
+    ui = _ui()
+    for _ in range(200):
+        ui.handle_event(_kd(pygame.K_a, mod=pygame.KMOD_SHIFT))
+    assert ui.black_height_ratio >= 0.30
+
+
+def test_build_calibration_carries_ratios():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_w))
+    ui.handle_event(_kd(pygame.K_s))
+    cal = ui.build_calibration()
+    assert cal.black_width_ratio == ui.black_width_ratio
+    assert cal.black_height_ratio == ui.black_height_ratio
+
+
+def test_initial_ratios_can_be_overridden():
+    from leadsheet_utility.calibration import CalibrationUI
+    ui = CalibrationUI(
+        canonical_size=(1920, 200),
+        projector_size=(1920, 1080),
+        black_width_ratio=0.75,
+        black_height_ratio=0.55,
+    )
+    assert ui.black_width_ratio == pytest.approx(0.75)
+    assert ui.black_height_ratio == pytest.approx(0.55)

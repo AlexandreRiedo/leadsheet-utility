@@ -14,6 +14,11 @@ from dataclasses import dataclass, field
 import cv2
 import numpy as np
 
+from leadsheet_utility.projection.layout import (
+    DEFAULT_BLACK_HEIGHT_RATIO,
+    DEFAULT_BLACK_WIDTH_RATIO,
+)
+
 # Marker order: top-left, top-right, bottom-right, bottom-left.
 # Matches the canonical-image corner ordering used by the homography.
 MARKER_LABELS = ("Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left")
@@ -26,11 +31,17 @@ class Calibration:
 
     `markers` is ordered TL, TR, BR, BL. `canonical_size` and `projector_size`
     are stored so the matrix can be invalidated when either changes.
+
+    `black_width_ratio` / `black_height_ratio` are per-instrument tunings of
+    the canonical keyboard layout — real pianos deviate from the "standard"
+    0.60 / 0.65 proportions, so they're persisted with the calibration.
     """
 
     canonical_size: tuple[int, int]
     projector_size: tuple[int, int]
     markers: list[tuple[float, float]] = field(default_factory=list)
+    black_width_ratio: float = DEFAULT_BLACK_WIDTH_RATIO
+    black_height_ratio: float = DEFAULT_BLACK_HEIGHT_RATIO
 
     def __post_init__(self) -> None:
         if len(self.markers) != NUM_MARKERS:

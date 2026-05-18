@@ -30,9 +30,10 @@ MIDI_DEFAULT_HIGH = 88  # E6
 _BLACK_PCS = frozenset({1, 3, 6, 8, 10})
 
 # Standard acoustic-piano proportions. A black key is roughly 60% the width
-# of a white key and about 65% of its length.
-_BLACK_WIDTH_RATIO = 0.6
-_BLACK_HEIGHT_RATIO = 0.65
+# of a white key and about 65% of its length. Real instruments vary, so the
+# layout builder accepts overrides — these are just the starting defaults.
+DEFAULT_BLACK_WIDTH_RATIO = 0.6
+DEFAULT_BLACK_HEIGHT_RATIO = 0.65
 
 
 @dataclass(frozen=True)
@@ -58,12 +59,17 @@ def build_keyboard_layout(
     height: int = 200,
     midi_low: int = MIDI_DEFAULT_LOW,
     midi_high: int = MIDI_DEFAULT_HIGH,
+    black_width_ratio: float = DEFAULT_BLACK_WIDTH_RATIO,
+    black_height_ratio: float = DEFAULT_BLACK_HEIGHT_RATIO,
 ) -> list[KeyRect]:
     """Compute axis-aligned rectangles for the keys in [midi_low, midi_high].
 
     White keys tile the full width with no gaps (rounding distributes the
     leftover sub-pixels). Black keys are centered on the boundary between
-    their two adjacent white keys.
+    their two adjacent white keys, sized by `black_width_ratio` (fraction of
+    a white-key's width) and `black_height_ratio` (fraction of canonical
+    image height). These default to "standard" piano proportions but can be
+    tuned per-instrument since real pianos vary.
 
     `midi_low` and `midi_high` must both be white keys so the canonical image
     starts and ends on a clean white-key edge.
@@ -75,8 +81,8 @@ def build_keyboard_layout(
 
     num_whites = count_white_keys(midi_low, midi_high)
     white_w = width / num_whites
-    black_w = white_w * _BLACK_WIDTH_RATIO
-    black_h = int(round(height * _BLACK_HEIGHT_RATIO))
+    black_w = white_w * black_width_ratio
+    black_h = int(round(height * black_height_ratio))
 
     rects: list[KeyRect] = []
     white_index = 0

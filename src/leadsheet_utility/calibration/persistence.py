@@ -6,6 +6,10 @@ import json
 from pathlib import Path
 
 from leadsheet_utility.calibration.models import NUM_MARKERS, Calibration
+from leadsheet_utility.projection.layout import (
+    DEFAULT_BLACK_HEIGHT_RATIO,
+    DEFAULT_BLACK_WIDTH_RATIO,
+)
 
 DEFAULT_CONFIG_DIR = Path.home() / ".leadsheet-utility"
 DEFAULT_CALIBRATION_PATH = DEFAULT_CONFIG_DIR / "calibration.json"
@@ -17,6 +21,8 @@ def save_calibration(calibration: Calibration, path: Path = DEFAULT_CALIBRATION_
         "canonical_size": list(calibration.canonical_size),
         "projector_size": list(calibration.projector_size),
         "markers": [list(m) for m in calibration.markers],
+        "black_width_ratio": calibration.black_width_ratio,
+        "black_height_ratio": calibration.black_height_ratio,
     }
     path.write_text(json.dumps(payload, indent=2))
 
@@ -34,6 +40,8 @@ def load_calibration(path: Path = DEFAULT_CALIBRATION_PATH) -> Calibration | Non
             canonical_size=tuple(data["canonical_size"]),
             projector_size=tuple(data["projector_size"]),
             markers=markers,
+            black_width_ratio=float(data.get("black_width_ratio", DEFAULT_BLACK_WIDTH_RATIO)),
+            black_height_ratio=float(data.get("black_height_ratio", DEFAULT_BLACK_HEIGHT_RATIO)),
         )
     except (json.JSONDecodeError, KeyError, ValueError, TypeError):
         return None

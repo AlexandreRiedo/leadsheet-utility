@@ -5,3 +5,28 @@
 - `cd src` -> `poetry run python -m leadsheet_utility`
 - `poetry run python scripts/preview_projector.py`
 - `poetry run python scripts/preview_calibration.py`
+
+# Projector calibration
+
+`scripts/preview_calibration.py` runs the 4-point calibration UI on the projector and saves the result to `~/.leadsheet-utility/calibration.json`. After confirming, it enters a static C-minor verification render so you can eyeball alignment on the real keys. Re-run anytime the projector or piano moves.
+
+## Controls
+
+| Input | Action |
+|---|---|
+| Drag a marker (mouse) | Move it |
+| `Tab` / `Shift+Tab` | Cycle active marker |
+| `1`–`4` | Jump to marker (TL, TR, BR, BL) |
+| Arrow keys | Nudge active marker by 1 px (`Shift` = 10 px) |
+| `Q` / `W` | Black-key narrower / wider (`Shift` = ×5 step) |
+| `A` / `S` | Black-key shorter / longer (`Shift` = ×5 step) |
+| `R` | Reset markers |
+| `Enter` | Confirm + save |
+| `Esc` | Cancel |
+
+## Tips
+
+- Default projected range is **F2–E6**: both edges of the band align to the left side of an F key, so you've got the same physical landmark to drag both corners onto.
+- After dragging the 4 white-corner markers, use `Q`/`W` and `A`/`S` to tune the black-key proportions to your specific piano — the "standard" 0.60 / 0.65 ratios won't match every instrument. Expect a small residual misalignment on the black keys: a single planar homography can't fully account for the fact that black keys sit on a physically higher plane than the whites. Good enough for highlighting.
+- The projector should have **keystone correction disabled** in its OSD — the app's homography is the only transform that should be active.
+- On a multi-monitor setup, set `PROJ_DISPLAY=<index>` to pick which display to fullscreen.

@@ -78,15 +78,27 @@ def _run_calibration(window: pygame.Window, proj_size: tuple[int, int]) -> bool:
     """Run the calibration UI. Returns True if confirmed (and saved), False otherwise."""
     existing = load_calibration()
     initial_markers = None
+    initial_bw = None
+    initial_bh = None
     if existing is not None and existing.projector_size == proj_size:
         initial_markers = existing.markers
-        print(f"Loaded existing markers from {DEFAULT_CALIBRATION_PATH}")
+        initial_bw = existing.black_width_ratio
+        initial_bh = existing.black_height_ratio
+        print(
+            f"Loaded existing calibration from {DEFAULT_CALIBRATION_PATH} "
+            f"(black ratios w={initial_bw:.2f} h={initial_bh:.2f})"
+        )
 
-    ui = CalibrationUI(
-        canonical_size=CANONICAL_SIZE,
-        projector_size=proj_size,
-        initial_markers=initial_markers,
-    )
+    ui_kwargs: dict = {
+        "canonical_size": CANONICAL_SIZE,
+        "projector_size": proj_size,
+        "initial_markers": initial_markers,
+    }
+    if initial_bw is not None:
+        ui_kwargs["black_width_ratio"] = initial_bw
+    if initial_bh is not None:
+        ui_kwargs["black_height_ratio"] = initial_bh
+    ui = CalibrationUI(**ui_kwargs)
     font = pygame.font.SysFont("consolas", 20)
     clock = pygame.time.Clock()
 
@@ -117,7 +129,11 @@ def _run_verification(window: pygame.Window, proj_size: tuple[int, int]) -> None
         return
     H = cal.homography()
 
-    layout = build_keyboard_layout(*CANONICAL_SIZE)
+    layout = build_keyboard_layout(
+        *CANONICAL_SIZE,
+        black_width_ratio=cal.black_width_ratio,
+        black_height_ratio=cal.black_height_ratio,
+    )
     canonical = make_canonical_surface(*CANONICAL_SIZE)
     c_minor_pcs = {0, 2, 3, 5, 7, 8, 10}
     highlights = [

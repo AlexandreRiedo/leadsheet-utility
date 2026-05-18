@@ -164,3 +164,32 @@ def test_range_endpoints_must_be_white_keys():
         build_keyboard_layout(midi_low=61, midi_high=72)  # starts on C#
     with pytest.raises(ValueError):
         build_keyboard_layout(midi_low=60, midi_high=70)  # ends on A#
+
+
+# --- black-key proportion overrides -----------------------------------------
+
+
+def test_black_width_ratio_scales_black_key_widths():
+    base = build_keyboard_layout(width=1920, height=200)
+    wider = build_keyboard_layout(width=1920, height=200, black_width_ratio=1.0)
+    base_black = next(k for k in base if k.is_black)
+    wide_black = next(k for k in wider if k.is_black)
+    assert wide_black.width > base_black.width
+
+
+def test_black_height_ratio_scales_black_key_heights():
+    base = build_keyboard_layout(width=1920, height=200)
+    longer = build_keyboard_layout(width=1920, height=200, black_height_ratio=0.95)
+    base_black = next(k for k in base if k.is_black)
+    long_black = next(k for k in longer if k.is_black)
+    assert long_black.height > base_black.height
+
+
+def test_ratio_overrides_do_not_affect_white_keys():
+    """Whites tile the full width regardless of black-key ratios."""
+    layout = build_keyboard_layout(width=1920, height=200, black_width_ratio=0.9, black_height_ratio=0.8)
+    whites = [k for k in layout if not k.is_black]
+    assert whites[0].x == 0
+    assert whites[-1].x + whites[-1].width == 1920
+    for k in whites:
+        assert k.height == 200

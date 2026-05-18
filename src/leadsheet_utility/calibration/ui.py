@@ -19,6 +19,8 @@ from leadsheet_utility.calibration.models import (
     default_markers,
 )
 from leadsheet_utility.projection.layout import (
+    DEFAULT_BLACK_HEIGHT_RATIO,
+    DEFAULT_BLACK_WIDTH_RATIO,
     MIDI_DEFAULT_HIGH,
     MIDI_DEFAULT_LOW,
     build_keyboard_layout,
@@ -39,6 +41,16 @@ _KEY_EDGE_COLOR = (0, 0, 0)
 _NUDGE_STEP = 1
 _NUDGE_BIG_STEP = 10
 
+# Per-instrument black-key proportion adjustments (live in calibration mode).
+_RATIO_STEP = 0.01
+_RATIO_BIG_STEP = 0.05
+_RATIO_MIN = 0.30
+_RATIO_MAX = 1.20
+
+
+def _clamp_ratio(v: float) -> float:
+    return max(_RATIO_MIN, min(_RATIO_MAX, round(v, 4)))
+
 
 class CalibrationUI:
     """Stateful 4-point calibration overlay.
@@ -55,6 +67,8 @@ class CalibrationUI:
         projector_size: tuple[int, int],
         initial_markers: list[tuple[float, float]] | None = None,
         midi_range: tuple[int, int] = (MIDI_DEFAULT_LOW, MIDI_DEFAULT_HIGH),
+        black_width_ratio: float = DEFAULT_BLACK_WIDTH_RATIO,
+        black_height_ratio: float = DEFAULT_BLACK_HEIGHT_RATIO,
     ) -> None:
         self.canonical_size = canonical_size
         self.projector_size = projector_size
@@ -68,6 +82,8 @@ class CalibrationUI:
         self._dragging: bool = False
         self.confirmed: bool = False
         self.cancelled: bool = False
+        self.black_width_ratio: float = black_width_ratio
+        self.black_height_ratio: float = black_height_ratio
 
     # -- state ------------------------------------------------------------
 
@@ -80,6 +96,8 @@ class CalibrationUI:
             canonical_size=self.canonical_size,
             projector_size=self.projector_size,
             markers=list(self.markers),
+            black_width_ratio=self.black_width_ratio,
+            black_height_ratio=self.black_height_ratio,
         )
 
     def homography(self) -> np.ndarray:
@@ -129,6 +147,12 @@ class CalibrationUI:
         elif key == pygame.K_r:
             self.markers = default_markers(self.projector_size)
             self.active_idx = 0
+        elif key in (pygame.K_q, pygame.K_w):
+            sign = 1 if key == pygame.K_w else -1
+            self._adjust_ratio("width", sign * (_RATIO_BIG_STEP if mods & pygame.KMOD_SHIFT else _RATIO_STEP))
+        elif key in (pygame.K_a, pygame.K_s):
+            sign = 1 if key == pygame.K_s else -1
+            self._adjust_ratio("height", sign * (_RATIO_BIG_STEP if mods & pygame.KMOD_SHIFT else _RATIO_STEP))
 
     def _marker_at(self, pos: tuple[int, int]) -> int | None:
         x, y = pos
@@ -146,6 +170,13 @@ class CalibrationUI:
     def _nudge(self, dx: int, dy: int) -> None:
         mx, my = self.markers[self.active_idx]
         self._set_marker(self.active_idx, (mx + dx, my + dy))
+
+    def _adjust_ratio(self, which: str, delta: float) -> None:
+        """Adjust the black-key width or height ratio, clamped to a sane range."""
+        if which == "width":
+            self.black_width_ratio = _clamp_ratio(self.black_width_ratio + delta)
+        elif which == "height":
+            self.black_height_ratio = _clamp_ratio(self.black_height_ratio + delta)
 
     # -- rendering --------------------------------------------------------
 
@@ -170,6 +201,8 @@ class CalibrationUI:
             *self.canonical_size,
             midi_low=self.midi_range[0],
             midi_high=self.midi_range[1],
+            black_width_ratio=self.black_width_ratio,
+            black_height_ratio=self.black_height_ratio,
         )
         H = self.homography()
 
@@ -221,6 +254,8 @@ class CalibrationUI:
         lines = [
             f"Calibrating — active marker: {MARKER_LABELS[self.active_idx]} ({self.active_idx + 1}/{NUM_MARKERS})",
             "Drag markers, or use arrows (Shift = x10) to nudge. Tab cycles, 1-4 jumps.",
+            f"Black-key proportions:  width = {self.black_width_ratio:.2f}  height = {self.black_height_ratio:.2f}",
+            "Q / W  narrower / wider    A / S  shorter / longer    (Shift = x5)",
             "R: reset markers   Enter: confirm   Esc: cancel",
         ]
         x, y = 20, 20
