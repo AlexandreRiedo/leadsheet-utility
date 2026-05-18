@@ -3,3 +3,4 @@
 
 # Running the project
 - `cd src` -> `poetry run python -m leadsheet_utility`
+- `poetry run python scripts/preview_projector.py`

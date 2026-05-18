@@ -1,16 +1,23 @@
 """End-to-end projection preview.
 
 Opens a fullscreen window on the secondary display (the projector), renders
-the C-minor scale into a canonical 1920x200 keyboard image, warps it with a
-placeholder homography to a horizontal band on the 1920x1080 projector frame,
-and displays it. If no secondary display is detected, falls back to a
-windowed preview on the primary display.
+the C-minor scale into a canonical 1920x200 keyboard image over the default
+projected range (D2..G6), warps it with a placeholder homography to a
+horizontal band on the 1920x1080 projector frame, and displays it. If no
+secondary display is detected, falls back to a windowed preview on the
+primary display.
+
+Range can be overridden via PROJ_MIDI_LOW / PROJ_MIDI_HIGH env vars (both
+must be white-key MIDI numbers).
 
 Press Esc or close the window to quit.
 """
 
 import os
 import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 # On Windows, opt into per-monitor DPI awareness so display sizes are reported
 # in real pixels (e.g. 1920x1080) instead of the scaled logical size that
@@ -29,6 +36,8 @@ import pygame
 
 from leadsheet_utility.projection import (
     KeyHighlight,
+    MIDI_DEFAULT_HIGH,
+    MIDI_DEFAULT_LOW,
     build_keyboard_layout,
     make_canonical_surface,
     make_default_homography,
@@ -71,9 +80,13 @@ def main() -> None:
         print("WARNING: window size differs from target — the OS may have placed it on the wrong monitor.")
         proj_size = actual_size
 
-    layout = build_keyboard_layout(*CANONICAL_SIZE)
+    midi_low = int(os.environ.get("PROJ_MIDI_LOW", MIDI_DEFAULT_LOW))
+    midi_high = int(os.environ.get("PROJ_MIDI_HIGH", MIDI_DEFAULT_HIGH))
+    print(f"Keyboard range: MIDI {midi_low}..{midi_high}")
+
+    layout = build_keyboard_layout(*CANONICAL_SIZE, midi_low=midi_low, midi_high=midi_high)
     canonical = make_canonical_surface(*CANONICAL_SIZE)
-    # C natural minor pitch classes across all 88 keys: C D Eb F G Ab Bb
+    # C natural minor pitch classes: C D Eb F G Ab Bb
     c_minor_pcs = {0, 2, 3, 5, 7, 8, 10}
     highlights = [
         KeyHighlight(k.midi_note, (255, 255, 255))

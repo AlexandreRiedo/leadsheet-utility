@@ -1,17 +1,28 @@
-"""88-key piano keyboard layout in a canonical (undistorted) image.
+"""Piano keyboard layout in a canonical (undistorted) image.
 
 Coordinates are pixel positions inside a flat top-down image of the keyboard
 (default 1920x200). This image is later warped onto the projector frame via
 a homography. The layout itself knows nothing about projection — it is pure
 geometry derived from standard piano proportions.
+
+The full 88-key range (A0–C8) is exposed as constants, but the default
+layout covers only D2–G6 — the band the projector actually lights up on
+the test rig. The range is configurable per call while we're still
+prototyping.
 """
 
 from dataclasses import dataclass
 
-MIDI_LOW = 21  # A0
-MIDI_HIGH = 108  # C8
+# Full 88-key reference range (A0..C8).
+MIDI_LOW = 21
+MIDI_HIGH = 108
 NUM_KEYS = MIDI_HIGH - MIDI_LOW + 1  # 88
 NUM_WHITE_KEYS = 52
+
+# Default projected range: D2..G6. This is what fits the projector's throw
+# on the test piano (see proto-img/). Adjust as the setup evolves.
+MIDI_DEFAULT_LOW = 38  # D2
+MIDI_DEFAULT_HIGH = 91  # G6
 
 # Pitch classes that correspond to black keys (C=0).
 _BLACK_PCS = frozenset({1, 3, 6, 8, 10})
@@ -36,23 +47,39 @@ def is_black_key(midi_note: int) -> bool:
     return (midi_note % 12) in _BLACK_PCS
 
 
-def build_keyboard_layout(width: int = 1920, height: int = 200) -> list[KeyRect]:
-    """Compute axis-aligned rectangles for all 88 keys.
+def count_white_keys(midi_low: int, midi_high: int) -> int:
+    return sum(1 for m in range(midi_low, midi_high + 1) if not is_black_key(m))
+
+
+def build_keyboard_layout(
+    width: int = 1920,
+    height: int = 200,
+    midi_low: int = MIDI_DEFAULT_LOW,
+    midi_high: int = MIDI_DEFAULT_HIGH,
+) -> list[KeyRect]:
+    """Compute axis-aligned rectangles for the keys in [midi_low, midi_high].
 
     White keys tile the full width with no gaps (rounding distributes the
     leftover sub-pixels). Black keys are centered on the boundary between
     their two adjacent white keys.
+
+    `midi_low` and `midi_high` must both be white keys so the canonical image
+    starts and ends on a clean white-key edge.
     """
-    white_w = width / NUM_WHITE_KEYS
+    if is_black_key(midi_low) or is_black_key(midi_high):
+        raise ValueError(
+            f"midi_low and midi_high must be white keys; got {midi_low}, {midi_high}"
+        )
+
+    num_whites = count_white_keys(midi_low, midi_high)
+    white_w = width / num_whites
     black_w = white_w * _BLACK_WIDTH_RATIO
     black_h = int(round(height * _BLACK_HEIGHT_RATIO))
 
     rects: list[KeyRect] = []
     white_index = 0
-    for midi in range(MIDI_LOW, MIDI_HIGH + 1):
+    for midi in range(midi_low, midi_high + 1):
         if is_black_key(midi):
-            # Black keys sit on top of the boundary between the previous
-            # white key (index white_index - 1) and the next (white_index).
             boundary_x = white_index * white_w
             x = boundary_x - black_w / 2
             rects.append(
@@ -66,8 +93,6 @@ def build_keyboard_layout(width: int = 1920, height: int = 200) -> list[KeyRect]
                 )
             )
         else:
-            # Snap left and right edges to integer pixels independently so
-            # adjacent white keys share an exact boundary with no 1-px gaps.
             left = int(round(white_index * white_w))
             right = int(round((white_index + 1) * white_w))
             rects.append(
