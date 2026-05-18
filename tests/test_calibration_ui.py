@@ -1,0 +1,150 @@
+"""Tests for the CalibrationUI state machine.
+
+Rendering is not tested here — the preview script is the visual harness.
+"""
+
+import os
+
+import pygame
+import pytest
+
+from leadsheet_utility.calibration import NUM_MARKERS, CalibrationUI
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _pygame_headless():
+    os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
+    pygame.init()
+    yield
+    pygame.quit()
+
+
+def _ui() -> CalibrationUI:
+    return CalibrationUI(canonical_size=(1920, 200), projector_size=(1920, 1080))
+
+
+def _kd(key: int, mod: int = 0) -> pygame.event.Event:
+    return pygame.event.Event(pygame.KEYDOWN, {"key": key, "mod": mod})
+
+
+def _mb_down(pos: tuple[int, int], button: int = 1) -> pygame.event.Event:
+    return pygame.event.Event(pygame.MOUSEBUTTONDOWN, {"pos": pos, "button": button})
+
+
+def _mb_up(button: int = 1) -> pygame.event.Event:
+    return pygame.event.Event(pygame.MOUSEBUTTONUP, {"pos": (0, 0), "button": button})
+
+
+def _mm(pos: tuple[int, int]) -> pygame.event.Event:
+    return pygame.event.Event(pygame.MOUSEMOTION, {"pos": pos, "rel": (0, 0), "buttons": (1, 0, 0)})
+
+
+def test_starts_active_with_four_markers():
+    ui = _ui()
+    assert ui.active
+    assert len(ui.markers) == NUM_MARKERS
+    assert not ui.confirmed and not ui.cancelled
+
+
+def test_enter_confirms():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_RETURN))
+    assert ui.confirmed
+    assert not ui.active
+
+
+def test_escape_cancels():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_ESCAPE))
+    assert ui.cancelled
+    assert not ui.active
+
+
+def test_events_ignored_once_inactive():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_RETURN))
+    original = list(ui.markers)
+    ui.handle_event(_kd(pygame.K_RIGHT))
+    assert ui.markers == original
+
+
+def test_tab_cycles_active_marker():
+    ui = _ui()
+    assert ui.active_idx == 0
+    ui.handle_event(_kd(pygame.K_TAB))
+    assert ui.active_idx == 1
+    ui.handle_event(_kd(pygame.K_TAB))
+    ui.handle_event(_kd(pygame.K_TAB))
+    ui.handle_event(_kd(pygame.K_TAB))
+    assert ui.active_idx == 0  # wraps
+
+
+def test_shift_tab_cycles_backward():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_TAB, mod=pygame.KMOD_SHIFT))
+    assert ui.active_idx == NUM_MARKERS - 1
+
+
+def test_number_keys_select_marker():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_3))
+    assert ui.active_idx == 2
+
+
+def test_arrow_keys_nudge_active_marker():
+    ui = _ui()
+    x0, y0 = ui.markers[0]
+    ui.handle_event(_kd(pygame.K_RIGHT))
+    ui.handle_event(_kd(pygame.K_DOWN))
+    assert ui.markers[0] == (x0 + 1, y0 + 1)
+
+
+def test_shift_arrow_big_step():
+    ui = _ui()
+    x0, y0 = ui.markers[0]
+    ui.handle_event(_kd(pygame.K_RIGHT, mod=pygame.KMOD_SHIFT))
+    assert ui.markers[0] == (x0 + 10, y0)
+
+
+def test_mouse_click_selects_nearest_marker_then_drag_moves_it():
+    ui = _ui()
+    target_pos = ui.markers[2]  # bottom-right
+    ui.handle_event(_mb_down((int(target_pos[0]), int(target_pos[1]))))
+    assert ui.active_idx == 2
+    ui.handle_event(_mm((500, 600)))
+    assert ui.markers[2] == (500.0, 600.0)
+    ui.handle_event(_mb_up())
+    # After mouse-up, motion should no longer move the marker.
+    ui.handle_event(_mm((10, 10)))
+    assert ui.markers[2] == (500.0, 600.0)
+
+
+def test_click_outside_any_marker_does_not_select():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_2))  # set active to 1
+    ui.handle_event(_mb_down((960, 540)))  # middle of the screen — no marker there
+    assert ui.active_idx == 1
+
+
+def test_markers_are_clamped_to_projector_bounds():
+    ui = _ui()
+    ui.active_idx = 0
+    for _ in range(100):
+        ui.handle_event(_kd(pygame.K_LEFT, mod=pygame.KMOD_SHIFT))
+        ui.handle_event(_kd(pygame.K_UP, mod=pygame.KMOD_SHIFT))
+    assert ui.markers[0] == (0.0, 0.0)
+
+
+def test_reset_restores_default_markers():
+    ui = _ui()
+    ui.handle_event(_kd(pygame.K_RIGHT, mod=pygame.KMOD_SHIFT))
+    original = ui.markers[0]
+    ui.handle_event(_kd(pygame.K_r))
+    assert ui.markers[0] != original
+
+
+def test_homography_matches_built_calibration():
+    ui = _ui()
+    H_ui = ui.homography()
+    H_cal = ui.build_calibration().homography()
+    assert (H_ui == H_cal).all()
