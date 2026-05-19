@@ -26,6 +26,10 @@ def save_calibration(calibration: Calibration, path: Path = DEFAULT_CALIBRATION_
         "markers": [list(m) for m in calibration.markers],
         "black_width_ratio": calibration.black_width_ratio,
         "black_height_ratio": calibration.black_height_ratio,
+        # JSON object keys must be strings — convert MIDI notes here, parse back on load.
+        "black_key_offsets": {
+            str(midi): list(off) for midi, off in calibration.black_key_offsets.items()
+        },
     }
     path.write_text(json.dumps(payload, indent=2))
 
@@ -39,12 +43,17 @@ def load_calibration(path: Path = DEFAULT_CALIBRATION_PATH) -> Calibration | Non
         markers = [tuple(m) for m in data["markers"]]
         if len(markers) != NUM_MARKERS:
             return None
+        raw_offsets = data.get("black_key_offsets", {})
+        offsets: dict[int, tuple[float, float]] = {
+            int(k): (float(v[0]), float(v[1])) for k, v in raw_offsets.items()
+        }
         return Calibration(
             canonical_size=tuple(data["canonical_size"]),
             projector_size=tuple(data["projector_size"]),
             markers=markers,
             black_width_ratio=float(data.get("black_width_ratio", DEFAULT_BLACK_WIDTH_RATIO)),
             black_height_ratio=float(data.get("black_height_ratio", DEFAULT_BLACK_HEIGHT_RATIO)),
+            black_key_offsets=offsets,
         )
     except (json.JSONDecodeError, KeyError, ValueError, TypeError):
         return None

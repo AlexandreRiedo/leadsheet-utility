@@ -588,11 +588,16 @@ class App:
         layout matches the specific piano; otherwise the spec defaults are used.
         """
         cal = load_calibration()
+        black_offsets: dict[int, tuple[float, float]] = {}
         if cal is not None and cal.projector_size == self._proj_size:
             self._homography = cal.homography()
             black_w = cal.black_width_ratio
             black_h = cal.black_height_ratio
-            logger.info("Loaded calibration (black ratios w=%.2f h=%.2f)", black_w, black_h)
+            black_offsets = cal.black_key_offsets
+            logger.info(
+                "Loaded calibration (black ratios w=%.2f h=%.2f, %d per-key offsets)",
+                black_w, black_h, len(black_offsets),
+            )
         else:
             self._homography = make_default_homography(_CANONICAL_SIZE, self._proj_size)
             black_w = DEFAULT_BLACK_WIDTH_RATIO
@@ -609,6 +614,7 @@ class App:
             *_CANONICAL_SIZE,
             black_width_ratio=black_w,
             black_height_ratio=black_h,
+            black_key_offsets=black_offsets,
         )
 
     def _render_projection(self) -> None:

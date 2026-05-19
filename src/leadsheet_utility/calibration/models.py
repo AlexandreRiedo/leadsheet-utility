@@ -42,6 +42,9 @@ class Calibration:
     markers: list[tuple[float, float]] = field(default_factory=list)
     black_width_ratio: float = DEFAULT_BLACK_WIDTH_RATIO
     black_height_ratio: float = DEFAULT_BLACK_HEIGHT_RATIO
+    # Per-black-key canonical-pixel offsets (MIDI note -> (dx, dy)). Empty
+    # dict means every black key uses the default placement.
+    black_key_offsets: dict[int, tuple[float, float]] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if len(self.markers) != NUM_MARKERS:

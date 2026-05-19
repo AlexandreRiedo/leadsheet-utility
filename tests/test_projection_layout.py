@@ -193,3 +193,46 @@ def test_ratio_overrides_do_not_affect_white_keys():
     assert whites[-1].x + whites[-1].width == 1920
     for k in whites:
         assert k.height == 200
+
+
+# --- per-black-key offsets ---------------------------------------------------
+
+
+def test_black_key_offsets_shift_individual_black_keys():
+    base = build_keyboard_layout(width=1920, height=200)
+    base_by_midi = {k.midi_note: k for k in base}
+    target_midi = next(m for m, k in base_by_midi.items() if k.is_black)
+    shifted = build_keyboard_layout(
+        width=1920, height=200, black_key_offsets={target_midi: (5.0, 3.0)},
+    )
+    shifted_by_midi = {k.midi_note: k for k in shifted}
+    assert shifted_by_midi[target_midi].x == base_by_midi[target_midi].x + 5
+    assert shifted_by_midi[target_midi].y == base_by_midi[target_midi].y + 3
+    # Width/height unchanged.
+    assert shifted_by_midi[target_midi].width == base_by_midi[target_midi].width
+    assert shifted_by_midi[target_midi].height == base_by_midi[target_midi].height
+
+
+def test_black_key_offsets_do_not_affect_white_keys():
+    base = build_keyboard_layout(width=1920, height=200)
+    target_midi = next(k.midi_note for k in base if k.is_black)
+    shifted = build_keyboard_layout(
+        width=1920, height=200, black_key_offsets={target_midi: (10.0, 0.0)},
+    )
+    base_whites = [k for k in base if not k.is_black]
+    shifted_whites = [k for k in shifted if not k.is_black]
+    assert base_whites == shifted_whites
+
+
+def test_black_key_offsets_only_apply_to_listed_keys():
+    base = build_keyboard_layout(width=1920, height=200)
+    base_blacks = {k.midi_note: k for k in base if k.is_black}
+    target = next(iter(base_blacks))
+    shifted = build_keyboard_layout(
+        width=1920, height=200, black_key_offsets={target: (5.0, 0.0)},
+    )
+    shifted_blacks = {k.midi_note: k for k in shifted if k.is_black}
+    for midi, key in shifted_blacks.items():
+        if midi == target:
+            continue
+        assert key == base_blacks[midi]

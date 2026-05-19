@@ -12,6 +12,10 @@
 
 ## Controls
 
+Calibration runs in two phases. `Enter` advances: phase 1 → phase 2 → save.
+
+### Phase 1 — main alignment (markers + global black-key ratios)
+
 | Input | Action |
 |---|---|
 | Drag a marker (mouse) | Move it |
@@ -21,6 +25,18 @@
 | `Q` / `W` | Black-key narrower / wider (`Shift` = ×5 step) |
 | `A` / `S` | Black-key shorter / longer (`Shift` = ×5 step) |
 | `R` | Reset markers |
+| `Enter` | Continue to per-key tuning |
+| `Esc` | Cancel |
+
+### Phase 2 — per-black-key fine tuning
+
+The active black key is drawn yellow. Use this phase to nudge individual black keys to mop up the residual drift the homography can't fix.
+
+| Input | Action |
+|---|---|
+| `Tab` / `Shift+Tab` | Next / previous black key |
+| Arrow keys | Nudge active black key by 1 px (`Shift` = 10 px) |
+| `R` | Reset all per-key offsets |
 | `Enter` | Confirm + save |
 | `Esc` | Cancel |
 

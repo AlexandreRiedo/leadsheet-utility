@@ -4,9 +4,19 @@
 events, and renders the marker overlay + a key-outline preview through the
 current homography. The host (main app or preview script) is responsible
 only for routing pygame events and calling :meth:`render` once per frame.
+
+Two-phase workflow:
+1. MAIN — drag the 4 corner markers, tune global black-key ratios.
+2. BLACK_KEY_TUNE — step through each black key with Tab and nudge its
+   canonical position to fix per-key drift the homography can't cover.
+
+Enter advances MAIN → BLACK_KEY_TUNE → confirmed. Escape cancels from
+either phase.
 """
 
 from __future__ import annotations
+
+from enum import Enum, auto
 
 import cv2
 import numpy as np
@@ -24,7 +34,13 @@ from leadsheet_utility.projection.layout import (
     MIDI_DEFAULT_HIGH,
     MIDI_DEFAULT_LOW,
     build_keyboard_layout,
+    is_black_key,
 )
+
+
+class CalibrationPhase(Enum):
+    MAIN = auto()
+    BLACK_KEY_TUNE = auto()
 
 # Visual constants.
 _MARKER_RADIUS = 14
@@ -37,6 +53,7 @@ _MARKER_COLORS = {
 _OUTLINE_COLOR = (80, 200, 255)
 _WHITE_KEY_FILL = (60, 220, 90)  # green
 _BLACK_KEY_FILL = (255, 90, 180)  # pink
+_ACTIVE_BLACK_KEY_FILL = (255, 235, 60)  # yellow — highlights the key being tuned
 _KEY_EDGE_COLOR = (0, 0, 0)
 _NUDGE_STEP = 1
 _NUDGE_BIG_STEP = 10
@@ -85,6 +102,15 @@ class CalibrationUI:
         self.black_width_ratio: float = black_width_ratio
         self.black_height_ratio: float = black_height_ratio
 
+        # Phase 2 state: per-black-key offsets in canonical pixels.
+        self.phase: CalibrationPhase = CalibrationPhase.MAIN
+        self.black_key_offsets: dict[int, tuple[float, float]] = {}
+        # MIDI notes of the black keys in the active range, in playing order.
+        # Populated when entering BLACK_KEY_TUNE so we always tune what's
+        # actually being projected.
+        self._black_key_midis: list[int] = []
+        self.active_black_idx: int = 0
+
     # -- state ------------------------------------------------------------
 
     @property
@@ -98,6 +124,7 @@ class CalibrationUI:
             markers=list(self.markers),
             black_width_ratio=self.black_width_ratio,
             black_height_ratio=self.black_height_ratio,
+            black_key_offsets=dict(self.black_key_offsets),
         )
 
     def homography(self) -> np.ndarray:
@@ -110,6 +137,14 @@ class CalibrationUI:
         if not self.active:
             return
 
+        if self.phase is CalibrationPhase.MAIN:
+            self._handle_event_main(event)
+        else:
+            self._handle_event_tune(event)
+
+    # -- phase: MAIN ------------------------------------------------------
+
+    def _handle_event_main(self, event: pygame.event.Event) -> None:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             idx = self._marker_at(event.pos)
             if idx is not None:
@@ -120,9 +155,9 @@ class CalibrationUI:
         elif event.type == pygame.MOUSEMOTION and self._dragging:
             self._set_marker(self.active_idx, event.pos)
         elif event.type == pygame.KEYDOWN:
-            self._handle_key(event)
+            self._handle_key_main(event)
 
-    def _handle_key(self, event: pygame.event.Event) -> None:
+    def _handle_key_main(self, event: pygame.event.Event) -> None:
         key = event.key
         mods = event.mod
         step = _NUDGE_BIG_STEP if mods & pygame.KMOD_SHIFT else _NUDGE_STEP
@@ -139,7 +174,8 @@ class CalibrationUI:
         elif key == pygame.K_DOWN:
             self._nudge(0, step)
         elif key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-            self.confirmed = True
+            # Advance to black-key tuning instead of confirming outright.
+            self._enter_black_key_tune()
         elif key == pygame.K_ESCAPE:
             self.cancelled = True
         elif key in (pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4):
@@ -153,6 +189,55 @@ class CalibrationUI:
         elif key in (pygame.K_a, pygame.K_s):
             sign = 1 if key == pygame.K_s else -1
             self._adjust_ratio("height", sign * (_RATIO_BIG_STEP if mods & pygame.KMOD_SHIFT else _RATIO_STEP))
+
+    # -- phase: BLACK_KEY_TUNE -------------------------------------------
+
+    def _enter_black_key_tune(self) -> None:
+        """Capture the set of black keys in the active range and switch phase."""
+        midi_low, midi_high = self.midi_range
+        self._black_key_midis = [
+            m for m in range(midi_low, midi_high + 1) if is_black_key(m)
+        ]
+        if not self._black_key_midis:
+            # Nothing to tune (degenerate range) — just confirm.
+            self.confirmed = True
+            return
+        self.active_black_idx = 0
+        self.phase = CalibrationPhase.BLACK_KEY_TUNE
+
+    def _handle_event_tune(self, event: pygame.event.Event) -> None:
+        if event.type == pygame.KEYDOWN:
+            self._handle_key_tune(event)
+
+    def _handle_key_tune(self, event: pygame.event.Event) -> None:
+        key = event.key
+        mods = event.mod
+        step = _NUDGE_BIG_STEP if mods & pygame.KMOD_SHIFT else _NUDGE_STEP
+
+        if key == pygame.K_TAB:
+            direction = -1 if mods & pygame.KMOD_SHIFT else 1
+            self.active_black_idx = (
+                self.active_black_idx + direction
+            ) % len(self._black_key_midis)
+        elif key == pygame.K_LEFT:
+            self._nudge_black(-step, 0)
+        elif key == pygame.K_RIGHT:
+            self._nudge_black(step, 0)
+        elif key == pygame.K_UP:
+            self._nudge_black(0, -step)
+        elif key == pygame.K_DOWN:
+            self._nudge_black(0, step)
+        elif key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+            self.confirmed = True
+        elif key == pygame.K_ESCAPE:
+            self.cancelled = True
+        elif key == pygame.K_r:
+            self.black_key_offsets = {}
+
+    def _nudge_black(self, dx: int, dy: int) -> None:
+        midi = self._black_key_midis[self.active_black_idx]
+        ox, oy = self.black_key_offsets.get(midi, (0.0, 0.0))
+        self.black_key_offsets[midi] = (ox + dx, oy + dy)
 
     def _marker_at(self, pos: tuple[int, int]) -> int | None:
         x, y = pos
@@ -189,20 +274,24 @@ class CalibrationUI:
         """
         surface.fill((0, 0, 0))
         self._render_key_outlines(surface)
-        self._render_markers(surface)
+        if self.phase is CalibrationPhase.MAIN:
+            self._render_markers(surface)
         if font is not None:
             self._render_hud_text(surface, font)
 
     def _render_key_outlines(self, surface: pygame.Surface) -> None:
         """Warp the canonical key rectangles through H and draw them as filled
         polygons — green for white-key zones, pink for black-key zones — so
-        the projected shape is visible against the piano during alignment."""
+        the projected shape is visible against the piano during alignment.
+        In BLACK_KEY_TUNE phase the currently selected black key is drawn
+        yellow so the user can see which key the arrow keys are nudging."""
         layout = build_keyboard_layout(
             *self.canonical_size,
             midi_low=self.midi_range[0],
             midi_high=self.midi_range[1],
             black_width_ratio=self.black_width_ratio,
             black_height_ratio=self.black_height_ratio,
+            black_key_offsets=self.black_key_offsets,
         )
         H = self.homography()
 
@@ -218,6 +307,13 @@ class CalibrationUI:
         pts = np.array(corners, dtype=np.float32).reshape(-1, 1, 2)
         warped = cv2.perspectiveTransform(pts, H).reshape(-1, 4, 2)
 
+        active_midi: int | None = None
+        if (
+            self.phase is CalibrationPhase.BLACK_KEY_TUNE
+            and self._black_key_midis
+        ):
+            active_midi = self._black_key_midis[self.active_black_idx]
+
         # Draw whites first, then blacks on top — same z-order as the
         # canonical renderer so the black-key zones overwrite the upper
         # portion of adjacent white keys.
@@ -232,7 +328,8 @@ class CalibrationUI:
             if not key.is_black:
                 continue
             poly_i = [(int(round(x)), int(round(y))) for x, y in poly]
-            pygame.draw.polygon(surface, _BLACK_KEY_FILL, poly_i)
+            fill = _ACTIVE_BLACK_KEY_FILL if key.midi_note == active_midi else _BLACK_KEY_FILL
+            pygame.draw.polygon(surface, fill, poly_i)
             pygame.draw.polygon(surface, _KEY_EDGE_COLOR, poly_i, width=1)
 
         # Outline the keyboard bounding quad so the overall frame is easy to
@@ -251,13 +348,23 @@ class CalibrationUI:
             pygame.draw.line(surface, (0, 0, 0), (x, y - _MARKER_RADIUS), (x, y + _MARKER_RADIUS), 1)
 
     def _render_hud_text(self, surface: pygame.Surface, font: pygame.font.Font) -> None:
-        lines = [
-            f"Calibrating — active marker: {MARKER_LABELS[self.active_idx]} ({self.active_idx + 1}/{NUM_MARKERS})",
-            "Drag markers, or use arrows (Shift = x10) to nudge. Tab cycles, 1-4 jumps.",
-            f"Black-key proportions:  width = {self.black_width_ratio:.2f}  height = {self.black_height_ratio:.2f}",
-            "Q / W  narrower / wider    A / S  shorter / longer    (Shift = x5)",
-            "R: reset markers   Enter: confirm   Esc: cancel",
-        ]
+        if self.phase is CalibrationPhase.MAIN:
+            lines = [
+                f"Phase 1/2 — active marker: {MARKER_LABELS[self.active_idx]} ({self.active_idx + 1}/{NUM_MARKERS})",
+                "Drag markers, or use arrows (Shift = x10) to nudge. Tab cycles, 1-4 jumps.",
+                f"Black-key proportions:  width = {self.black_width_ratio:.2f}  height = {self.black_height_ratio:.2f}",
+                "Q / W  narrower / wider    A / S  shorter / longer    (Shift = x5)",
+                "R: reset markers   Enter: next (per-key tuning)   Esc: cancel",
+            ]
+        else:
+            midi = self._black_key_midis[self.active_black_idx]
+            ox, oy = self.black_key_offsets.get(midi, (0.0, 0.0))
+            lines = [
+                f"Phase 2/2 — tuning black key {self.active_black_idx + 1}/{len(self._black_key_midis)} (MIDI {midi})",
+                f"Offset: dx = {ox:+.0f}px  dy = {oy:+.0f}px",
+                "Arrows: nudge active key (Shift = x10)   Tab / Shift-Tab: prev / next key",
+                "R: reset all per-key offsets   Enter: confirm and save   Esc: cancel",
+            ]
         x, y = 20, 20
         for line in lines:
             text = font.render(line, True, (220, 220, 220))

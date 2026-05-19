@@ -133,6 +133,7 @@ def _run_verification(window: pygame.Window, proj_size: tuple[int, int]) -> None
         *CANONICAL_SIZE,
         black_width_ratio=cal.black_width_ratio,
         black_height_ratio=cal.black_height_ratio,
+        black_key_offsets=cal.black_key_offsets,
     )
     canonical = make_canonical_surface(*CANONICAL_SIZE)
     c_minor_pcs = {0, 2, 3, 5, 7, 8, 10}

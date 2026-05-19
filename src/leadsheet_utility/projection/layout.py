@@ -61,6 +61,7 @@ def build_keyboard_layout(
     midi_high: int = MIDI_DEFAULT_HIGH,
     black_width_ratio: float = DEFAULT_BLACK_WIDTH_RATIO,
     black_height_ratio: float = DEFAULT_BLACK_HEIGHT_RATIO,
+    black_key_offsets: dict[int, tuple[float, float]] | None = None,
 ) -> list[KeyRect]:
     """Compute axis-aligned rectangles for the keys in [midi_low, midi_high].
 
@@ -71,6 +72,11 @@ def build_keyboard_layout(
     image height). These default to "standard" piano proportions but can be
     tuned per-instrument since real pianos vary.
 
+    `black_key_offsets` maps MIDI note → (dx, dy) in canonical pixels. Each
+    listed black key is shifted by its offset after the standard placement.
+    Used to compensate for the residual per-key drift that a single planar
+    homography can't correct (black-key tops sit on a higher physical plane).
+
     `midi_low` and `midi_high` must both be white keys so the canonical image
     starts and ends on a clean white-key edge.
     """
@@ -79,6 +85,7 @@ def build_keyboard_layout(
             f"midi_low and midi_high must be white keys; got {midi_low}, {midi_high}"
         )
 
+    offsets = black_key_offsets or {}
     num_whites = count_white_keys(midi_low, midi_high)
     white_w = width / num_whites
     black_w = white_w * black_width_ratio
@@ -90,12 +97,13 @@ def build_keyboard_layout(
         if is_black_key(midi):
             boundary_x = white_index * white_w
             x = boundary_x - black_w / 2
+            dx, dy = offsets.get(midi, (0.0, 0.0))
             rects.append(
                 KeyRect(
                     midi_note=midi,
                     is_black=True,
-                    x=int(round(x)),
-                    y=0,
+                    x=int(round(x + dx)),
+                    y=int(round(dy)),
                     width=int(round(black_w)),
                     height=black_h,
                 )

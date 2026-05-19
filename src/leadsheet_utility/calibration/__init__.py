@@ -9,12 +9,13 @@ from leadsheet_utility.calibration.persistence import (
     load_calibration,
     save_calibration,
 )
-from leadsheet_utility.calibration.ui import CalibrationUI
+from leadsheet_utility.calibration.ui import CalibrationPhase, CalibrationUI
 
 __all__ = [
     "MARKER_LABELS",
     "NUM_MARKERS",
     "Calibration",
+    "CalibrationPhase",
     "CalibrationUI",
     "default_markers",
     "DEFAULT_CALIBRATION_PATH",

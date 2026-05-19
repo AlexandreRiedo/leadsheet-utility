@@ -8,7 +8,7 @@ import os
 import pygame
 import pytest
 
-from leadsheet_utility.calibration import NUM_MARKERS, CalibrationUI
+from leadsheet_utility.calibration import NUM_MARKERS, CalibrationPhase, CalibrationUI
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -46,8 +46,12 @@ def test_starts_active_with_four_markers():
     assert not ui.confirmed and not ui.cancelled
 
 
-def test_enter_confirms():
+def test_enter_advances_to_black_key_tuning_then_confirms():
+    """Enter is a two-step confirm: MAIN -> BLACK_KEY_TUNE -> confirmed."""
     ui = _ui()
+    ui.handle_event(_kd(pygame.K_RETURN))
+    assert ui.phase is CalibrationPhase.BLACK_KEY_TUNE
+    assert ui.active  # not confirmed yet
     ui.handle_event(_kd(pygame.K_RETURN))
     assert ui.confirmed
     assert not ui.active
@@ -62,6 +66,8 @@ def test_escape_cancels():
 
 def test_events_ignored_once_inactive():
     ui = _ui()
+    # Two Enters: advance into tuning, then confirm.
+    ui.handle_event(_kd(pygame.K_RETURN))
     ui.handle_event(_kd(pygame.K_RETURN))
     original = list(ui.markers)
     ui.handle_event(_kd(pygame.K_RIGHT))
@@ -211,3 +217,84 @@ def test_initial_ratios_can_be_overridden():
     )
     assert ui.black_width_ratio == pytest.approx(0.75)
     assert ui.black_height_ratio == pytest.approx(0.55)
+
+
+# --- phase 2: per-black-key tuning ------------------------------------------
+
+
+def _enter_tune_phase(ui: CalibrationUI) -> None:
+    ui.handle_event(_kd(pygame.K_RETURN))
+    assert ui.phase is CalibrationPhase.BLACK_KEY_TUNE
+
+
+def test_tune_phase_tab_cycles_black_keys():
+    ui = _ui()
+    _enter_tune_phase(ui)
+    assert ui.active_black_idx == 0
+    ui.handle_event(_kd(pygame.K_TAB))
+    assert ui.active_black_idx == 1
+    ui.handle_event(_kd(pygame.K_TAB, mod=pygame.KMOD_SHIFT))
+    assert ui.active_black_idx == 0
+    # Shift-Tab from index 0 wraps to the last black key.
+    ui.handle_event(_kd(pygame.K_TAB, mod=pygame.KMOD_SHIFT))
+    assert ui.active_black_idx == len(ui._black_key_midis) - 1
+
+
+def test_tune_phase_arrow_nudges_active_black_key_offset():
+    ui = _ui()
+    _enter_tune_phase(ui)
+    midi = ui._black_key_midis[0]
+    ui.handle_event(_kd(pygame.K_RIGHT))
+    ui.handle_event(_kd(pygame.K_DOWN))
+    assert ui.black_key_offsets[midi] == (1.0, 1.0)
+    ui.handle_event(_kd(pygame.K_LEFT, mod=pygame.KMOD_SHIFT))
+    assert ui.black_key_offsets[midi] == (-9.0, 1.0)
+
+
+def test_tune_phase_offsets_are_per_key():
+    ui = _ui()
+    _enter_tune_phase(ui)
+    first = ui._black_key_midis[0]
+    ui.handle_event(_kd(pygame.K_RIGHT))
+    ui.handle_event(_kd(pygame.K_TAB))
+    second = ui._black_key_midis[1]
+    ui.handle_event(_kd(pygame.K_LEFT))
+    assert ui.black_key_offsets[first] == (1.0, 0.0)
+    assert ui.black_key_offsets[second] == (-1.0, 0.0)
+
+
+def test_tune_phase_r_resets_offsets():
+    ui = _ui()
+    _enter_tune_phase(ui)
+    ui.handle_event(_kd(pygame.K_RIGHT))
+    assert ui.black_key_offsets
+    ui.handle_event(_kd(pygame.K_r))
+    assert ui.black_key_offsets == {}
+
+
+def test_tune_phase_escape_cancels():
+    ui = _ui()
+    _enter_tune_phase(ui)
+    ui.handle_event(_kd(pygame.K_ESCAPE))
+    assert ui.cancelled
+    assert not ui.active
+
+
+def test_tune_phase_ignores_marker_drag():
+    """Mouse events shouldn't move markers during black-key tuning."""
+    ui = _ui()
+    original_markers = list(ui.markers)
+    _enter_tune_phase(ui)
+    ui.handle_event(_mb_down((int(ui.markers[0][0]), int(ui.markers[0][1]))))
+    ui.handle_event(_mm((500, 600)))
+    ui.handle_event(_mb_up())
+    assert ui.markers == original_markers
+
+
+def test_build_calibration_carries_black_key_offsets():
+    ui = _ui()
+    _enter_tune_phase(ui)
+    ui.handle_event(_kd(pygame.K_RIGHT, mod=pygame.KMOD_SHIFT))
+    cal = ui.build_calibration()
+    assert cal.black_key_offsets == ui.black_key_offsets
+    assert len(cal.black_key_offsets) == 1

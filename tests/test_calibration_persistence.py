@@ -85,3 +85,30 @@ def test_legacy_file_without_ratios_uses_defaults(tmp_path: Path) -> None:
     assert loaded is not None
     assert loaded.black_width_ratio == pytest.approx(0.6)
     assert loaded.black_height_ratio == pytest.approx(0.65)
+    assert loaded.black_key_offsets == {}
+
+
+def test_round_trip_preserves_black_key_offsets(tmp_path: Path) -> None:
+    path = tmp_path / "calibration.json"
+    cal = Calibration(
+        canonical_size=(1920, 200),
+        projector_size=(1920, 1080),
+        markers=[(100, 100), (1800, 110), (1810, 1000), (90, 1010)],
+        black_key_offsets={61: (3.5, -1.0), 63: (-2.0, 0.0)},
+    )
+    save_calibration(cal, path)
+    loaded = load_calibration(path)
+    assert loaded is not None
+    assert loaded.black_key_offsets == {61: (3.5, -1.0), 63: (-2.0, 0.0)}
+
+
+def test_legacy_file_without_offsets_uses_empty_dict(tmp_path: Path) -> None:
+    path = tmp_path / "calibration.json"
+    path.write_text(
+        '{"canonical_size":[1920,200],"projector_size":[1920,1080],'
+        '"markers":[[0,0],[1920,0],[1920,1080],[0,1080]],'
+        '"black_width_ratio":0.6,"black_height_ratio":0.65}'
+    )
+    loaded = load_calibration(path)
+    assert loaded is not None
+    assert loaded.black_key_offsets == {}
