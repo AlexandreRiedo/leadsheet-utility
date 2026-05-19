@@ -206,7 +206,6 @@ class App:
         self._proj_size: tuple[int, int] = proj_size
         self._load_projection_calibration()
         self._canonical_surface = make_canonical_surface(*_CANONICAL_SIZE)
-        self._warped_buffer = pygame.Surface(proj_size)
 
     # -- public interface ----------------------------------------------------
 
@@ -615,11 +614,10 @@ class App:
         if playing and tl_state is not None and not self._count_in_active:
             highlights = free_mode_highlights(tl_state.current_chord)
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
-            warp_canonical_to_projector(
+            warped = warp_canonical_to_projector(
                 self._canonical_surface, self._homography, self._proj_size,
-                out=self._warped_buffer,
             )
-            screen.blit(self._warped_buffer, (0, 0))
+            screen.blit(warped, (0, 0))
 
         self._proj_window.flip()
 
