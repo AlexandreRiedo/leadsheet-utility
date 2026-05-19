@@ -30,3 +30,7 @@
 - After dragging the 4 white-corner markers, use `Q`/`W` and `A`/`S` to tune the black-key proportions to your specific piano — the "standard" 0.60 / 0.65 ratios won't match every instrument. Expect a small residual misalignment on the black keys: a single planar homography can't fully account for the fact that black keys sit on a physically higher plane than the whites. Good enough for highlighting.
 - The projector should have **keystone correction disabled** in its OSD — the app's homography is the only transform that should be active.
 - On a multi-monitor setup, set `PROJ_DISPLAY=<index>` to pick which display to fullscreen.
+
+# Projector lag compensation
+
+Projectors have non-trivial input + processing lag, so the lit-up chord-scale will trail the backing track if we show it on the audio chord boundary. To compensate, the main app projects the chord that will be active `_PROJECTION_LEAD_SECONDS` (default **0.12 s**) ahead of the timeline. Tune this in [src/leadsheet_utility/main.py](src/leadsheet_utility/main.py): bump up if the projector still trails, down if it now leads.

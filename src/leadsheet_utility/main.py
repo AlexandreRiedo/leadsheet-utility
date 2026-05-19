@@ -30,7 +30,12 @@ import numpy as np
 import pygame
 
 from leadsheet_utility.backing.comping import generate_comping
-from leadsheet_utility.backing.events import MidiEvent, generate_count_in, generate_drums, generate_metronome
+from leadsheet_utility.backing.events import (
+    MidiEvent,
+    generate_count_in,
+    generate_drums,
+    generate_metronome,
+)
 from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
 from leadsheet_utility.calibration import load_calibration
@@ -64,6 +69,11 @@ _TEMPO_MIN = 40
 _TEMPO_MAX = 320
 _DEFAULT_SF_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "soundfonts" / "GeneralUser-GS.sf2"
 _CANONICAL_SIZE = (1920, 200)
+
+# Empirically tuned to cover projector input lag + signal/processing delay so
+# the lit-up scale lines up with the audio. Bump up if the projector still
+# trails the backing track; down if it now leads.
+_PROJECTION_LEAD_SECONDS = 0.16
 
 
 # ---------------------------------------------------------------------------
@@ -606,13 +616,13 @@ class App:
         screen = self._proj_window.get_surface()
         screen.fill((0, 0, 0))
 
-        tl_state = self._timeline.get_state() if self._timeline else None
-        playing = (
-            self._timeline is not None
-            and self._timeline.playback_state is PlaybackState.PLAYING
-        )
-        if playing and tl_state is not None and not self._count_in_active:
-            highlights = free_mode_highlights(tl_state.current_chord)
+        timeline = self._timeline
+        tl_state = timeline.get_state() if timeline else None
+        playing = timeline is not None and timeline.playback_state is PlaybackState.PLAYING
+        if playing and timeline is not None and tl_state is not None and not self._count_in_active:
+            lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
+            projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
+            highlights = free_mode_highlights(projected_chord)
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
             warped = warp_canonical_to_projector(
                 self._canonical_surface, self._homography, self._proj_size,

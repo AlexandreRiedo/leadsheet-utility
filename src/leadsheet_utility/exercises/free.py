@@ -14,6 +14,7 @@ from leadsheet_utility.projection import KeyHighlight
 # Debug green — same hue used by the calibration overlay, easier to spot on
 # the piano than pure white while we're still validating projection alignment.
 HIGHLIGHT_COLOR: tuple[int, int, int] = (60, 220, 90)
+# HIGHLIGHT_COLOR: tuple[int, int, int] = (255, 255, 255)
 
 
 def free_mode_highlights(chord: ChordEvent) -> list[KeyHighlight]:

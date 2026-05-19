@@ -189,6 +189,21 @@ class Timeline:
             form_repeat=form_repeat,
         )
 
+    def chord_at(self, beat_in_form: float) -> ChordEvent:
+        """Return the chord active at *beat_in_form*.
+
+        Wraps modulo the form length so callers can pass a look-ahead beat
+        past the end of the form without worrying about repeat boundaries.
+        Useful for the projection lead-time compensation: the projector has
+        physical input lag, so we want to show the chord the player will
+        hear in a few frames, not the one playing right now.
+        """
+        chords = self._lead_sheet.chords
+        beat = beat_in_form % self._form_beats
+        idx = bisect_right(self._chord_starts, beat) - 1
+        idx = max(0, min(idx, len(chords) - 1))
+        return chords[idx]
+
     # -- read-only properties ------------------------------------------------
 
     @property
