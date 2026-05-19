@@ -9,7 +9,12 @@
       "mcp__plugin_context7_context7__resolve-library-id",
       "mcp__plugin_context7_context7__query-docs",
       "Bash(PYTHONPATH=src poetry run python scripts/preview_layout.py)",
-      "Bash(PYTHONPATH=src poetry run python scripts/preview_projector.py)"
+      "Bash(PYTHONPATH=src poetry run python scripts/preview_projector.py)",
+      "Bash(ls \"c:/Users/Cloud/Documents/UNIGE Main/Bachelor/leadsheet-utility/src/leadsheet_utility/calibration.json\" 2>&1; ls \"C:/Users/Cloud/.leadsheet-utility/\" 2>&1)",
+      "Read(//c/Users/Cloud/.leadsheet-utility/**)",
+      "Bash(mv __TRACKED_VAR__/.leadsheet-utility/calibration.json data/calibration.json)",
+      "Bash(rmdir __TRACKED_VAR__/.leadsheet-utility)",
+      "Bash(rm \"src/leadsheet_utility/calibration.json\")"
     ]
   }
 }

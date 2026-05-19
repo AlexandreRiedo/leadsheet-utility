@@ -8,9 +8,23 @@ the same :class:`~leadsheet_utility.timeline.Timeline` state.
 from __future__ import annotations
 
 import logging
+import sys
 import threading
 import time
 from pathlib import Path
+
+# Windows reports a scaled (logical) desktop size unless the process opts into
+# DPI awareness — without this we'd open the projector window at e.g. 1280x720
+# on a 1920x1080 display and the saved calibration would no longer match.
+if sys.platform == "win32":
+    try:
+        import ctypes
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)
+    except Exception:
+        try:
+            ctypes.windll.user32.SetProcessDPIAware()
+        except Exception:
+            pass
 
 import numpy as np
 import pygame
@@ -19,11 +33,22 @@ from leadsheet_utility.backing.comping import generate_comping
 from leadsheet_utility.backing.events import MidiEvent, generate_count_in, generate_drums, generate_metronome
 from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
+from leadsheet_utility.calibration import load_calibration
+from leadsheet_utility.exercises import free_mode_highlights
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
 from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
 from leadsheet_utility.leadsheet.models import ChordEvent, LeadSheet
 from leadsheet_utility.leadsheet.parser import parse_leadsheet
+from leadsheet_utility.projection import (
+    DEFAULT_BLACK_HEIGHT_RATIO,
+    DEFAULT_BLACK_WIDTH_RATIO,
+    build_keyboard_layout,
+    make_canonical_surface,
+    make_default_homography,
+    render_canonical,
+    warp_canonical_to_projector,
+)
 from leadsheet_utility.timeline import PlaybackState, Timeline, TimelineState
 
 logger = logging.getLogger(__name__)
@@ -38,6 +63,7 @@ _TEMPO_STEP = 5
 _TEMPO_MIN = 40
 _TEMPO_MAX = 320
 _DEFAULT_SF_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "soundfonts" / "GeneralUser-GS.sf2"
+_CANONICAL_SIZE = (1920, 200)
 
 
 # ---------------------------------------------------------------------------
@@ -175,6 +201,12 @@ class App:
         self._count_in_total_beats: int = 0
         self._count_in_spb: float = 0.0  # seconds per beat at current tempo
         self._count_in_channel: pygame.mixer.Channel | None = None
+
+        # -- Projection state -------------------------------------------------
+        self._proj_size: tuple[int, int] = proj_size
+        self._load_projection_calibration()
+        self._canonical_surface = make_canonical_surface(*_CANONICAL_SIZE)
+        self._warped_buffer = pygame.Surface(proj_size)
 
     # -- public interface ----------------------------------------------------
 
@@ -539,11 +571,56 @@ class App:
             return None
         return self._timeline.get_state()
 
+    def _load_projection_calibration(self) -> None:
+        """Load saved calibration, or fall back to a default identity homography.
+
+        Sets `self._homography`, `self._keyboard_layout`. Black-key proportion
+        ratios come from the saved calibration when present so the canonical
+        layout matches the specific piano; otherwise the spec defaults are used.
+        """
+        cal = load_calibration()
+        if cal is not None and cal.projector_size == self._proj_size:
+            self._homography = cal.homography()
+            black_w = cal.black_width_ratio
+            black_h = cal.black_height_ratio
+            logger.info("Loaded calibration (black ratios w=%.2f h=%.2f)", black_w, black_h)
+        else:
+            self._homography = make_default_homography(_CANONICAL_SIZE, self._proj_size)
+            black_w = DEFAULT_BLACK_WIDTH_RATIO
+            black_h = DEFAULT_BLACK_HEIGHT_RATIO
+            if cal is None:
+                logger.info("No calibration found — using default identity homography")
+            else:
+                logger.info(
+                    "Calibration projector size mismatch (%s vs %s) — using default",
+                    cal.projector_size, self._proj_size,
+                )
+
+        self._keyboard_layout = build_keyboard_layout(
+            *_CANONICAL_SIZE,
+            black_width_ratio=black_w,
+            black_height_ratio=black_h,
+        )
+
     def _render_projection(self) -> None:
-        """Render the projection window (black when stopped, stubs for now)."""
-        surface = self._proj_window.get_surface()
-        surface.fill((0, 0, 0))
-        # TODO: projection rendering (exercises + warpPerspective) goes here
+        """Render the projection window: free-mode highlights warped through H."""
+        screen = self._proj_window.get_surface()
+        screen.fill((0, 0, 0))
+
+        tl_state = self._timeline.get_state() if self._timeline else None
+        playing = (
+            self._timeline is not None
+            and self._timeline.playback_state is PlaybackState.PLAYING
+        )
+        if playing and tl_state is not None and not self._count_in_active:
+            highlights = free_mode_highlights(tl_state.current_chord)
+            render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
+            warp_canonical_to_projector(
+                self._canonical_surface, self._homography, self._proj_size,
+                out=self._warped_buffer,
+            )
+            screen.blit(self._warped_buffer, (0, 0))
+
         self._proj_window.flip()
 
     def _render_hud(self, tl_state: TimelineState | None) -> None:

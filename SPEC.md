@@ -16,14 +16,14 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
 
 1. The user physically mounts the projector above the piano. **The projector stays fixed from this point on.**
 2. The user connects the projector as a secondary display and launches the app: `python -m leadsheet_utility`.
-3. On first launch, no `~/.leadsheet-utility/calibration.json` exists, so the app enters **calibration mode**. Four bright markers appear on the projector display.
+3. On first launch, no `data/calibration.json` exists, so the app enters **calibration mode**. Four bright markers appear on the projector display.
 4. The user drags the 4 markers until they sit on the physical corners of the keyboard. Presses Enter to confirm.
 5. The app computes the homography, draws a preview of all 88 key outlines. If alignment looks good, the user confirms. If not, re-drag and retry.
 6. Calibration is saved. **These steps never need to be repeated** unless the projector is physically moved.
 
 ### Normal Usage (every session)
 
-1. User launches the app. It loads config + calibration from `~/.leadsheet-utility/`.
+1. User launches the app. It loads `data/calibration.json` (and, eventually, user config from `~/.leadsheet-utility/`).
 2. The projector display goes fullscreen black (no light on the piano yet). The primary display shows the HUD.
 3. User presses `O` to open a `.tsv` lead sheet file (or the app loads the last-used file).
 4. The HUD shows: title, chord chart, tempo, exercise selection.
@@ -109,9 +109,9 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `timeline` | **Done** | Musical clock deriving beat position from audio playback, resolving current chord |
 | `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering |
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar |
-| `projection` | **Done (not wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; exercised via `scripts/preview_projector.py` |
-| `calibration` | **Done (not wired into main)** | 4-point marker drag UI + ratio tuning + JSON persistence; exercised via `scripts/preview_calibration.py` |
-| `exercises` | **Not started** | 5 exercise modes computing colored highlights per beat |
+| `projection` | **Done (wired into main for Free Mode)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame |
+| `calibration` | **Done (standalone)** | 4-point marker drag UI + ratio tuning + JSON persistence; loaded by main on startup, but in-session `C` re-entry still a stub |
+| `exercises` | **Free Mode done; others not started** | Free Mode (all scale notes white) wired; Guide Tone / Contour / Flow / Start & End Note pending |
 
 ### Application States
 
@@ -247,11 +247,11 @@ class KeyHighlight:
     color: tuple[int, int, int]   # RGB
 ```
 
-### 6.1 Free Mode (Mode Libre)
+### 6.1 Free Mode (Mode Libre) — Implemented
 
 - **Projection**: All chord-scale notes in **white**.
 - **Purpose**: Introductory mode; the player sees which notes are "safe" and improvises freely.
-- **Logic**: Return all `scale_notes` in white.
+- **Logic**: Return all `scale_notes` in white. Implemented in `exercises/free.py` as `free_mode_highlights(chord)`; called once per frame by `App._render_projection` against the timeline's current chord, then rendered → warped → blitted onto the projector window.
 
 ### 6.2 Guide Tone Game
 
@@ -345,7 +345,7 @@ A single planar homography cannot fully correct black-key parallax (black-key to
 2. User drags each marker to the corresponding corner of the physical piano. Arrow keys nudge for precision. Tab cycles markers.
 3. Compute homography: `H = cv2.getPerspectiveTransform(src, dst)` where `src` = canonical corners, `dst` = marker positions.
 4. Preview: render all 88 key outlines through the homography for visual verification.
-5. Save to `~/.leadsheet-utility/calibration.json`:
+5. Save to `data/calibration.json` (per-machine, gitignored):
 
 ```json
 {
@@ -513,11 +513,12 @@ ruff = ">=0.4"
 
 - [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, standalone preview script)
 - [x] Calibration (4-point marker drag UI + Q/W/A/S per-instrument black-key ratio tuning + JSON persistence, standalone preview script)
+- [x] Main-app integration of projection: calibration loaded on startup, Free Mode rendered through the saved homography during playback
+- [x] Free Mode exercise
 
 ### TODO (MVP)
 
-- [ ] Wire projection + calibration into `main.py` (load on startup, `C` to re-enter, render highlights through saved homography during playback)
-- [ ] Free Mode exercise
+- [ ] In-app calibration entry (`C` keybinding) — currently only reachable via `scripts/preview_calibration.py`
 - [ ] Guide Tone exercise
 
 ### Stretch Goals

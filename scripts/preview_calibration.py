@@ -1,7 +1,7 @@
 """Standalone calibration preview.
 
 Opens the projector window in fullscreen and runs the 4-point calibration
-UI. On Enter, saves the calibration to ~/.leadsheet-utility/calibration.json
+UI. On Enter, saves the calibration to <repo>/data/calibration.json
 and then enters a verification mode: a static C-minor highlight is rendered
 through the saved homography so you can eyeball alignment on the real keys.
 

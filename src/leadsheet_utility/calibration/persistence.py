@@ -1,4 +1,4 @@
-"""Load/save calibration to ~/.leadsheet-utility/calibration.json."""
+"""Load/save calibration to <repo>/data/calibration.json."""
 
 from __future__ import annotations
 
@@ -11,7 +11,10 @@ from leadsheet_utility.projection.layout import (
     DEFAULT_BLACK_WIDTH_RATIO,
 )
 
-DEFAULT_CONFIG_DIR = Path.home() / ".leadsheet-utility"
+# Repo root = parent of src/. This module sits at
+# src/leadsheet_utility/calibration/persistence.py so we go up four levels.
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_CONFIG_DIR = _REPO_ROOT / "data"
 DEFAULT_CALIBRATION_PATH = DEFAULT_CONFIG_DIR / "calibration.json"
 
 

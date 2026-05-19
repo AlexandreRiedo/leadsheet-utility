@@ -214,3 +214,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Per-machine projector calibration (geometry depends on physical setup)
+/data/calibration.json

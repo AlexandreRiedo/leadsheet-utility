@@ -10,7 +10,7 @@ SPEC.md is the authoritative design reference (treat it as a living document tha
 
 ## Project Status: Early Development
 
-Core pipeline is functional end-to-end: lead sheets can be loaded, harmony analyzed, a full backing track (walking bass + swing drums + jazz guitar comping) rendered via FluidSynth, and playback driven from a shared timeline with a HUD window. Backing track rendering happens on a background thread with a "Rendering audio..." loading screen on the HUD, followed by a 2-bar count-in before playback begins. The `projection` and `calibration` modules are implemented as standalone components (canonical 88-key layout, homography warp, 4-point marker drag UI with persistence to `~/.leadsheet-utility/calibration.json`) and exercised via `scripts/preview_projector.py` and `scripts/preview_calibration.py`, but are **not yet wired into `main.py`**. The `exercises` module is **not yet implemented**.
+Core pipeline is functional end-to-end: lead sheets can be loaded, harmony analyzed, a full backing track (walking bass + swing drums + jazz guitar comping) rendered via FluidSynth, and playback driven from a shared timeline with a HUD window. Backing track rendering happens on a background thread with a "Rendering audio..." loading screen on the HUD, followed by a 2-bar count-in before playback begins. The `projection` and `calibration` modules are implemented (canonical 88-key layout, homography warp, 4-point marker drag UI with persistence to `data/calibration.json`) and exercised via `scripts/preview_projector.py` and `scripts/preview_calibration.py`. **Free Mode** is now wired into `main.py`: on startup the app loads saved calibration (falling back to a default identity homography when missing) and during playback the projection window lights up every chord-scale note in white, warped through the saved homography. The remaining four exercises (Guide Tone, Contour, Flow, Start & End Note) are still unimplemented, and entering calibration mode mid-session via `C` is still a stub.
 
 ## Commands
 
@@ -83,9 +83,10 @@ Sync: timeline uses wall-clock elapsed time (perf_counter) -> drives both projec
 - **`src/leadsheet_utility/timeline/`** — `engine.py`: wall-clock-based musical clock with play/pause/stop transport. Uses `ClockSource` protocol for testability. Binary-searches chord list to resolve current chord each frame.
 - **`src/leadsheet_utility/backing/`** — `events.py` (MidiEvent dataclass, metronome, count-in, and swing drum pattern generators), `walking_bass.py` (algorithmic walking bass with phrase-direction arcs, chord-tone variation, approach notes), `comping.py` + `comping_voicings.py` + `comping_rhythms.py` (jazz guitar comping: drop-2/drop-3 voicings with voice-leading optimisation, 12 one-bar + 4 two-bar Phil DeGreg swing rhythm patterns with anticipations), `renderer.py` (offline FluidSynth rendering to numpy int16 buffer for pygame.mixer)
 - **`src/leadsheet_utility/gui/`** — `hud.py` (HUD rendering: song info, current/next chord, exercise selector, progress bar, shortcuts), `input.py` (key-to-action mapping via enum)
-- **`src/leadsheet_utility/main.py`** — `App` class: two-window pygame-ce loop (projection + HUD), transport controls, file dialog, async background-thread audio rendering with loading screen, 2-bar count-in before playback. Toggleable metronome (`M`) and guitar comping (`G`).
+- **`src/leadsheet_utility/main.py`** — `App` class: two-window pygame-ce loop (projection + HUD), transport controls, file dialog, async background-thread audio rendering with loading screen, 2-bar count-in before playback. Toggleable metronome (`M`) and guitar comping (`G`). On startup loads `data/calibration.json` (or falls back to `make_default_homography`); during playback `_render_projection()` runs Free Mode (`free_mode_highlights`), renders the canonical surface, and warps it through the saved homography onto the projector window.
+- **`src/leadsheet_utility/exercises/`** — `free.py` (`free_mode_highlights(chord)` returns one white `KeyHighlight` per MIDI note in `chord.scale_notes`)
 - **`src/leadsheet_utility/projection/`** — `layout.py` (88-key `KeyRect` geometry, configurable MIDI range + per-instrument `black_width_ratio`/`black_height_ratio`; default range F2–E6 so both edges align to the left side of an F-key landmark; white-key endpoint validation), `renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), `warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`, `make_default_homography` for identity preview)
-- **`src/leadsheet_utility/calibration/`** — `models.py` (`Calibration` dataclass: canonical_size, projector_size, 4 markers TL/TR/BR/BL, black-key ratios, `homography()` via `cv2.getPerspectiveTransform`), `persistence.py` (JSON load/save to `~/.leadsheet-utility/calibration.json`, legacy files without ratio keys fall back to defaults), `ui.py` (`CalibrationUI` state machine: marker drag, Tab/1-4 selection, arrow-key nudge with Shift=×10, Q/W width and A/S height ratio tuning with Shift=×5, R reset, Enter/Esc confirm/cancel; renders green-white/pink-black filled overlay through current homography for visual alignment)
+- **`src/leadsheet_utility/calibration/`** — `models.py` (`Calibration` dataclass: canonical_size, projector_size, 4 markers TL/TR/BR/BL, black-key ratios, `homography()` via `cv2.getPerspectiveTransform`), `persistence.py` (JSON load/save to `data/calibration.json`, legacy files without ratio keys fall back to defaults), `ui.py` (`CalibrationUI` state machine: marker drag, Tab/1-4 selection, arrow-key nudge with Shift=×10, Q/W width and A/S height ratio tuning with Shift=×5, R reset, Enter/Esc confirm/cancel; renders green-white/pink-black filled overlay through current homography for visual alignment)
 - **`scripts/preview_projector.py`** — standalone harness rendering a static C-minor highlight through a default identity homography on the projector display
 - **`scripts/preview_calibration.py`** — standalone calibration harness: loads existing calibration (or defaults), runs `CalibrationUI`, saves the result, then drops into a static C-minor verification render so alignment can be eyeballed on the real piano
 - **`data/leadsheets/`** — 14 lead sheets as `.tsv` + `.meta.json` pairs
@@ -95,8 +96,8 @@ Multi-monitor: `PROJ_DISPLAY=<index>` env var picks which display the projector 
 
 ### What Does NOT Exist Yet
 
-- **`exercises`** — highlight logic per exercise mode (Free, Guide Tone, Contour, Flow, Start & End Note)
-- **Main-app integration of projection/calibration** — `main.py` does not yet load calibration on startup, has no `C` key handler to enter calibration mode mid-session, and its `_render_projection()` stub does not yet draw highlights through the saved homography
+- **Other exercise modes** — Guide Tone, Contour, Flow, Start & End Note (only Free Mode is wired)
+- **In-app calibration entry** — `C` key still logs "not implemented"; calibration is currently only reachable via `scripts/preview_calibration.py`
 
 Harmony integration tests are fixture-driven: JSON files in `tests/fixtures/harmony/` define expected pitch-class sets per chord for real lead sheets — update these when adding pieces or changing scale resolution.
 
@@ -123,6 +124,5 @@ Chord symbols use colon notation: `Root:quality` with optional parenthesized ext
 
 ### User Config
 
-Stored in `~/.leadsheet-utility/`:
-- `config.json` — SoundFont path
-- `calibration.json` — projector resolution, marker positions, homography matrix
+- `data/calibration.json` (project-local, gitignored) — projector resolution, marker positions, black-key ratios. Loaded by `main.py` on startup; falls back to an identity homography if missing.
+- `~/.leadsheet-utility/config.json` (not yet implemented) — SoundFont path overrides etc.

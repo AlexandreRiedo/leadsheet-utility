@@ -1,4 +1,6 @@
 from leadsheet_utility.projection.layout import (
+    DEFAULT_BLACK_HEIGHT_RATIO,
+    DEFAULT_BLACK_WIDTH_RATIO,
     KeyRect,
     MIDI_LOW,
     MIDI_HIGH,
@@ -21,6 +23,8 @@ from leadsheet_utility.projection.warp import (
 )
 
 __all__ = [
+    "DEFAULT_BLACK_HEIGHT_RATIO",
+    "DEFAULT_BLACK_WIDTH_RATIO",
     "KeyRect",
     "KeyHighlight",
     "Homography",
