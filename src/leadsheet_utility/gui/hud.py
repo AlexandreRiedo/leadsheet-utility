@@ -73,6 +73,8 @@ def render_hud(
     chord_tone_mode: str = "OFF",
     count_in_beat: float | None = None,
     count_in_total_beats: int = 0,
+    frozen_mode: bool = False,
+    frozen_chord_idx: int = 0,
 ) -> None:
     """Draw the full HUD onto *surface*.  Called once per frame."""
     fonts = _get_fonts()
@@ -109,7 +111,21 @@ def render_hud(
     y += 34
 
     # -- Current / next chord ------------------------------------------------
-    if timeline_state is not None:
+    if frozen_mode:
+        chords = lead_sheet.chords
+        idx = max(0, min(frozen_chord_idx, len(chords) - 1))
+        chord = chords[idx]
+        cur_line = (
+            f"Current: {chord.chord_symbol}  "
+            f"(bar {chord.bar_number}/{lead_sheet.total_bars})  "
+            f"[FROZEN {idx + 1}/{len(chords)}]"
+        )
+        _blit(surface, fonts["heading"], cur_line, 14, y, _ACCENT)
+        y += 26
+        nxt = chords[(idx + 1) % len(chords)].chord_symbol if chords else "--"
+        _blit(surface, fonts["body"], f"Next:    {nxt}", 14, y, _DIM)
+        y += 34
+    elif timeline_state is not None:
         chord = timeline_state.current_chord
         bar = chord.bar_number
         total_bars = lead_sheet.total_bars
@@ -144,11 +160,14 @@ def render_hud(
     y += 60
 
     # -- Transport / progress ------------------------------------------------
-    status_label = {
-        PlaybackState.STOPPED: "STOPPED",
-        PlaybackState.PLAYING: "PLAYING",
-        PlaybackState.PAUSED: "PAUSED",
-    }[playback_state]
+    if frozen_mode:
+        status_label = "FROZEN"
+    else:
+        status_label = {
+            PlaybackState.STOPPED: "STOPPED",
+            PlaybackState.PLAYING: "PLAYING",
+            PlaybackState.PAUSED: "PAUSED",
+        }[playback_state]
     met_label = "ON" if metronome_on else "OFF"
     comp_label = "ON" if comping_on else "OFF"
     root_label = "ON" if highlight_root else "OFF"
@@ -290,6 +309,7 @@ def _render_shortcuts(
         "[M] Metronome         [G] Comping",
         "[R] Root highlight    [B] Small (free)",
         "[T] Chord tones       [C] Calibrate",
+        "[F] Frozen mode       [<-/->] Step chord",
         "[Q] Quit",
     ]
     for line in shortcuts:

@@ -226,6 +226,10 @@ class App:
         self._small_mode: SmallMode = SmallMode.OFF
         self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
 
+        # -- Frozen mode state ------------------------------------------------
+        self._frozen_mode: bool = False
+        self._frozen_chord_idx: int = 0
+
         # -- Async render state ----------------------------------------------
         self._render_thread: threading.Thread | None = None
         self._render_result: np.ndarray | None = None
@@ -339,6 +343,15 @@ class App:
             self._chord_tone_mode = next_chord_tone_mode(self._chord_tone_mode)
             logger.info("Chord-tone mode: %s", self._chord_tone_mode.name)
 
+        elif action is Action.TOGGLE_FROZEN:
+            self._toggle_frozen_mode()
+
+        elif action is Action.FROZEN_PREV:
+            self._frozen_step(-1)
+
+        elif action is Action.FROZEN_NEXT:
+            self._frozen_step(1)
+
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
             if 0 <= idx < len(EXERCISE_NAMES):
@@ -348,6 +361,10 @@ class App:
 
     def _toggle_play_pause(self) -> None:
         if self._timeline is None or self._lead_sheet is None:
+            return
+
+        # Frozen mode owns the projection and does not advance with audio.
+        if self._frozen_mode:
             return
 
         # During count-in, treat play/pause as stop
@@ -389,6 +406,41 @@ class App:
             self._channel.stop()
         if self._timeline:
             self._timeline.stop()
+
+    # -- frozen mode -----------------------------------------------------------
+
+    def _toggle_frozen_mode(self) -> None:
+        """Enter/exit frozen mode. Entering halts playback and pins the projection
+        to a single chord that the user steps through with the arrow keys."""
+        if self._lead_sheet is None:
+            return
+        if self._frozen_mode:
+            self._frozen_mode = False
+            logger.info("Frozen mode OFF")
+            return
+        self._stop_playback()
+        self._frozen_mode = True
+        self._frozen_chord_idx = max(
+            0, min(self._frozen_chord_idx, len(self._lead_sheet.chords) - 1)
+        )
+        chord = self._lead_sheet.chords[self._frozen_chord_idx]
+        logger.info(
+            "Frozen mode ON — chord %d/%d: %s",
+            self._frozen_chord_idx + 1, len(self._lead_sheet.chords), chord.chord_symbol,
+        )
+
+    def _frozen_step(self, delta: int) -> None:
+        if not self._frozen_mode or self._lead_sheet is None:
+            return
+        n = len(self._lead_sheet.chords)
+        if n == 0:
+            return
+        self._frozen_chord_idx = (self._frozen_chord_idx + delta) % n
+        chord = self._lead_sheet.chords[self._frozen_chord_idx]
+        logger.info(
+            "Frozen chord %d/%d: %s",
+            self._frozen_chord_idx + 1, n, chord.chord_symbol,
+        )
 
     # -- count-in --------------------------------------------------------------
 
@@ -608,6 +660,8 @@ class App:
             self._audio_dirty = True
             self._rebuild_timeline()
             self._prev_chord_symbol = None  # reset chord-change tracker
+            self._frozen_mode = False
+            self._frozen_chord_idx = 0
             _log_harmony_summary(ls)
         except Exception:
             logger.exception("Failed to load %s", path)
@@ -737,12 +791,21 @@ class App:
 
         screen.fill((0, 0, 0))
 
-        timeline = self._timeline
-        tl_state = timeline.get_state() if timeline else None
-        playing = timeline is not None and timeline.playback_state is PlaybackState.PLAYING
-        if playing and timeline is not None and tl_state is not None and not self._count_in_active:
-            lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
-            projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
+        projected_chord: ChordEvent | None = None
+        if self._frozen_mode and self._lead_sheet is not None:
+            chords = self._lead_sheet.chords
+            if chords:
+                idx = max(0, min(self._frozen_chord_idx, len(chords) - 1))
+                projected_chord = chords[idx]
+        else:
+            timeline = self._timeline
+            tl_state = timeline.get_state() if timeline else None
+            playing = timeline is not None and timeline.playback_state is PlaybackState.PLAYING
+            if playing and timeline is not None and tl_state is not None and not self._count_in_active:
+                lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
+                projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
+
+        if projected_chord is not None:
             if self._chord_tone_mode is ChordToneMode.ONLY:
                 highlights = chord_tone_only_highlights(projected_chord, small=self._small_mode)
             else:
@@ -789,6 +852,8 @@ class App:
             chord_tone_mode=self._chord_tone_mode.name,
             count_in_beat=self._get_count_in_beat(),
             count_in_total_beats=self._count_in_total_beats,
+            frozen_mode=self._frozen_mode,
+            frozen_chord_idx=self._frozen_chord_idx,
         )
         self._hud_window.flip()
 

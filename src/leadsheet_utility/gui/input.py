@@ -31,6 +31,9 @@ class Action(Enum):
     TOGGLE_ROOT_HIGHLIGHT = auto()
     TOGGLE_FREE_SMALL = auto()
     TOGGLE_CHORD_TONES = auto()
+    TOGGLE_FROZEN = auto()
+    FROZEN_PREV = auto()
+    FROZEN_NEXT = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -50,6 +53,9 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_r: Action.TOGGLE_ROOT_HIGHLIGHT,
     pygame.K_b: Action.TOGGLE_FREE_SMALL,
     pygame.K_t: Action.TOGGLE_CHORD_TONES,
+    pygame.K_f: Action.TOGGLE_FROZEN,
+    pygame.K_LEFT: Action.FROZEN_PREV,
+    pygame.K_RIGHT: Action.FROZEN_NEXT,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,
