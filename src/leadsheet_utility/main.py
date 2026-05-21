@@ -38,7 +38,12 @@ from leadsheet_utility.backing.events import (
 )
 from leadsheet_utility.backing.renderer import render_backing_track
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
-from leadsheet_utility.calibration import load_calibration
+from leadsheet_utility.calibration import (
+    DEFAULT_CALIBRATION_PATH,
+    CalibrationUI,
+    load_calibration,
+    save_calibration,
+)
 from leadsheet_utility.exercises import free_mode_highlights
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
@@ -217,6 +222,10 @@ class App:
         self._load_projection_calibration()
         self._canonical_surface = make_canonical_surface(*_CANONICAL_SIZE)
 
+        # -- Calibration mode (None when not active) --------------------------
+        self._calibration_ui: CalibrationUI | None = None
+        self._calibration_font: pygame.font.Font | None = None
+
     # -- public interface ----------------------------------------------------
 
     def run(self) -> None:
@@ -238,11 +247,18 @@ class App:
 
     def _process_events(self) -> None:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 self._running = False
-            elif event.type == pygame.WINDOWCLOSE:
-                self._running = False
-            elif event.type == pygame.KEYDOWN:
+                continue
+            # While calibrating, the UI consumes all keyboard + mouse input.
+            # Its own state machine handles Enter/Esc/etc.; we only watch for
+            # it becoming inactive so we can save and return to normal mode.
+            if self._calibration_ui is not None:
+                self._calibration_ui.handle_event(event)
+                if not self._calibration_ui.active:
+                    self._finish_calibration()
+                continue
+            if event.type == pygame.KEYDOWN:
                 self._handle_action(key_to_action(event.key))
 
     def _handle_action(self, action: Action) -> None:
@@ -274,7 +290,7 @@ class App:
             self._rebuild_timeline()
 
         elif action is Action.CALIBRATE:
-            logger.info("Calibration mode not yet implemented")
+            self._enter_calibration()
 
         elif action is Action.TOGGLE_METRONOME:
             self._metronome_on = not self._metronome_on
@@ -505,6 +521,18 @@ class App:
         """True while the async render thread is running."""
         return self._render_thread is not None and self._render_thread.is_alive()
 
+    def _render_calibration_hud(self) -> None:
+        """Minimal HUD while calibrating — directs the user to the projector."""
+        surface = self._hud_window.get_surface()
+        surface.fill((30, 30, 30))
+        font = pygame.font.SysFont("consolas", 22)
+        text = font.render(
+            "Calibrating — see projector window", True, (220, 220, 220),
+        )
+        w, h = surface.get_size()
+        surface.blit(text, ((w - text.get_width()) // 2, (h - text.get_height()) // 2))
+        self._hud_window.flip()
+
     def _render_loading_screen(self, message: str) -> None:
         """Draw an animated 'Rendering audio...' screen while the render thread runs."""
         surface = self._hud_window.get_surface()
@@ -580,6 +608,51 @@ class App:
             return None
         return self._timeline.get_state()
 
+    # -- calibration mode ----------------------------------------------------
+
+    def _enter_calibration(self) -> None:
+        """Stop playback and switch the projector window to calibration mode.
+
+        Seeds the UI with the saved calibration when its projector size
+        matches, so the user can fine-tune incrementally instead of starting
+        from defaults each time.
+        """
+        if self._calibration_ui is not None:
+            return  # already calibrating
+        self._stop_playback()
+
+        cal = load_calibration()
+        if cal is not None and cal.projector_size == self._proj_size:
+            self._calibration_ui = CalibrationUI(
+                canonical_size=_CANONICAL_SIZE,
+                projector_size=self._proj_size,
+                initial_markers=cal.markers,
+                black_width_ratio=cal.black_width_ratio,
+                black_height_ratio=cal.black_height_ratio,
+                black_key_offsets=cal.black_key_offsets,
+            )
+        else:
+            self._calibration_ui = CalibrationUI(
+                canonical_size=_CANONICAL_SIZE,
+                projector_size=self._proj_size,
+            )
+        if self._calibration_font is None:
+            self._calibration_font = pygame.font.SysFont("consolas", 20)
+        logger.info("Entered calibration mode")
+
+    def _finish_calibration(self) -> None:
+        """Save (or discard) and reload calibration after the UI closes."""
+        ui = self._calibration_ui
+        self._calibration_ui = None
+        if ui is None:
+            return
+        if ui.confirmed:
+            save_calibration(ui.build_calibration())
+            logger.info("Saved calibration to %s", DEFAULT_CALIBRATION_PATH)
+            self._load_projection_calibration()
+        else:
+            logger.info("Calibration cancelled — saved calibration unchanged")
+
     def _load_projection_calibration(self) -> None:
         """Load saved calibration, or fall back to a default identity homography.
 
@@ -618,8 +691,17 @@ class App:
         )
 
     def _render_projection(self) -> None:
-        """Render the projection window: free-mode highlights warped through H."""
+        """Render the projection window: free-mode highlights warped through H.
+
+        While calibrating, hand the entire projector surface over to the
+        CalibrationUI — it does its own warping and overlay drawing.
+        """
         screen = self._proj_window.get_surface()
+        if self._calibration_ui is not None:
+            self._calibration_ui.render(screen, font=self._calibration_font)
+            self._proj_window.flip()
+            return
+
         screen.fill((0, 0, 0))
 
         timeline = self._timeline
@@ -639,6 +721,9 @@ class App:
 
     def _render_hud(self, tl_state: TimelineState | None) -> None:
         """Render the HUD window."""
+        if self._calibration_ui is not None:
+            self._render_calibration_hud()
+            return
         if self._rendering:
             self._render_loading_screen("Rendering audio")
             return

@@ -110,7 +110,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering |
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar |
 | `projection` | **Done (wired into main for Free Mode)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame |
-| `calibration` | **Done (standalone)** | 4-point marker drag UI + ratio tuning + JSON persistence; loaded by main on startup, but in-session `C` re-entry still a stub |
+| `calibration` | **Done (wired into main)** | Two-phase 4-point marker + ratio + per-black-key tuning UI; loaded by main on startup, re-entered in-session via `C` |
 | `exercises` | **Free Mode done; others not started** | Free Mode (all scale notes white) wired; Guide Tone / Contour / Flow / Start & End Note pending |
 
 ### Application States
@@ -516,9 +516,10 @@ ruff = ">=0.4"
 - [x] Main-app integration of projection: calibration loaded on startup, Free Mode rendered through the saved homography during playback
 - [x] Free Mode exercise
 
+- [x] In-app calibration entry (`C` keybinding) — stops playback, runs the `CalibrationUI` on the projector, reloads homography/layout on confirm
+
 ### TODO (MVP)
 
-- [ ] In-app calibration entry (`C` keybinding) — currently only reachable via `scripts/preview_calibration.py`
 - [ ] Guide Tone exercise
 
 ### Stretch Goals

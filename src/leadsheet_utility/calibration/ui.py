@@ -86,6 +86,7 @@ class CalibrationUI:
         midi_range: tuple[int, int] = (MIDI_DEFAULT_LOW, MIDI_DEFAULT_HIGH),
         black_width_ratio: float = DEFAULT_BLACK_WIDTH_RATIO,
         black_height_ratio: float = DEFAULT_BLACK_HEIGHT_RATIO,
+        black_key_offsets: dict[int, tuple[float, float]] | None = None,
     ) -> None:
         self.canonical_size = canonical_size
         self.projector_size = projector_size
@@ -104,7 +105,9 @@ class CalibrationUI:
 
         # Phase 2 state: per-black-key offsets in canonical pixels.
         self.phase: CalibrationPhase = CalibrationPhase.MAIN
-        self.black_key_offsets: dict[int, tuple[float, float]] = {}
+        self.black_key_offsets: dict[int, tuple[float, float]] = (
+            dict(black_key_offsets) if black_key_offsets else {}
+        )
         # MIDI notes of the black keys in the active range, in playing order.
         # Populated when entering BLACK_KEY_TUNE so we always tune what's
         # actually being projected.
