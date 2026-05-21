@@ -28,6 +28,8 @@ class Action(Enum):
     EXERCISE_5 = auto()
     TOGGLE_METRONOME = auto()
     TOGGLE_COMPING = auto()
+    TOGGLE_ROOT_HIGHLIGHT = auto()
+    TOGGLE_FREE_SMALL = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -44,6 +46,8 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_c: Action.CALIBRATE,
     pygame.K_m: Action.TOGGLE_METRONOME,
     pygame.K_g: Action.TOGGLE_COMPING,
+    pygame.K_r: Action.TOGGLE_ROOT_HIGHLIGHT,
+    pygame.K_b: Action.TOGGLE_FREE_SMALL,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,

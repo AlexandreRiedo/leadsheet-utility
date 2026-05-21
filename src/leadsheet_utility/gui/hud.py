@@ -68,6 +68,8 @@ def render_hud(
     tempo: int,
     metronome_on: bool = False,
     comping_on: bool = True,
+    highlight_root: bool = False,
+    free_small: bool = False,
     count_in_beat: float | None = None,
     count_in_total_beats: int = 0,
 ) -> None:
@@ -148,10 +150,19 @@ def render_hud(
     }[playback_state]
     met_label = "ON" if metronome_on else "OFF"
     comp_label = "ON" if comping_on else "OFF"
+    root_label = "ON" if highlight_root else "OFF"
+    small_label = "ON" if free_small else "OFF"
     _blit(
         surface,
         fonts["body"],
         f"Status: {status_label}    Metronome: {met_label}    Comping: {comp_label}",
+        14, y, _ACCENT,
+    )
+    y += 22
+    _blit(
+        surface,
+        fonts["body"],
+        f"Root: {root_label}    Small (free): {small_label}",
         14, y, _ACCENT,
     )
     y += 30
@@ -275,6 +286,7 @@ def _render_shortcuts(
         "[SPACE] Play/Pause    [S] Stop",
         "[+/-] Tempo           [O] Open file",
         "[M] Metronome         [G] Comping",
+        "[R] Root highlight    [B] Small (free)",
         "[C] Calibrate         [Q] Quit",
     ]
     for line in shortcuts:
