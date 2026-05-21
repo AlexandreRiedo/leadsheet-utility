@@ -69,7 +69,7 @@ def render_hud(
     metronome_on: bool = False,
     comping_on: bool = True,
     highlight_root: bool = False,
-    free_small: bool = False,
+    small_mode: str = "OFF",
     chord_tone_mode: str = "OFF",
     count_in_beat: float | None = None,
     count_in_total_beats: int = 0,
@@ -152,7 +152,7 @@ def render_hud(
     met_label = "ON" if metronome_on else "OFF"
     comp_label = "ON" if comping_on else "OFF"
     root_label = "ON" if highlight_root else "OFF"
-    small_label = "ON" if free_small else "OFF"
+    small_label = small_mode  # OFF / 1-OCT / 2-OCT
     tones_label = chord_tone_mode  # OFF / ONLY / OVERLAY
     _blit(
         surface,

@@ -46,11 +46,13 @@ from leadsheet_utility.calibration import (
 )
 from leadsheet_utility.exercises import (
     ChordToneMode,
+    SmallMode,
     apply_chord_tone_highlight,
     apply_root_highlight,
     chord_tone_only_highlights,
     free_mode_highlights,
     next_chord_tone_mode,
+    next_small_mode,
 )
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
@@ -86,6 +88,15 @@ _CANONICAL_SIZE = (1920, 200)
 # the lit-up scale lines up with the audio. Bump up if the projector still
 # trails the backing track; down if it now leads.
 _PROJECTION_LEAD_SECONDS = 0.16
+
+
+def _small_mode_label(mode: SmallMode) -> str:
+    """Short HUD label for the small-mode cycle."""
+    return {
+        SmallMode.OFF: "OFF",
+        SmallMode.ONE_OCTAVE: "1-OCT",
+        SmallMode.TWO_OCTAVE: "2-OCT",
+    }[mode]
 
 
 # ---------------------------------------------------------------------------
@@ -212,7 +223,7 @@ class App:
         self._metronome_on: bool = False
         self._comping_on: bool = True
         self._highlight_root: bool = False
-        self._free_small: bool = False
+        self._small_mode: SmallMode = SmallMode.OFF
         self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
 
         # -- Async render state ----------------------------------------------
@@ -321,8 +332,8 @@ class App:
             logger.info("Root highlight %s", "ON" if self._highlight_root else "OFF")
 
         elif action is Action.TOGGLE_FREE_SMALL:
-            self._free_small = not self._free_small
-            logger.info("Free-mode small range %s", "ON" if self._free_small else "OFF")
+            self._small_mode = next_small_mode(self._small_mode)
+            logger.info("Small mode: %s", self._small_mode.name)
 
         elif action is Action.TOGGLE_CHORD_TONES:
             self._chord_tone_mode = next_chord_tone_mode(self._chord_tone_mode)
@@ -733,9 +744,9 @@ class App:
             lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
             projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
             if self._chord_tone_mode is ChordToneMode.ONLY:
-                highlights = chord_tone_only_highlights(projected_chord, small=self._free_small)
+                highlights = chord_tone_only_highlights(projected_chord, small=self._small_mode)
             else:
-                highlights = free_mode_highlights(projected_chord, small=self._free_small)
+                highlights = free_mode_highlights(projected_chord, small=self._small_mode)
                 if self._chord_tone_mode is ChordToneMode.OVERLAY:
                     highlights = apply_chord_tone_highlight(highlights, projected_chord)
             # Root overlay applied last so the root keeps its own color
@@ -774,7 +785,7 @@ class App:
             self._metronome_on,
             comping_on=self._comping_on,
             highlight_root=self._highlight_root,
-            free_small=self._free_small,
+            small_mode=_small_mode_label(self._small_mode),
             chord_tone_mode=self._chord_tone_mode.name,
             count_in_beat=self._get_count_in_beat(),
             count_in_total_beats=self._count_in_total_beats,

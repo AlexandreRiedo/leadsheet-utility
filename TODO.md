@@ -1,8 +1,7 @@
 # WIP
 - Think about getting white tape?
-- Make the small mode a toggle between 1 and 2 octaves
 
-# MAYBE
+# LONG TERM
 - Make it multi-track? Pressing keys to mute/toggle the tracks?
 - Redesign the UI
 - Make the app full screen

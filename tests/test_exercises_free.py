@@ -8,17 +8,21 @@ from leadsheet_utility.exercises import (
     CHORD_TONE_COLOR,
     ROOT_COLOR,
     ChordToneMode,
+    SmallMode,
     apply_chord_tone_highlight,
     apply_root_highlight,
     chord_tone_only_highlights,
     chord_tone_pitch_classes,
     free_mode_highlights,
     next_chord_tone_mode,
+    next_small_mode,
 )
 from leadsheet_utility.exercises.free import (
     HIGHLIGHT_COLOR,
-    SMALL_RANGE_HIGH,
-    SMALL_RANGE_LOW,
+    ONE_OCTAVE_RANGE_HIGH,
+    ONE_OCTAVE_RANGE_LOW,
+    TWO_OCTAVE_RANGE_HIGH,
+    TWO_OCTAVE_RANGE_LOW,
 )
 from leadsheet_utility.harmony import analyze
 from leadsheet_utility.harmony.constants import NOTE_TO_PC
@@ -104,7 +108,7 @@ def _g_lydian_chord() -> ChordEvent:
 def test_small_mode_matches_g_lydian_example():
     """User's example: G Lydian -> G4 A4 B4 C#5 D5 E5 F#5 G5."""
     chord = _g_lydian_chord()
-    highlights = free_mode_highlights(chord, small=True)
+    highlights = free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)
     midis = [h.midi_note for h in highlights]
     # G4=67, A4=69, B4=71, C#5=73, D5=74, E5=76, F#5=78, G5=79
     assert midis == [67, 69, 71, 73, 74, 76, 78, 79]
@@ -122,16 +126,16 @@ def test_small_mode_all_notes_within_range():
             quality="maj7",
             scale_notes=scale_notes,
         )
-        midis = [h.midi_note for h in free_mode_highlights(chord, small=True)]
+        midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)]
         assert midis, f"{root}: empty"
-        assert all(SMALL_RANGE_LOW <= m <= SMALL_RANGE_HIGH for m in midis), (
+        assert all(ONE_OCTAVE_RANGE_LOW <= m <= ONE_OCTAVE_RANGE_HIGH for m in midis), (
             f"{root}: out of range — {midis}"
         )
 
 
 def test_small_mode_emits_eight_notes_for_seven_note_scale():
     chord = _g_lydian_chord()
-    midis = [h.midi_note for h in free_mode_highlights(chord, small=True)]
+    midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)]
     assert len(midis) == 8
     # First and last share a pitch class (octave).
     assert midis[0] % 12 == midis[-1] % 12
@@ -139,24 +143,24 @@ def test_small_mode_emits_eight_notes_for_seven_note_scale():
 
 def test_small_mode_starts_on_chord_root():
     chord = _g_lydian_chord()
-    midis = [h.midi_note for h in free_mode_highlights(chord, small=True)]
+    midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)]
     assert midis[0] % 12 == NOTE_TO_PC[chord.root]
 
 
 def test_small_mode_octave_is_exactly_twelve_above_root():
     chord = _g_lydian_chord()
-    midis = [h.midi_note for h in free_mode_highlights(chord, small=True)]
+    midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)]
     assert midis[-1] == midis[0] + 12
 
 
 def test_small_mode_handles_empty_scale():
     chord = ChordEvent(chord_symbol="N.C.", root="C", quality="", scale_notes=[])
-    assert free_mode_highlights(chord, small=True) == []
+    assert free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE) == []
 
 
 def test_small_mode_composes_with_root_highlight_overlay():
     chord = _g_lydian_chord()
-    base = free_mode_highlights(chord, small=True)
+    base = free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)
     overlayed = apply_root_highlight(base, chord)
     # In one ascending octave, exactly two notes share the root pitch class
     # (the 1st degree and the 8th).
@@ -244,7 +248,7 @@ def test_chord_tone_overlay_is_pure():
 def test_chord_tone_overlay_composes_with_small():
     """Small + chord-tone overlay: 8 scale notes, 4 chord tones blue, rest green."""
     chord = _resolved_chord("C:7")
-    base = free_mode_highlights(chord, small=True)
+    base = free_mode_highlights(chord, small=SmallMode.ONE_OCTAVE)
     overlayed = apply_chord_tone_highlight(base, chord)
     blues = [h for h in overlayed if h.color == CHORD_TONE_COLOR]
     greens = [h for h in overlayed if h.color == HIGHLIGHT_COLOR]
@@ -296,14 +300,14 @@ def test_chord_tone_only_highlights_returns_chord_tones_only():
 def test_chord_tone_only_small_emits_no_octave_repeat():
     """C7 small + chord-tone-only: C4 E4 G4 Bb4 (no C5 octave repeat)."""
     chord = _resolved_chord("C:7")
-    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=True))
+    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=SmallMode.ONE_OCTAVE))
     assert midis == [60, 64, 67, 70]
 
 
 def test_chord_tone_only_small_with_substitution():
     """Emaj7#11 small + chord-tone-only: E4 G#4 A#4 D#5 (A# via #11)."""
     chord = _resolved_chord("E:maj7(#11)")
-    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=True))
+    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=SmallMode.ONE_OCTAVE))
     assert midis == [64, 68, 70, 75]
 
 
@@ -320,3 +324,66 @@ def test_chord_tone_mode_cycle_order():
     assert next_chord_tone_mode(ChordToneMode.OFF) is ChordToneMode.ONLY
     assert next_chord_tone_mode(ChordToneMode.ONLY) is ChordToneMode.OVERLAY
     assert next_chord_tone_mode(ChordToneMode.OVERLAY) is ChordToneMode.OFF
+
+
+# --- 2-octave small mode -----------------------------------------------------
+
+
+def test_small_mode_cycle_order():
+    """B key cycles OFF -> 1-OCT -> 2-OCT -> OFF."""
+    assert next_small_mode(SmallMode.OFF) is SmallMode.ONE_OCTAVE
+    assert next_small_mode(SmallMode.ONE_OCTAVE) is SmallMode.TWO_OCTAVE
+    assert next_small_mode(SmallMode.TWO_OCTAVE) is SmallMode.OFF
+
+
+def test_two_octave_mode_g_lydian():
+    """G Lydian over 2 octaves: G4..G6, 15 notes total (1..15)."""
+    chord = _g_lydian_chord()
+    midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.TWO_OCTAVE)]
+    # 1st octave: G4 A4 B4 C#5 D5 E5 F#5 = 67, 69, 71, 73, 74, 76, 78
+    # 2nd octave: G5 A5 B5 C#6 D6 E6 F#6 = 79, 81, 83, 85, 86, 88, 90
+    # 15th degree: G6 = 91
+    assert midis == [67, 69, 71, 73, 74, 76, 78, 79, 81, 83, 85, 86, 88, 90, 91]
+
+
+def test_two_octave_mode_all_roots_fit_in_range():
+    """Every chromatic root must place its 2-octave run inside Ab3..G6."""
+    for root, root_pc in NOTE_TO_PC.items():
+        pcs = {(root_pc + i) % 12 for i in (0, 2, 4, 5, 7, 9, 11)}
+        scale_notes = [n for n in range(21, 109) if n % 12 in pcs]
+        chord = ChordEvent(
+            chord_symbol=f"{root}:maj7",
+            root=root,
+            quality="maj7",
+            scale_notes=scale_notes,
+        )
+        midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.TWO_OCTAVE)]
+        assert midis, f"{root}: empty"
+        assert all(TWO_OCTAVE_RANGE_LOW <= m <= TWO_OCTAVE_RANGE_HIGH for m in midis), (
+            f"{root}: out of range — min={min(midis)} max={max(midis)} range=[{TWO_OCTAVE_RANGE_LOW},{TWO_OCTAVE_RANGE_HIGH}]"
+        )
+
+
+def test_two_octave_mode_first_and_last_are_root():
+    chord = _g_lydian_chord()
+    midis = [h.midi_note for h in free_mode_highlights(chord, small=SmallMode.TWO_OCTAVE)]
+    assert midis[0] % 12 == NOTE_TO_PC[chord.root]
+    assert midis[-1] == midis[0] + 24
+
+
+def test_two_octave_chord_tones_only_no_octave_repeat():
+    """C7 + 2-octave + chord-tones-only: 8 chord tones, no octave repeat."""
+    chord = _resolved_chord("C:7")
+    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=SmallMode.TWO_OCTAVE))
+    # C4=60, E4=64, G4=67, Bb4=70, C5=72, E5=76, G5=79, Bb5=82
+    assert midis == [60, 64, 67, 70, 72, 76, 79, 82]
+
+
+def test_two_octave_composes_with_root_overlay():
+    """2-octave + root highlight: exactly 3 root-colored notes (1, 8, 15)."""
+    chord = _g_lydian_chord()
+    base = free_mode_highlights(chord, small=SmallMode.TWO_OCTAVE)
+    overlayed = apply_root_highlight(base, chord)
+    blues = [h for h in overlayed if h.color == ROOT_COLOR]
+    assert len(blues) == 3
+    assert {h.midi_note for h in blues} == {67, 79, 91}  # G4, G5, G6
