@@ -7,10 +7,13 @@ import pytest
 from leadsheet_utility.exercises import (
     CHORD_TONE_COLOR,
     ROOT_COLOR,
+    ChordToneMode,
     apply_chord_tone_highlight,
     apply_root_highlight,
+    chord_tone_only_highlights,
     chord_tone_pitch_classes,
     free_mode_highlights,
+    next_chord_tone_mode,
 )
 from leadsheet_utility.exercises.free import (
     HIGHLIGHT_COLOR,
@@ -277,3 +280,43 @@ def test_chord_tone_overlay_handles_empty():
 def test_chord_tone_color_differs_from_other_colors():
     assert CHORD_TONE_COLOR != HIGHLIGHT_COLOR
     assert CHORD_TONE_COLOR != ROOT_COLOR
+
+
+# --- ONLY mode (filter, not overlay) ----------------------------------------
+
+
+def test_chord_tone_only_highlights_returns_chord_tones_only():
+    chord = _resolved_chord("C:7")
+    highlights = chord_tone_only_highlights(chord)
+    pcs = {h.midi_note % 12 for h in highlights}
+    assert pcs == {0, 4, 7, 10}  # C E G Bb only
+    assert all(h.color == CHORD_TONE_COLOR for h in highlights)
+
+
+def test_chord_tone_only_small_emits_no_octave_repeat():
+    """C7 small + chord-tone-only: C4 E4 G4 Bb4 (no C5 octave repeat)."""
+    chord = _resolved_chord("C:7")
+    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=True))
+    assert midis == [60, 64, 67, 70]
+
+
+def test_chord_tone_only_small_with_substitution():
+    """Emaj7#11 small + chord-tone-only: E4 G#4 A#4 D#5 (A# via #11)."""
+    chord = _resolved_chord("E:maj7(#11)")
+    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, small=True))
+    assert midis == [64, 68, 70, 75]
+
+
+def test_chord_tone_only_empty_chord_returns_empty():
+    chord = ChordEvent(chord_symbol="N.C.", root="C", quality="", chord_tones=[])
+    assert chord_tone_only_highlights(chord) == []
+
+
+# --- mode cycle --------------------------------------------------------------
+
+
+def test_chord_tone_mode_cycle_order():
+    """T key cycles OFF -> ONLY -> OVERLAY -> OFF."""
+    assert next_chord_tone_mode(ChordToneMode.OFF) is ChordToneMode.ONLY
+    assert next_chord_tone_mode(ChordToneMode.ONLY) is ChordToneMode.OVERLAY
+    assert next_chord_tone_mode(ChordToneMode.OVERLAY) is ChordToneMode.OFF

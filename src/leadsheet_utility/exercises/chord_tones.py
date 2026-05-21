@@ -1,21 +1,23 @@
-"""Chord-tone overlay shared by all exercises.
+"""Chord-tone highlighting (shared by all exercises).
 
-Recolours every highlight that shares a pitch class with the current
-chord's 7-chord (or triad) tones — R, 3, 5/#11/b6, 7 — using the same
-5th-substitution rule as the comping voicings:
+Three rendering modes (cycled by the `T` keybinding):
+
+- ``OFF``  — no chord-tone treatment.
+- ``ONLY`` — replace the chord-scale with just the chord tones (R, 3, 5/#11/b6, 7).
+- ``OVERLAY`` — keep the full chord-scale, recolor chord-tone pitch classes.
+
+Pitch classes use the same 5th-substitution rule as the comping voicings:
 
 - ``#11`` / ``b5`` extensions or ``maj7#11`` quality → 5 becomes #11 (6)
 - ``b9`` / ``b13`` without natural ``13`` (and not already taking #11) →
   5 becomes b6 (8)
-
-Like the root overlay, this is a pure post-processing pass — exercises
-emit their highlights, and the App layer composes overlays on top.
-Chord tones that aren't part of the underlying highlight set are not
-added; the overlay only recolors what is already lit.
 """
 
 from __future__ import annotations
 
+from enum import Enum, auto
+
+from leadsheet_utility.exercises.free import SMALL_RANGE_LOW
 from leadsheet_utility.harmony.constants import NOTE_TO_PC
 from leadsheet_utility.leadsheet.models import ChordEvent
 from leadsheet_utility.projection import KeyHighlight
@@ -25,11 +27,28 @@ from leadsheet_utility.projection import KeyHighlight
 CHORD_TONE_COLOR: tuple[int, int, int] = (100, 200, 255)
 
 
-def chord_tone_pitch_classes(chord: ChordEvent) -> set[int]:
-    """Return the pitch classes of the chord's 7-chord (or triad) tones.
+class ChordToneMode(Enum):
+    OFF = auto()
+    ONLY = auto()
+    OVERLAY = auto()
 
-    Applies the #11/b5/b6 substitution rules used elsewhere for voicings.
-    """
+
+# Stable cycle order used by the `T` keybinding.
+CHORD_TONE_CYCLE: tuple[ChordToneMode, ...] = (
+    ChordToneMode.OFF,
+    ChordToneMode.ONLY,
+    ChordToneMode.OVERLAY,
+)
+
+
+def next_chord_tone_mode(mode: ChordToneMode) -> ChordToneMode:
+    """Return the next mode in the cycle (OFF -> ONLY -> OVERLAY -> OFF)."""
+    idx = CHORD_TONE_CYCLE.index(mode)
+    return CHORD_TONE_CYCLE[(idx + 1) % len(CHORD_TONE_CYCLE)]
+
+
+def chord_tone_pitch_classes(chord: ChordEvent) -> set[int]:
+    """Return the pitch classes of the chord's 7-chord (or triad) tones."""
     if not chord.chord_tones:
         return set()
     root_pc = NOTE_TO_PC[chord.root]
@@ -49,12 +68,37 @@ def chord_tone_pitch_classes(chord: ChordEvent) -> set[int]:
     return {(root_pc + i) % 12 for i in intervals}
 
 
+def chord_tone_only_highlights(
+    chord: ChordEvent,
+    *,
+    small: bool = False,
+    color: tuple[int, int, int] = CHORD_TONE_COLOR,
+) -> list[KeyHighlight]:
+    """Return only the chord-tone highlights, hiding the rest of the scale.
+
+    When ``small`` is True, emits the chord tones in one octave starting at
+    the lowest root ≥ Bb3 — e.g. C7 → C4 E4 G4 Bb4. Otherwise tiles the
+    chord-tone pitch classes across the full MIDI range 21-108.
+    """
+    pcs = chord_tone_pitch_classes(chord)
+    if not pcs:
+        return []
+    if small:
+        root_pc = NOTE_TO_PC[chord.root]
+        root_midi = SMALL_RANGE_LOW + (root_pc - SMALL_RANGE_LOW) % 12
+        ordered = sorted(pcs, key=lambda pc: (pc - root_pc) % 12)
+        midis = [root_midi + (pc - root_pc) % 12 for pc in ordered]
+    else:
+        midis = [n for n in range(21, 109) if n % 12 in pcs]
+    return [KeyHighlight(midi_note=n, color=color) for n in midis]
+
+
 def apply_chord_tone_highlight(
     highlights: list[KeyHighlight],
     chord: ChordEvent,
     color: tuple[int, int, int] = CHORD_TONE_COLOR,
 ) -> list[KeyHighlight]:
-    """Return a new list with chord-tone pitch classes recolored.
+    """Recolor every highlight whose pitch class is a chord tone (OVERLAY mode).
 
     Notes whose pitch class isn't a chord tone pass through unchanged.
     The original list is not mutated.

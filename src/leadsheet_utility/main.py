@@ -45,9 +45,12 @@ from leadsheet_utility.calibration import (
     save_calibration,
 )
 from leadsheet_utility.exercises import (
+    ChordToneMode,
     apply_chord_tone_highlight,
     apply_root_highlight,
+    chord_tone_only_highlights,
     free_mode_highlights,
+    next_chord_tone_mode,
 )
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
@@ -210,7 +213,7 @@ class App:
         self._comping_on: bool = True
         self._highlight_root: bool = False
         self._free_small: bool = False
-        self._chord_tones_only: bool = False
+        self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
 
         # -- Async render state ----------------------------------------------
         self._render_thread: threading.Thread | None = None
@@ -322,8 +325,8 @@ class App:
             logger.info("Free-mode small range %s", "ON" if self._free_small else "OFF")
 
         elif action is Action.TOGGLE_CHORD_TONES:
-            self._chord_tones_only = not self._chord_tones_only
-            logger.info("Chord-tones-only %s", "ON" if self._chord_tones_only else "OFF")
+            self._chord_tone_mode = next_chord_tone_mode(self._chord_tone_mode)
+            logger.info("Chord-tone mode: %s", self._chord_tone_mode.name)
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -729,11 +732,14 @@ class App:
         if playing and timeline is not None and tl_state is not None and not self._count_in_active:
             lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
             projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
-            highlights = free_mode_highlights(projected_chord, small=self._free_small)
-            # Chord-tone overlay first, then root — so the root keeps its own
-            # color when both toggles are on (root is always a chord tone).
-            if self._chord_tones_only:
-                highlights = apply_chord_tone_highlight(highlights, projected_chord)
+            if self._chord_tone_mode is ChordToneMode.ONLY:
+                highlights = chord_tone_only_highlights(projected_chord, small=self._free_small)
+            else:
+                highlights = free_mode_highlights(projected_chord, small=self._free_small)
+                if self._chord_tone_mode is ChordToneMode.OVERLAY:
+                    highlights = apply_chord_tone_highlight(highlights, projected_chord)
+            # Root overlay applied last so the root keeps its own color
+            # (root is always a chord tone).
             if self._highlight_root:
                 highlights = apply_root_highlight(highlights, projected_chord)
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
@@ -769,7 +775,7 @@ class App:
             comping_on=self._comping_on,
             highlight_root=self._highlight_root,
             free_small=self._free_small,
-            chord_tones_only=self._chord_tones_only,
+            chord_tone_mode=self._chord_tone_mode.name,
             count_in_beat=self._get_count_in_beat(),
             count_in_total_beats=self._count_in_total_beats,
         )
