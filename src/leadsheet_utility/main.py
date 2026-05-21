@@ -44,7 +44,11 @@ from leadsheet_utility.calibration import (
     load_calibration,
     save_calibration,
 )
-from leadsheet_utility.exercises import apply_root_highlight, free_mode_highlights
+from leadsheet_utility.exercises import (
+    apply_chord_tone_highlight,
+    apply_root_highlight,
+    free_mode_highlights,
+)
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
 from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
@@ -206,6 +210,7 @@ class App:
         self._comping_on: bool = True
         self._highlight_root: bool = False
         self._free_small: bool = False
+        self._chord_tones_only: bool = False
 
         # -- Async render state ----------------------------------------------
         self._render_thread: threading.Thread | None = None
@@ -315,6 +320,10 @@ class App:
         elif action is Action.TOGGLE_FREE_SMALL:
             self._free_small = not self._free_small
             logger.info("Free-mode small range %s", "ON" if self._free_small else "OFF")
+
+        elif action is Action.TOGGLE_CHORD_TONES:
+            self._chord_tones_only = not self._chord_tones_only
+            logger.info("Chord-tones-only %s", "ON" if self._chord_tones_only else "OFF")
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -721,6 +730,10 @@ class App:
             lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
             projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
             highlights = free_mode_highlights(projected_chord, small=self._free_small)
+            # Chord-tone overlay first, then root — so the root keeps its own
+            # color when both toggles are on (root is always a chord tone).
+            if self._chord_tones_only:
+                highlights = apply_chord_tone_highlight(highlights, projected_chord)
             if self._highlight_root:
                 highlights = apply_root_highlight(highlights, projected_chord)
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
@@ -756,6 +769,7 @@ class App:
             comping_on=self._comping_on,
             highlight_root=self._highlight_root,
             free_small=self._free_small,
+            chord_tones_only=self._chord_tones_only,
             count_in_beat=self._get_count_in_beat(),
             count_in_total_beats=self._count_in_total_beats,
         )

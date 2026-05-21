@@ -70,6 +70,7 @@ def render_hud(
     comping_on: bool = True,
     highlight_root: bool = False,
     free_small: bool = False,
+    chord_tones_only: bool = False,
     count_in_beat: float | None = None,
     count_in_total_beats: int = 0,
 ) -> None:
@@ -152,6 +153,7 @@ def render_hud(
     comp_label = "ON" if comping_on else "OFF"
     root_label = "ON" if highlight_root else "OFF"
     small_label = "ON" if free_small else "OFF"
+    tones_label = "ON" if chord_tones_only else "OFF"
     _blit(
         surface,
         fonts["body"],
@@ -162,7 +164,7 @@ def render_hud(
     _blit(
         surface,
         fonts["body"],
-        f"Root: {root_label}    Small (free): {small_label}",
+        f"Root: {root_label}    Small: {small_label}    Chord tones: {tones_label}",
         14, y, _ACCENT,
     )
     y += 30
@@ -287,7 +289,8 @@ def _render_shortcuts(
         "[+/-] Tempo           [O] Open file",
         "[M] Metronome         [G] Comping",
         "[R] Root highlight    [B] Small (free)",
-        "[C] Calibrate         [Q] Quit",
+        "[T] Chord tones       [C] Calibrate",
+        "[Q] Quit",
     ]
     for line in shortcuts:
         _blit(surface, font, line, 14, y, _DIM)

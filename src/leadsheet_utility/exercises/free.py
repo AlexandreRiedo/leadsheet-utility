@@ -5,10 +5,15 @@ The projector lights up exactly the notes the player can use over the
 current chord, leaving the choice of *which* ones to play entirely to
 them.
 
-A "small" sub-mode collapses the highlight set to a single ascending
+A "small" sub-toggle collapses the highlight set to a single ascending
 octave of scale degrees (1-2-3-4-5-6-7-8) inside Bb3-A5, so the player
 can practice the scale shape in one position instead of seeing it
 tiled across the whole keyboard.
+
+Other Free-mode emphases (chord-tone overlay, root overlay) are pure
+post-processing passes that live in sibling modules — see
+:mod:`leadsheet_utility.exercises.chord_tones` and
+:mod:`leadsheet_utility.exercises.root`.
 """
 
 from __future__ import annotations
@@ -37,10 +42,8 @@ def _small_octave_midis(chord: ChordEvent) -> list[int]:
     if not chord.scale_notes:
         return []
     root_pc = NOTE_TO_PC[chord.root]
-    # Lowest MIDI >= SMALL_RANGE_LOW with the root pitch class.
     root_offset = (root_pc - SMALL_RANGE_LOW) % 12
     root_midi = SMALL_RANGE_LOW + root_offset
-    # Scale pitch classes ordered by distance up from the root.
     pcs = sorted(
         {n % 12 for n in chord.scale_notes},
         key=lambda pc: (pc - root_pc) % 12,
@@ -56,11 +59,6 @@ def free_mode_highlights(
     small: bool = False,
 ) -> list[KeyHighlight]:
     """Return one KeyHighlight per MIDI note in the chord-scale.
-
-    `chord.scale_notes` already contains the full MIDI range (21–108) of
-    the resolved scale, so the renderer just needs to draw whichever of
-    those land inside the projected keyboard layout — out-of-range notes
-    are silently dropped downstream.
 
     When ``small`` is True, only one ascending octave's worth of scale
     degrees inside Bb3-A5 is returned.
