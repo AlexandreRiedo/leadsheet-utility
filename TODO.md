@@ -1,5 +1,6 @@
 # WIP
 - Think about getting white tape?
+- Guide Tone Exercice
 
 # LONG TERM
 - Make it multi-track? Pressing keys to mute/toggle the tracks?
