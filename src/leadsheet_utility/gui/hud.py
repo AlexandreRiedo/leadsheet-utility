@@ -27,6 +27,14 @@ _COUNT_IN_FILL = (60, 160, 80)
 _COUNT_IN_ACCENT = (100, 200, 120)
 
 # ---------------------------------------------------------------------------
+# Vertical rhythm
+# ---------------------------------------------------------------------------
+
+_LINE_H = 32         # space between consecutive body lines inside a group
+_HEADER_GAP = 36     # space between a SECTION title and the first content line
+_SECTION_GAP = 36    # extra vertical air between sibling groups
+
+# ---------------------------------------------------------------------------
 # Exercise names
 # ---------------------------------------------------------------------------
 
@@ -49,8 +57,10 @@ def _get_fonts() -> dict[str, pygame.font.Font]:
     if not _fonts:
         _fonts["title"] = pygame.font.SysFont("consolas", 39, bold=True)
         _fonts["heading"] = pygame.font.SysFont("consolas", 30, bold=True)
+        _fonts["section"] = pygame.font.SysFont("consolas", 30, bold=True)
         _fonts["body"] = pygame.font.SysFont("consolas", 27)
         _fonts["small"] = pygame.font.SysFont("consolas", 20)
+        _fonts["small_bold"] = pygame.font.SysFont("consolas", 20, bold=True)
     return _fonts
 
 
@@ -101,16 +111,17 @@ def render_hud(
         return
 
     # -- Song info -----------------------------------------------------------
-    song_line = f"{lead_sheet.title}  --  {lead_sheet.composer}"
-    _blit(surface, fonts["heading"], song_line, 20, y, _TEXT)
-    y += 36
+    # The song title doubles as the section header (no separate "SONG" label).
+    song_line = f"{lead_sheet.title} (by {lead_sheet.composer})".upper()
+    _blit(surface, fonts["section"], song_line, 20, y, _TEXT)
+    y += _HEADER_GAP
 
     ts = lead_sheet.time_signature
     info = f"Key: {lead_sheet.key}    Time: {ts[0]}/{ts[1]}    Tempo: {tempo} BPM"
     _blit(surface, fonts["body"], info, 20, y, _DIM)
-    y += 60
+    y += _LINE_H
 
-    # -- Current / next chord ------------------------------------------------
+    # -- Current / next chord (no extra gap — same SONG block) ---------------
     if frozen_mode:
         chords = lead_sheet.chords
         idx = max(0, min(frozen_chord_idx, len(chords) - 1))
@@ -120,11 +131,11 @@ def render_hud(
             f"(bar {chord.bar_number}/{lead_sheet.total_bars})  "
             f"[FROZEN {idx + 1}/{len(chords)}]"
         )
-        _blit(surface, fonts["heading"], cur_line, 20, y, _ACCENT)
-        y += 36
+        _blit(surface, fonts["body"], cur_line, 20, y, _DIM)
+        y += _LINE_H
         nxt = chords[(idx + 1) % len(chords)].chord_symbol if chords else "--"
         _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
-        y += 60
+        y += _LINE_H + _SECTION_GAP
     elif timeline_state is not None:
         chord = timeline_state.current_chord
         bar = chord.bar_number
@@ -137,8 +148,8 @@ def render_hud(
             f"(bar {bar}/{total_bars})  "
             f"[Form {form_rep}/{form_total}]"
         )
-        _blit(surface, fonts["heading"], cur_line, 20, y, _TEXT)
-        y += 36
+        _blit(surface, fonts["body"], cur_line, 20, y, _DIM)
+        y += _LINE_H
 
         # Next chord
         chords = lead_sheet.chords
@@ -150,16 +161,20 @@ def render_hud(
         else:
             nxt = "--"
         _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
-        y += 60
+        y += _LINE_H + _SECTION_GAP
     else:
         _blit(surface, fonts["body"], f"Current: {lead_sheet.chords[0].chord_symbol}", 20, y, _DIM)
-        y += 60
+        y += _LINE_H + _SECTION_GAP
 
     # -- Exercise selection --------------------------------------------------
+    _blit(surface, fonts["section"], "PROJECTION EXERCICES", 20, y, _TEXT)
+    y += _HEADER_GAP
     _render_exercises(surface, fonts, exercise_idx, y)
-    y += 105
+    y += 2 * _LINE_H + _SECTION_GAP
 
     # -- Transport / progress ------------------------------------------------
+    _blit(surface, fonts["section"], "PLAYBACK", 20, y, _TEXT)
+    y += _HEADER_GAP
     if frozen_mode:
         status_label = "FROZEN"
     else:
@@ -189,9 +204,11 @@ def render_hud(
     else:
         progress = 0.0
     _render_progress_bar(surface, 20, y, w - 40, 24, progress)
-    y += 65
+    y += 24 + _SECTION_GAP
 
     # -- Keyboard shortcuts --------------------------------------------------
+    _blit(surface, fonts["section"], "CONTROLS", 20, y, _TEXT)
+    y += _HEADER_GAP
     _render_shortcuts(surface, fonts, y)
 
 
@@ -324,7 +341,7 @@ def _render_shortcuts(
     for i, (title, items) in enumerate(columns):
         x = margin + i * col_w
         cy = y
-        _blit(surface, font, title, x, cy, _TEXT)
+        _blit(surface, fonts["small_bold"], title, x, cy, _TEXT)
         cy += line_h
         for line in items:
             _blit(surface, font, line, x, cy, _DIM)

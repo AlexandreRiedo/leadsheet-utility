@@ -219,6 +219,4 @@ __marimo__/
 /data/calibration.json
 
 # Demo / prototype media (too large for git; host externally)
-proto-img/*.MOV
-proto-img/*.mov
-proto-img/*.mp4
+proto-img/videos/
