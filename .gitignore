@@ -217,3 +217,8 @@ __marimo__/
 
 # Per-machine projector calibration (geometry depends on physical setup)
 /data/calibration.json
+
+# Demo / prototype media (too large for git; host externally)
+proto-img/*.MOV
+proto-img/*.mov
+proto-img/*.mp4
