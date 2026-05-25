@@ -11,6 +11,7 @@ import logging
 import sys
 import threading
 import time
+from enum import Enum
 from pathlib import Path
 
 # Windows reports a scaled (logical) desktop size unless the process opts into
@@ -36,7 +37,7 @@ from leadsheet_utility.backing.events import (
     generate_drums,
     generate_metronome,
 )
-from leadsheet_utility.backing.renderer import render_backing_track
+from leadsheet_utility.backing.renderer import mix_layers, render_backing_track, render_layer
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
 from leadsheet_utility.calibration import (
     DEFAULT_CALIBRATION_PATH,
@@ -83,11 +84,45 @@ _TEMPO_MIN = 40
 _TEMPO_MAX = 320
 _DEFAULT_SF_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "soundfonts" / "GeneralUser-GS.sf2"
 _CANONICAL_SIZE = (1920, 200)
+_SAMPLE_RATE = 44100
 
 # Empirically tuned to cover projector input lag + signal/processing delay so
 # the lit-up scale lines up with the audio. Bump up if the projector still
 # trails the backing track; down if it now leads.
 _PROJECTION_LEAD_SECONDS = 0.16
+
+
+class BackingMode(Enum):
+    """How much of the rhythm section is audible.
+
+    Cycled with the G key; remixed instantly from cached per-layer renders so
+    toggling doesn't require a fresh FluidSynth pass.
+    """
+
+    NONE = 0
+    DRUMS = 1
+    DRUMS_BASS = 2
+    FULL = 3
+
+
+_BACKING_CYCLE: list[BackingMode] = [
+    BackingMode.NONE,
+    BackingMode.DRUMS,
+    BackingMode.DRUMS_BASS,
+    BackingMode.FULL,
+]
+
+_BACKING_LABELS: dict[BackingMode, str] = {
+    BackingMode.NONE: "NONE",
+    BackingMode.DRUMS: "DRUMS",
+    BackingMode.DRUMS_BASS: "Drums and Bass",
+    BackingMode.FULL: "FULL",
+}
+
+
+def _next_backing_mode(mode: BackingMode) -> BackingMode:
+    i = _BACKING_CYCLE.index(mode)
+    return _BACKING_CYCLE[(i + 1) % len(_BACKING_CYCLE)]
 
 
 def _small_mode_label(mode: SmallMode) -> str:
@@ -221,7 +256,7 @@ class App:
         self._channel: pygame.mixer.Channel | None = None
         self._audio_dirty: bool = True  # re-render needed
         self._metronome_on: bool = False
-        self._comping_on: bool = True
+        self._backing_mode: BackingMode = BackingMode.FULL
         self._highlight_root: bool = False
         self._small_mode: SmallMode = SmallMode.OFF
         self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
@@ -231,9 +266,13 @@ class App:
         self._frozen_chord_idx: int = 0
 
         # -- Async render state ----------------------------------------------
+        # Layers are cached per-instrument (bass/drums/guitar/metronome) as
+        # int16 buffers without normalization, so toggling backing mode or the
+        # metronome only triggers a fast numpy sum, not a fresh FluidSynth pass.
         self._render_thread: threading.Thread | None = None
-        self._render_result: np.ndarray | None = None
+        self._render_result: dict[str, np.ndarray] | None = None
         self._render_pending_action: str | None = None  # "count_in" or "resume"
+        self._layers: dict[str, np.ndarray] | None = None
 
         # -- Count-in state ----------------------------------------------------
         self._count_in_active: bool = False
@@ -304,14 +343,14 @@ class App:
 
         elif action is Action.TEMPO_UP:
             self._tempo = min(_TEMPO_MAX, self._tempo + _TEMPO_STEP)
+            self._invalidate_layers()
             self._stop_playback()
-            self._audio_dirty = True
             self._rebuild_timeline()
 
         elif action is Action.TEMPO_DOWN:
             self._tempo = max(_TEMPO_MIN, self._tempo - _TEMPO_STEP)
+            self._invalidate_layers()
             self._stop_playback()
-            self._audio_dirty = True
             self._rebuild_timeline()
 
         elif action is Action.CALIBRATE:
@@ -319,17 +358,13 @@ class App:
 
         elif action is Action.TOGGLE_METRONOME:
             self._metronome_on = not self._metronome_on
-            self._audio_dirty = True
-            self._stop_playback()
-            self._rebuild_timeline()
             logger.info("Metronome %s", "ON" if self._metronome_on else "OFF")
+            self._remix_and_swap()
 
         elif action is Action.TOGGLE_COMPING:
-            self._comping_on = not self._comping_on
-            self._audio_dirty = True
-            self._stop_playback()
-            self._rebuild_timeline()
-            logger.info("Comping %s", "ON" if self._comping_on else "OFF")
+            self._backing_mode = _next_backing_mode(self._backing_mode)
+            logger.info("Backing: %s", _BACKING_LABELS[self._backing_mode])
+            self._remix_and_swap()
 
         elif action is Action.TOGGLE_ROOT_HIGHLIGHT:
             self._highlight_root = not self._highlight_root
@@ -406,6 +441,11 @@ class App:
             self._channel.stop()
         if self._timeline:
             self._timeline.stop()
+        # `_remix_and_swap` may have left `_sound` as a buffer sliced from the
+        # middle of the song; rebuild from the full mix so the next play
+        # starts at sample 0.
+        if self._layers is not None:
+            self._sound = pygame.mixer.Sound(buffer=self._mix_active_layers())
 
     # -- frozen mode -----------------------------------------------------------
 
@@ -518,12 +558,16 @@ class App:
         return True
 
     def _start_render_async(self, after_done: str) -> None:
-        """Kick off a background thread to render the backing track.
+        """Kick off a background thread to render the four backing layers.
+
+        Renders bass, drums, guitar, and metronome as separate int16 buffers
+        so toggling backing mode or metronome can remix from the cache without
+        another FluidSynth pass.
 
         *after_done* is the action to trigger once the render finishes:
         ``"count_in"`` (fresh start → play count-in then song) or
-        ``"resume"`` (coming back from a tempo/comping change).
-        The main loop polls via :meth:`_update_render`.
+        ``"resume"`` (coming back from a tempo change).  The main loop polls
+        via :meth:`_update_render`.
         """
         if self._lead_sheet is None or self._sf_path is None:
             return
@@ -531,44 +575,47 @@ class App:
             return
 
         total_beats = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
-        logger.info("Rendering backing track (%.0f beats at %d BPM)...", total_beats, self._tempo)
+        logger.info("Rendering backing layers (%.0f beats at %d BPM)...", total_beats, self._tempo)
 
-        events = generate_walking_bass(
-            self._lead_sheet.chords,
-            self._tempo,
-            form_repeats=self._lead_sheet.form_repeats,
-        )
-        events.extend(generate_drums(total_beats, self._tempo))
-        if self._comping_on:
-            events.extend(generate_comping(
+        layer_events: dict[str, list[MidiEvent]] = {
+            "bass": generate_walking_bass(
                 self._lead_sheet.chords,
                 self._tempo,
                 form_repeats=self._lead_sheet.form_repeats,
-            ))
-        if self._metronome_on:
-            events.extend(generate_metronome(total_beats, self._tempo))
+            ),
+            "drums": generate_drums(total_beats, self._tempo),
+            "guitar": generate_comping(
+                self._lead_sheet.chords,
+                self._tempo,
+                form_repeats=self._lead_sheet.form_repeats,
+            ),
+            "metronome": generate_metronome(total_beats, self._tempo),
+        }
 
         self._render_pending_action = after_done
         self._render_result = None
         self._render_thread = threading.Thread(
             target=self._render_worker,
-            args=(events, total_beats, self._tempo, self._sf_path),
+            args=(layer_events, total_beats, self._tempo, self._sf_path),
             daemon=True,
         )
         self._render_thread.start()
 
     def _render_worker(
         self,
-        events: list[MidiEvent],
+        layer_events: dict[str, list[MidiEvent]],
         total_beats: float,
         tempo: int,
         sf_path: str,
     ) -> None:
-        """Run on a background thread: render events to a stereo int16 buffer."""
+        """Render each layer to its own int16 buffer on a background thread."""
         try:
-            self._render_result = render_backing_track(events, sf_path, total_beats, tempo)
+            self._render_result = {
+                name: render_layer(events, sf_path, total_beats, tempo)
+                for name, events in layer_events.items()
+            }
         except Exception:
-            logger.exception("Backing-track render failed")
+            logger.exception("Backing-layer render failed")
             self._render_result = None
 
     def _update_render(self) -> None:
@@ -581,15 +628,16 @@ class App:
         self._render_thread.join()
         self._render_thread = None
 
-        buf = self._render_result
+        layers = self._render_result
         self._render_result = None
         action = self._render_pending_action
         self._render_pending_action = None
 
-        if buf is None:
+        if layers is None:
             return
 
-        self._sound = pygame.mixer.Sound(buffer=buf)
+        self._layers = layers
+        self._sound = pygame.mixer.Sound(buffer=self._mix_active_layers())
         self._audio_dirty = False
         logger.info("Render complete.")
 
@@ -600,6 +648,75 @@ class App:
                 self._timeline.play()
             if self._sound is not None:
                 self._channel = self._sound.play()
+
+    # -- layer mixing --------------------------------------------------------
+
+    def _invalidate_layers(self) -> None:
+        """Drop cached layers — the next play() will re-render them."""
+        self._layers = None
+        self._sound = None
+        self._audio_dirty = True
+
+    def _mix_active_layers(self) -> np.ndarray:
+        """Sum the currently-enabled layers into a single int16 buffer."""
+        assert self._layers is not None
+        active: list[np.ndarray] = []
+        if self._backing_mode is not BackingMode.NONE:
+            active.append(self._layers["drums"])
+        if self._backing_mode in (BackingMode.DRUMS_BASS, BackingMode.FULL):
+            active.append(self._layers["bass"])
+        if self._backing_mode is BackingMode.FULL:
+            active.append(self._layers["guitar"])
+        if self._metronome_on:
+            active.append(self._layers["metronome"])
+        # All layers share the same length; pass it explicitly so NONE+no-metronome
+        # still produces a buffer of the right duration (silence).
+        total_samples = self._layers["drums"].size
+        return mix_layers(active, total_samples=total_samples)
+
+    def _remix_and_swap(self) -> None:
+        """Rebuild the active mix and, if playing, splice it in mid-stream.
+
+        Cheap (numpy add over int16 arrays) — the whole point of caching layers
+        is that this never blocks on FluidSynth.  If the layers haven't been
+        rendered yet (no playback has happened), this is a no-op; the next
+        play() will render with the new state baked in.
+        """
+        if self._layers is None:
+            return  # nothing to remix from; next play() will pick up new state
+
+        buf = self._mix_active_layers()
+
+        playing = (
+            self._channel is not None
+            and self._channel.get_busy()
+            and not self._count_in_active
+        )
+        if playing:
+            # Slice from the current playhead so audio resumes seamlessly.
+            # Stereo interleaved → 2 array entries per audio frame.
+            sample_pos = self._current_sample_position()
+            offset = sample_pos * 2
+            if offset >= buf.size:
+                return  # past the end of the song; let it stop naturally
+            buf = buf[offset:].copy()  # pygame.mixer keeps a view alive
+
+        self._sound = pygame.mixer.Sound(buffer=buf)
+        if playing:
+            if self._channel is not None:
+                self._channel.stop()
+            self._channel = self._sound.play()
+
+    def _current_sample_position(self) -> int:
+        """Where in the song buffer the playhead currently sits, in samples."""
+        if self._timeline is None or self._lead_sheet is None:
+            return 0
+        state = self._timeline.get_state()
+        total_beats_elapsed = (
+            state.form_repeat * self._lead_sheet.total_beats + state.current_beat
+        )
+        elapsed_seconds = total_beats_elapsed * 60.0 / self._tempo
+        return int(elapsed_seconds * _SAMPLE_RATE)
 
     @property
     def _rendering(self) -> bool:
@@ -846,7 +963,7 @@ class App:
             self._exercise_idx,
             self._tempo,
             self._metronome_on,
-            comping_on=self._comping_on,
+            backing_mode=_BACKING_LABELS[self._backing_mode],
             highlight_root=self._highlight_root,
             small_mode=_small_mode_label(self._small_mode),
             chord_tone_mode=self._chord_tone_mode.name,

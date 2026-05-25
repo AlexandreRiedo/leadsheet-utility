@@ -67,7 +67,7 @@ def render_hud(
     exercise_idx: int,
     tempo: int,
     metronome_on: bool = False,
-    comping_on: bool = True,
+    backing_mode: str = "FULL",
     highlight_root: bool = False,
     small_mode: str = "OFF",
     chord_tone_mode: str = "OFF",
@@ -169,12 +169,11 @@ def render_hud(
             PlaybackState.PAUSED: "PAUSED",
         }[playback_state]
     met_label = "ON" if metronome_on else "OFF"
-    comp_label = "ON" if comping_on else "OFF"
     root_label = "ON" if highlight_root else "OFF"
     small_label = small_mode  # OFF / 1-OCT / 2-OCT
     tones_label = chord_tone_mode  # OFF / ONLY / OVERLAY
     status_grid = [
-        [("Status", status_label), ("Metronome", met_label), ("Comping", comp_label)],
+        [("Status", status_label), ("Metronome", met_label), ("Backing", backing_mode)],
         [("Root", root_label), ("Small", small_label), ("Chord tones", tones_label)],
     ]
     col_x = [20, 310, 600]
@@ -313,7 +312,7 @@ def _render_shortcuts(
             ],
         ),
         ("CALIBRATION", ["[C] Calibrate"]),
-        ("BACKING", ["[M] Metronome", "[G] Comping"]),
+        ("BACKING", ["[M] Metronome", "[G] Cycle backing"]),
         ("DISPLAY", ["[R] Root highlight", "[B] Small", "[T] Chord tones"]),
         ("FROZEN", ["[F] Frozen mode", "[<-/->] Step chord"]),
     ]
