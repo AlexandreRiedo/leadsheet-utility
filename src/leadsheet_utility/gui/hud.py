@@ -90,7 +90,7 @@ def render_hud(
     # -- Title bar -----------------------------------------------------------
     pygame.draw.rect(surface, _TITLE_BG, (0, 0, w, 60))
     _blit(surface, fonts["title"], "leadsheet-utility", 20, 10, _TEXT)
-    y = 75
+    y = 90
 
     if lead_sheet is None:
         _blit(surface, fonts["body"], "No lead sheet loaded.", 20, y, _DIM)
@@ -103,12 +103,12 @@ def render_hud(
     # -- Song info -----------------------------------------------------------
     song_line = f"{lead_sheet.title}  --  {lead_sheet.composer}"
     _blit(surface, fonts["heading"], song_line, 20, y, _TEXT)
-    y += 42
+    y += 36
 
     ts = lead_sheet.time_signature
     info = f"Key: {lead_sheet.key}    Time: {ts[0]}/{ts[1]}    Tempo: {tempo} BPM"
     _blit(surface, fonts["body"], info, 20, y, _DIM)
-    y += 50
+    y += 60
 
     # -- Current / next chord ------------------------------------------------
     if frozen_mode:
@@ -121,10 +121,10 @@ def render_hud(
             f"[FROZEN {idx + 1}/{len(chords)}]"
         )
         _blit(surface, fonts["heading"], cur_line, 20, y, _ACCENT)
-        y += 40
+        y += 36
         nxt = chords[(idx + 1) % len(chords)].chord_symbol if chords else "--"
         _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
-        y += 50
+        y += 60
     elif timeline_state is not None:
         chord = timeline_state.current_chord
         bar = chord.bar_number
@@ -138,7 +138,7 @@ def render_hud(
             f"[Form {form_rep}/{form_total}]"
         )
         _blit(surface, fonts["heading"], cur_line, 20, y, _TEXT)
-        y += 40
+        y += 36
 
         # Next chord
         chords = lead_sheet.chords
@@ -150,14 +150,14 @@ def render_hud(
         else:
             nxt = "--"
         _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
-        y += 50
+        y += 60
     else:
         _blit(surface, fonts["body"], f"Current: {lead_sheet.chords[0].chord_symbol}", 20, y, _DIM)
-        y += 50
+        y += 60
 
     # -- Exercise selection --------------------------------------------------
     _render_exercises(surface, fonts, exercise_idx, y)
-    y += 90
+    y += 105
 
     # -- Transport / progress ------------------------------------------------
     if frozen_mode:
@@ -173,20 +173,16 @@ def render_hud(
     root_label = "ON" if highlight_root else "OFF"
     small_label = small_mode  # OFF / 1-OCT / 2-OCT
     tones_label = chord_tone_mode  # OFF / ONLY / OVERLAY
-    _blit(
-        surface,
-        fonts["body"],
-        f"Status: {status_label}    Metronome: {met_label}    Comping: {comp_label}",
-        20, y, _ACCENT,
-    )
-    y += 33
-    _blit(
-        surface,
-        fonts["body"],
-        f"Root: {root_label}    Small: {small_label}    Chord tones: {tones_label}",
-        20, y, _ACCENT,
-    )
-    y += 45
+    status_grid = [
+        [("Status", status_label), ("Metronome", met_label), ("Comping", comp_label)],
+        [("Root", root_label), ("Small", small_label), ("Chord tones", tones_label)],
+    ]
+    col_x = [20, 310, 600]
+    for row in status_grid:
+        for (key, val), x in zip(row, col_x):
+            _blit(surface, fonts["body"], f"{key}: {val}", x, y, _ACCENT)
+        y += 32
+    y += 23
 
     # Progress bar
     if timeline_state is not None and lead_sheet is not None:
@@ -194,7 +190,7 @@ def render_hud(
     else:
         progress = 0.0
     _render_progress_bar(surface, 20, y, w - 40, 24, progress)
-    y += 50
+    y += 65
 
     # -- Keyboard shortcuts --------------------------------------------------
     _render_shortcuts(surface, fonts, y)
@@ -279,7 +275,7 @@ def _render_exercises(
         x += font.size(label)[0] + 24
         if i == 2:
             # Wrap to second row
-            y += 36
+            y += 32
             x = 20
 
 
@@ -303,7 +299,7 @@ def _render_shortcuts(
     y: int,
 ) -> None:
     font = fonts["small"]
-    line_h = 22
+    line_h = 30
 
     columns: list[tuple[str, list[str]]] = [
         (

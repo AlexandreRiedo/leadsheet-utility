@@ -76,7 +76,7 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 
-_HUD_SIZE = (1200, 750)
+_HUD_SIZE = (1200, 820)
 _FPS = 60
 _TEMPO_STEP = 5
 _TEMPO_MIN = 40
