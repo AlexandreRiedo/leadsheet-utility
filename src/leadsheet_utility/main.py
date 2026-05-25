@@ -612,15 +612,28 @@ class App:
         tempo: int,
         sf_path: str,
     ) -> None:
-        """Render each layer to its own int16 buffer on a background thread."""
+        """Render layers in parallel (one thread per layer).
+
+        Each FluidSynth instance is independent (its own SF load, its own
+        synth state), so they don't share mutable state. The C-level
+        ``get_samples`` calls release the GIL, letting the per-layer renders
+        actually overlap on multiple cores.
+        """
+        from concurrent.futures import ThreadPoolExecutor
+
+        t0 = time.perf_counter()
         try:
-            self._render_result = {
-                name: render_layer(events, sf_path, total_beats, tempo)
-                for name, events in layer_events.items()
-            }
+            with ThreadPoolExecutor(max_workers=len(layer_events)) as pool:
+                futures = {
+                    name: pool.submit(render_layer, events, sf_path, total_beats, tempo)
+                    for name, events in layer_events.items()
+                }
+                self._render_result = {name: f.result() for name, f in futures.items()}
         except Exception:
             logger.exception("Backing-layer render failed")
             self._render_result = None
+            return
+        logger.info("Layer render took %.2fs (parallel)", time.perf_counter() - t0)
 
     def _update_render(self) -> None:
         """Finalise an async render when the thread completes."""
