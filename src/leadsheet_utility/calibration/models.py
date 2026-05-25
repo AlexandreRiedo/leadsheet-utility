@@ -17,7 +17,17 @@ import numpy as np
 from leadsheet_utility.projection.layout import (
     DEFAULT_BLACK_HEIGHT_RATIO,
     DEFAULT_BLACK_WIDTH_RATIO,
+    MIDI_DEFAULT_HIGH,
+    MIDI_DEFAULT_LOW,
 )
+
+# Default 1- and 2-octave bands used by the FreeMode "range" sub-toggle.
+# Chosen so every chromatic root has a slot (matches the historical hardcoded
+# values in `exercises.free`).
+DEFAULT_ONE_OCTAVE_LOW = 58   # Bb3
+DEFAULT_ONE_OCTAVE_HIGH = 81  # A5
+DEFAULT_TWO_OCTAVE_LOW = 56   # Ab3
+DEFAULT_TWO_OCTAVE_HIGH = 91  # G6
 
 # Marker order: top-left, top-right, bottom-right, bottom-left.
 # Matches the canonical-image corner ordering used by the homography.
@@ -45,6 +55,19 @@ class Calibration:
     # Per-black-key canonical-pixel offsets (MIDI note -> (dx, dy)). Empty
     # dict means every black key uses the default placement.
     black_key_offsets: dict[int, tuple[float, float]] = field(default_factory=dict)
+    # Physical key range the projector actually covers, in MIDI notes. Both
+    # endpoints must be white keys (see build_keyboard_layout).
+    midi_full_low: int = MIDI_DEFAULT_LOW
+    midi_full_high: int = MIDI_DEFAULT_HIGH
+    # 1- and 2-octave exercise bands (low endpoint defines the band; the
+    # exercise itself derives octaves from there).
+    midi_one_octave_low: int = DEFAULT_ONE_OCTAVE_LOW
+    midi_one_octave_high: int = DEFAULT_ONE_OCTAVE_HIGH
+    midi_two_octave_low: int = DEFAULT_TWO_OCTAVE_LOW
+    midi_two_octave_high: int = DEFAULT_TWO_OCTAVE_HIGH
+    # Positive = projection should appear N ms later than audio. Applied as
+    # a delta to the projection lead-time compensation in the main app.
+    audio_delay_ms: int = 0
 
     def __post_init__(self) -> None:
         if len(self.markers) != NUM_MARKERS:

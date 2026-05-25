@@ -8,6 +8,12 @@ from __future__ import annotations
 
 import pygame
 
+from leadsheet_utility.calibration.ui import (
+    CalibrationPhase,
+    CalibrationSnapshot,
+    RangeEndpoint,
+)
+from leadsheet_utility.exercises.free import RangeMode
 from leadsheet_utility.leadsheet.models import LeadSheet
 from leadsheet_utility.timeline import PlaybackState, TimelineState
 
@@ -352,3 +358,253 @@ def _compute_progress(state: TimelineState, lead_sheet: LeadSheet) -> float:
     total = lead_sheet.total_beats * lead_sheet.form_repeats
     current = state.form_repeat * lead_sheet.total_beats + state.current_beat
     return current / total if total > 0 else 0.0
+
+
+# ---------------------------------------------------------------------------
+# Calibration HUD mirror
+# ---------------------------------------------------------------------------
+
+
+_PHASE_LABELS: dict[CalibrationPhase, str] = {
+    CalibrationPhase.RANGE_EDIT: "1/5 — FULL range (projector reach)",
+    CalibrationPhase.MAIN: "2/5 — Markers & ratios",
+    CalibrationPhase.BLACK_KEY_TUNE: "3/5 — Per-key offsets",
+    CalibrationPhase.BAND_EDIT: "4/5 — 1-OCT / 2-OCT exercise bands",
+    CalibrationPhase.AUDIO_DELAY: "5/5 — Audio delay",
+}
+
+_RANGE_LABELS: dict[RangeMode, str] = {
+    RangeMode.FULL: "FULL",
+    RangeMode.TWO_OCTAVE: "2-OCT",
+    RangeMode.ONE_OCTAVE: "1-OCT",
+}
+
+
+def _midi_note_label(midi: int) -> str:
+    """Render a MIDI note as 'C4', 'F#3' etc. for HUD readability."""
+    names = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+    octave = (midi // 12) - 1
+    return f"{names[midi % 12]}{octave}"
+
+
+def render_calibration_hud(
+    surface: pygame.Surface,
+    snapshot: CalibrationSnapshot,
+) -> None:
+    """Mirror the calibration UI state onto the HUD window.
+
+    The projector overlay is hard to read from across the room, so the HUD
+    repeats the phase, the value being edited, and the keybind cheat sheet
+    here in a comfortable size.
+    """
+    fonts = _get_fonts()
+    surface.fill(_BG)
+    w, _ = surface.get_size()
+
+    # -- Title bar -----------------------------------------------------------
+    pygame.draw.rect(surface, _TITLE_BG, (0, 0, w, 60))
+    _blit(surface, fonts["title"], "Calibrating", 20, 10, _TEXT)
+    y = 90
+
+    _blit(surface, fonts["section"], "PHASE", 20, y, _TEXT)
+    y += _HEADER_GAP
+    _blit(surface, fonts["body"], _PHASE_LABELS[snapshot.phase], 20, y, _ACCENT)
+    y += _LINE_H + _SECTION_GAP
+
+    # -- Phase-specific values ----------------------------------------------
+    _blit(surface, fonts["section"], "EDITING", 20, y, _TEXT)
+    y += _HEADER_GAP
+    for line in _calibration_value_lines(snapshot):
+        _blit(surface, fonts["body"], line, 20, y, _ACCENT)
+        y += _LINE_H
+    y += _SECTION_GAP
+
+    # -- Persistent fields (always shown so the user sees current state) ----
+    _blit(surface, fonts["section"], "CURRENT VALUES", 20, y, _TEXT)
+    y += _HEADER_GAP
+    full_low, full_high = snapshot.full_range
+    two_low, two_high = snapshot.two_octave_range
+    one_low, one_high = snapshot.one_octave_range
+    rows = [
+        f"FULL    {_midi_note_label(full_low)} - {_midi_note_label(full_high)}"
+        f"  (MIDI {full_low}-{full_high})",
+        f"2-OCT   {_midi_note_label(two_low)} - {_midi_note_label(two_high)}"
+        f"  (MIDI {two_low}-{two_high})",
+        f"1-OCT   {_midi_note_label(one_low)} - {_midi_note_label(one_high)}"
+        f"  (MIDI {one_low}-{one_high})",
+        f"Audio delay: {snapshot.audio_delay_ms:+d} ms",
+        f"Black-key ratios: width={snapshot.black_width_ratio:.2f}  "
+        f"height={snapshot.black_height_ratio:.2f}",
+    ]
+    for line in rows:
+        _blit(surface, fonts["body"], line, 20, y, _DIM)
+        y += _LINE_H
+    y += _SECTION_GAP
+
+    # -- Keybind cheat sheet -------------------------------------------------
+    _blit(surface, fonts["section"], "KEYS (this phase)", 20, y, _TEXT)
+    y += _HEADER_GAP
+    _render_calibration_keys(surface, fonts, snapshot.phase, y)
+
+
+def _calibration_value_lines(snapshot: CalibrationSnapshot) -> list[str]:
+    """Per-phase 'what am I editing right now' lines."""
+    if snapshot.phase is CalibrationPhase.MAIN:
+        mx, my = snapshot.marker_pos
+        return [
+            f"Marker: {snapshot.active_marker_label} "
+            f"({snapshot.active_marker_idx + 1}/{snapshot.marker_count})",
+            f"Position: ({mx:.0f}, {my:.0f}) px",
+            f"Black-key ratios: width={snapshot.black_width_ratio:.2f}  "
+            f"height={snapshot.black_height_ratio:.2f}",
+        ]
+    if snapshot.phase is CalibrationPhase.RANGE_EDIT:
+        low, high = snapshot.full_range
+        endpoint = "LOW" if snapshot.active_endpoint is RangeEndpoint.LOW else "HIGH"
+        return [
+            "Editing FULL range (projector reach)",
+            f"Editing endpoint: {endpoint}",
+            f"Low:  {_midi_note_label(low)}  (MIDI {low})",
+            f"High: {_midi_note_label(high)}  (MIDI {high})",
+        ]
+    if snapshot.phase is CalibrationPhase.BAND_EDIT:
+        mode = snapshot.active_range_mode
+        if mode is RangeMode.TWO_OCTAVE:
+            low, high = snapshot.two_octave_range
+        else:
+            low, high = snapshot.one_octave_range
+        endpoint = "LOW" if snapshot.active_endpoint is RangeEndpoint.LOW else "HIGH"
+        full_low, full_high = snapshot.full_range
+        return [
+            f"Active band: {_RANGE_LABELS[mode]}",
+            f"Editing endpoint: {endpoint}",
+            f"Low:  {_midi_note_label(low)}  (MIDI {low})",
+            f"High: {_midi_note_label(high)}  (MIDI {high})",
+            f"Clipped to FULL: {_midi_note_label(full_low)} - {_midi_note_label(full_high)}",
+        ]
+    if snapshot.phase is CalibrationPhase.AUDIO_DELAY:
+        return [
+            f"Audio delay: {snapshot.audio_delay_ms:+d} ms",
+            "Positive = projection lags audio.",
+        ]
+    # BLACK_KEY_TUNE
+    if snapshot.active_black_midi is None:
+        return ["(no black keys in range)"]
+    ox, oy = snapshot.active_black_offset
+    return [
+        f"Black key {snapshot.active_black_idx + 1}/{snapshot.black_key_count}: "
+        f"{_midi_note_label(snapshot.active_black_midi)} "
+        f"(MIDI {snapshot.active_black_midi})",
+        f"Offset: dx={ox:+.0f} px   dy={oy:+.0f} px",
+    ]
+
+
+def _render_calibration_keys(
+    surface: pygame.Surface,
+    fonts: dict[str, pygame.font.Font],
+    phase: CalibrationPhase,
+    y: int,
+) -> None:
+    columns: list[tuple[str, list[str]]]
+    if phase is CalibrationPhase.RANGE_EDIT:
+        columns = [
+            (
+                "FULL RANGE",
+                [
+                    "[Tab] Switch low/high endpoint",
+                    "[Left/Right] Nudge by white key",
+                    "[Shift+Arrow] Octave step",
+                    "[R] Reset to defaults",
+                ],
+            ),
+            (
+                "PHASE",
+                ["[Enter] Next (markers)", "[Esc] Cancel"],
+            ),
+        ]
+    elif phase is CalibrationPhase.BAND_EDIT:
+        columns = [
+            (
+                "EXERCISE BANDS",
+                [
+                    "[B] Switch 1-OCT / 2-OCT",
+                    "[Tab] Switch low/high endpoint",
+                    "[Left/Right] Nudge by white key",
+                    "[Shift+Arrow] Octave step",
+                    "[R] Reset active band",
+                ],
+            ),
+            (
+                "PHASE",
+                ["[Enter] Next (audio delay)", "[Esc] Cancel"],
+            ),
+        ]
+    elif phase is CalibrationPhase.MAIN:
+        columns = [
+            (
+                "MARKERS",
+                [
+                    "[Drag/Arrows] Move",
+                    "[Tab / 1-4] Select",
+                    "[Shift+Arrow] x10",
+                    "[R] Reset",
+                ],
+            ),
+            (
+                "RATIOS",
+                [
+                    "[Q/W] Width -/+",
+                    "[A/S] Height -/+",
+                    "[Shift] x5",
+                ],
+            ),
+            (
+                "PHASE",
+                ["[Enter] Next (per-key)", "[Esc] Cancel"],
+            ),
+        ]
+    elif phase is CalibrationPhase.BLACK_KEY_TUNE:
+        columns = [
+            (
+                "PER-KEY OFFSETS",
+                [
+                    "[Tab / Shift+Tab] Next / prev key",
+                    "[Arrows] Nudge",
+                    "[Shift+Arrow] x10",
+                    "[R] Reset all offsets",
+                ],
+            ),
+            (
+                "PHASE",
+                ["[Enter] Next (bands)", "[Esc] Cancel"],
+            ),
+        ]
+    else:  # AUDIO_DELAY
+        columns = [
+            (
+                "AUDIO DELAY",
+                [
+                    "[Up/Down] +/- 1 ms",
+                    "[Shift+Up/Dn] +/- 10 ms",
+                    "[R] Reset to 0",
+                ],
+            ),
+            (
+                "PHASE",
+                ["[Enter] Confirm & save", "[Esc] Cancel"],
+            ),
+        ]
+
+    font = fonts["small"]
+    line_h = 30
+    w = surface.get_width()
+    margin = 20
+    col_w = (w - 2 * margin) // max(1, len(columns))
+    for i, (title, items) in enumerate(columns):
+        x = margin + i * col_w
+        cy = y
+        _blit(surface, fonts["small_bold"], title, x, cy, _TEXT)
+        cy += line_h
+        for line in items:
+            _blit(surface, font, line, x, cy, _DIM)
+            cy += line_h

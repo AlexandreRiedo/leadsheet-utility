@@ -41,6 +41,8 @@ from leadsheet_utility.backing.renderer import mix_layers, render_backing_track,
 from leadsheet_utility.backing.walking_bass import generate_walking_bass
 from leadsheet_utility.calibration import (
     DEFAULT_CALIBRATION_PATH,
+    DEFAULT_ONE_OCTAVE_LOW,
+    DEFAULT_TWO_OCTAVE_LOW,
     CalibrationUI,
     load_calibration,
     save_calibration,
@@ -55,7 +57,7 @@ from leadsheet_utility.exercises import (
     next_chord_tone_mode,
     next_range_mode,
 )
-from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
+from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_calibration_hud, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
 from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
 from leadsheet_utility.leadsheet.models import ChordEvent, LeadSheet
@@ -63,6 +65,8 @@ from leadsheet_utility.leadsheet.parser import parse_leadsheet
 from leadsheet_utility.projection import (
     DEFAULT_BLACK_HEIGHT_RATIO,
     DEFAULT_BLACK_WIDTH_RATIO,
+    MIDI_DEFAULT_HIGH,
+    MIDI_DEFAULT_LOW,
     build_keyboard_layout,
     make_canonical_surface,
     make_default_homography,
@@ -741,15 +745,12 @@ class App:
         return self._render_thread is not None and self._render_thread.is_alive()
 
     def _render_calibration_hud(self) -> None:
-        """Minimal HUD while calibrating — directs the user to the projector."""
+        """Mirror the calibration UI on the HUD — the projector text is
+        physically too far / too warped to read while editing markers."""
         surface = self._hud_window.get_surface()
-        surface.fill((30, 30, 30))
-        font = pygame.font.SysFont("consolas", 33)
-        text = font.render(
-            "Calibrating — see projector window", True, (220, 220, 220),
-        )
-        w, h = surface.get_size()
-        surface.blit(text, ((w - text.get_width()) // 2, (h - text.get_height()) // 2))
+        if self._calibration_ui is None:
+            return
+        render_calibration_hud(surface, self._calibration_ui.snapshot())
         self._hud_window.flip()
 
     def _render_loading_screen(self, message: str) -> None:
@@ -851,6 +852,13 @@ class App:
                 black_width_ratio=cal.black_width_ratio,
                 black_height_ratio=cal.black_height_ratio,
                 black_key_offsets=cal.black_key_offsets,
+                midi_full_low=cal.midi_full_low,
+                midi_full_high=cal.midi_full_high,
+                midi_one_octave_low=cal.midi_one_octave_low,
+                midi_one_octave_high=cal.midi_one_octave_high,
+                midi_two_octave_low=cal.midi_two_octave_low,
+                midi_two_octave_high=cal.midi_two_octave_high,
+                audio_delay_ms=cal.audio_delay_ms,
             )
         else:
             self._calibration_ui = CalibrationUI(
@@ -877,9 +885,11 @@ class App:
     def _load_projection_calibration(self) -> None:
         """Load saved calibration, or fall back to a default identity homography.
 
-        Sets `self._homography`, `self._keyboard_layout`. Black-key proportion
-        ratios come from the saved calibration when present so the canonical
-        layout matches the specific piano; otherwise the spec defaults are used.
+        Sets `self._homography`, `self._keyboard_layout`, the per-range MIDI
+        bands used by the exercises, and the audio-delay offset. Black-key
+        proportion ratios + bands come from the saved calibration when
+        present so the canonical layout matches the specific piano;
+        otherwise the spec defaults are used.
         """
         cal = load_calibration()
         black_offsets: dict[int, tuple[float, float]] = {}
@@ -888,14 +898,28 @@ class App:
             black_w = cal.black_width_ratio
             black_h = cal.black_height_ratio
             black_offsets = cal.black_key_offsets
+            self._midi_full_low = cal.midi_full_low
+            self._midi_full_high = cal.midi_full_high
+            self._midi_one_octave_low = cal.midi_one_octave_low
+            self._midi_two_octave_low = cal.midi_two_octave_low
+            self._audio_delay_ms = cal.audio_delay_ms
             logger.info(
-                "Loaded calibration (black ratios w=%.2f h=%.2f, %d per-key offsets)",
+                "Loaded calibration (black ratios w=%.2f h=%.2f, %d per-key offsets, "
+                "full=%d-%d, 1oct low=%d, 2oct low=%d, audio_delay=%+d ms)",
                 black_w, black_h, len(black_offsets),
+                self._midi_full_low, self._midi_full_high,
+                self._midi_one_octave_low, self._midi_two_octave_low,
+                self._audio_delay_ms,
             )
         else:
             self._homography = make_default_homography(_CANONICAL_SIZE, self._proj_size)
             black_w = DEFAULT_BLACK_WIDTH_RATIO
             black_h = DEFAULT_BLACK_HEIGHT_RATIO
+            self._midi_full_low = MIDI_DEFAULT_LOW
+            self._midi_full_high = MIDI_DEFAULT_HIGH
+            self._midi_one_octave_low = DEFAULT_ONE_OCTAVE_LOW
+            self._midi_two_octave_low = DEFAULT_TWO_OCTAVE_LOW
+            self._audio_delay_ms = 0
             if cal is None:
                 logger.info("No calibration found — using default identity homography")
             else:
@@ -906,10 +930,20 @@ class App:
 
         self._keyboard_layout = build_keyboard_layout(
             *_CANONICAL_SIZE,
+            midi_low=self._midi_full_low,
+            midi_high=self._midi_full_high,
             black_width_ratio=black_w,
             black_height_ratio=black_h,
             black_key_offsets=black_offsets,
         )
+
+    def _active_band_low(self) -> int | None:
+        """Calibrated band-low for the active RangeMode, or None for FULL."""
+        if self._range_mode is RangeMode.ONE_OCTAVE:
+            return self._midi_one_octave_low
+        if self._range_mode is RangeMode.TWO_OCTAVE:
+            return self._midi_two_octave_low
+        return None
 
     def _render_projection(self) -> None:
         """Render the projection window: free-mode highlights warped through H.
@@ -936,14 +970,22 @@ class App:
             tl_state = timeline.get_state() if timeline else None
             playing = timeline is not None and timeline.playback_state is PlaybackState.PLAYING
             if playing and timeline is not None and tl_state is not None and not self._count_in_active:
-                lead_beats = _PROJECTION_LEAD_SECONDS * (self._tempo / 60.0)
+                # Positive audio_delay_ms = projection trails audio by N ms →
+                # less projection lead than the hardware-tuned default.
+                effective_lead_s = _PROJECTION_LEAD_SECONDS - self._audio_delay_ms / 1000.0
+                lead_beats = effective_lead_s * (self._tempo / 60.0)
                 projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
 
+        band_low = self._active_band_low()
         if projected_chord is not None:
             if self._chord_tone_mode is ChordToneMode.ONLY:
-                highlights = chord_tone_only_highlights(projected_chord, range_mode=self._range_mode)
+                highlights = chord_tone_only_highlights(
+                    projected_chord, range_mode=self._range_mode, band_low=band_low,
+                )
             else:
-                highlights = free_mode_highlights(projected_chord, range_mode=self._range_mode)
+                highlights = free_mode_highlights(
+                    projected_chord, range_mode=self._range_mode, band_low=band_low,
+                )
                 if self._chord_tone_mode is ChordToneMode.OVERLAY:
                     highlights = apply_chord_tone_highlight(highlights, projected_chord)
             # Root overlay applied last so the root keeps its own color

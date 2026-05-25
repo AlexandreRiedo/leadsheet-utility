@@ -112,3 +112,56 @@ def test_legacy_file_without_offsets_uses_empty_dict(tmp_path: Path) -> None:
     loaded = load_calibration(path)
     assert loaded is not None
     assert loaded.black_key_offsets == {}
+
+
+def test_round_trip_preserves_range_and_audio_delay(tmp_path: Path) -> None:
+    path = tmp_path / "calibration.json"
+    cal = Calibration(
+        canonical_size=(1920, 200),
+        projector_size=(1920, 1080),
+        markers=[(100, 100), (1800, 110), (1810, 1000), (90, 1010)],
+        midi_full_low=36,
+        midi_full_high=84,
+        midi_one_octave_low=60,
+        midi_one_octave_high=83,
+        midi_two_octave_low=48,
+        midi_two_octave_high=83,
+        audio_delay_ms=25,
+    )
+    save_calibration(cal, path)
+    loaded = load_calibration(path)
+    assert loaded is not None
+    assert loaded.midi_full_low == 36
+    assert loaded.midi_full_high == 84
+    assert loaded.midi_one_octave_low == 60
+    assert loaded.midi_one_octave_high == 83
+    assert loaded.midi_two_octave_low == 48
+    assert loaded.midi_two_octave_high == 83
+    assert loaded.audio_delay_ms == 25
+
+
+def test_legacy_file_without_range_fields_uses_defaults(tmp_path: Path) -> None:
+    """Pre-range/audio-delay JSON files must still load with defaults."""
+    from leadsheet_utility.calibration import (
+        DEFAULT_ONE_OCTAVE_HIGH,
+        DEFAULT_ONE_OCTAVE_LOW,
+        DEFAULT_TWO_OCTAVE_HIGH,
+        DEFAULT_TWO_OCTAVE_LOW,
+    )
+    from leadsheet_utility.projection import MIDI_DEFAULT_HIGH, MIDI_DEFAULT_LOW
+
+    path = tmp_path / "calibration.json"
+    path.write_text(
+        '{"canonical_size":[1920,200],"projector_size":[1920,1080],'
+        '"markers":[[0,0],[1920,0],[1920,1080],[0,1080]],'
+        '"black_width_ratio":0.6,"black_height_ratio":0.65}'
+    )
+    loaded = load_calibration(path)
+    assert loaded is not None
+    assert loaded.midi_full_low == MIDI_DEFAULT_LOW
+    assert loaded.midi_full_high == MIDI_DEFAULT_HIGH
+    assert loaded.midi_one_octave_low == DEFAULT_ONE_OCTAVE_LOW
+    assert loaded.midi_one_octave_high == DEFAULT_ONE_OCTAVE_HIGH
+    assert loaded.midi_two_octave_low == DEFAULT_TWO_OCTAVE_LOW
+    assert loaded.midi_two_octave_high == DEFAULT_TWO_OCTAVE_HIGH
+    assert loaded.audio_delay_ms == 0

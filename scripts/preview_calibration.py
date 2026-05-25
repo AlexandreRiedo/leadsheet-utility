@@ -98,6 +98,15 @@ def _run_calibration(window: pygame.Window, proj_size: tuple[int, int]) -> bool:
         ui_kwargs["black_width_ratio"] = initial_bw
     if initial_bh is not None:
         ui_kwargs["black_height_ratio"] = initial_bh
+    if existing is not None:
+        ui_kwargs["black_key_offsets"] = existing.black_key_offsets
+        ui_kwargs["midi_full_low"] = existing.midi_full_low
+        ui_kwargs["midi_full_high"] = existing.midi_full_high
+        ui_kwargs["midi_one_octave_low"] = existing.midi_one_octave_low
+        ui_kwargs["midi_one_octave_high"] = existing.midi_one_octave_high
+        ui_kwargs["midi_two_octave_low"] = existing.midi_two_octave_low
+        ui_kwargs["midi_two_octave_high"] = existing.midi_two_octave_high
+        ui_kwargs["audio_delay_ms"] = existing.audio_delay_ms
     ui = CalibrationUI(**ui_kwargs)
     font = pygame.font.SysFont("consolas", 20)
     clock = pygame.time.Clock()
@@ -131,6 +140,8 @@ def _run_verification(window: pygame.Window, proj_size: tuple[int, int]) -> None
 
     layout = build_keyboard_layout(
         *CANONICAL_SIZE,
+        midi_low=cal.midi_full_low,
+        midi_high=cal.midi_full_high,
         black_width_ratio=cal.black_width_ratio,
         black_height_ratio=cal.black_height_ratio,
         black_key_offsets=cal.black_key_offsets,

@@ -73,6 +73,7 @@ def chord_tone_only_highlights(
     *,
     range_mode: RangeMode = RangeMode.FULL,
     color: tuple[int, int, int] = CHORD_TONE_COLOR,
+    band_low: int | None = None,
 ) -> list[KeyHighlight]:
     """Return only the chord-tone highlights, hiding the rest of the scale.
 
@@ -80,7 +81,8 @@ def chord_tone_only_highlights(
     within the corresponding band, starting at the lowest root in the band.
     For ``ONE_OCTAVE`` of C7 → C4 E4 G4 Bb4. For ``TWO_OCTAVE`` → C4 E4 G4
     Bb4 C5 E5 G5 Bb5. No octave-of-root repeat is added — the chord-tone
-    set is already a complete voicing.
+    set is already a complete voicing. ``band_low`` overrides the module
+    default — pass the calibrated band low when available.
     """
     pcs = chord_tone_pitch_classes(chord)
     if not pcs:
@@ -89,9 +91,9 @@ def chord_tone_only_highlights(
         midis = [n for n in range(21, 109) if n % 12 in pcs]
     else:
         octaves = 1 if range_mode is RangeMode.ONE_OCTAVE else 2
-        band_low = range_mode_low(range_mode)
+        low = band_low if band_low is not None else range_mode_low(range_mode)
         root_pc = NOTE_TO_PC[chord.root]
-        root_midi = band_low + (root_pc - band_low) % 12
+        root_midi = low + (root_pc - low) % 12
         ordered = sorted(pcs, key=lambda pc: (pc - root_pc) % 12)
         midis = []
         for o in range(octaves):

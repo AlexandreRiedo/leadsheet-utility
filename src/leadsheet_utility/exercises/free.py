@@ -60,7 +60,11 @@ def next_range_mode(mode: RangeMode) -> RangeMode:
 
 
 def range_mode_low(mode: RangeMode) -> int:
-    """Lowest MIDI note in the band selected by `mode`."""
+    """Lowest MIDI note in the *default* band selected by `mode`.
+
+    Callers that have a calibrated band should pass it explicitly via the
+    ``band_low`` parameter on the highlight functions instead.
+    """
     if mode is RangeMode.ONE_OCTAVE:
         return ONE_OCTAVE_RANGE_LOW
     if mode is RangeMode.TWO_OCTAVE:
@@ -68,14 +72,13 @@ def range_mode_low(mode: RangeMode) -> int:
     raise ValueError(f"range_mode_low: not applicable for {mode}")
 
 
-def _range_midis(chord: ChordEvent, mode: RangeMode) -> list[int]:
+def _range_midis(chord: ChordEvent, mode: RangeMode, band_low: int) -> list[int]:
     """Scale degrees 1..(8 or 15), one or two octaves, starting at the
     lowest root inside the active band. Empty list if no scale.
     """
     if not chord.scale_notes:
         return []
     octaves = 1 if mode is RangeMode.ONE_OCTAVE else 2
-    band_low = range_mode_low(mode)
     root_pc = NOTE_TO_PC[chord.root]
     root_midi = band_low + (root_pc - band_low) % 12
     pcs = sorted(
@@ -94,15 +97,18 @@ def free_mode_highlights(
     chord: ChordEvent,
     *,
     range_mode: RangeMode = RangeMode.FULL,
+    band_low: int | None = None,
 ) -> list[KeyHighlight]:
     """Return one KeyHighlight per MIDI note in the chord-scale.
 
     When ``range_mode`` is ``ONE_OCTAVE`` or ``TWO_OCTAVE``, only that many
     ascending octaves of scale degrees inside the corresponding band are
-    returned (plus the final octave repeat).
+    returned (plus the final octave repeat). ``band_low`` overrides the
+    module default — pass the calibrated band low when available.
     """
     if range_mode is RangeMode.FULL:
         midis = chord.scale_notes
     else:
-        midis = _range_midis(chord, range_mode)
+        low = band_low if band_low is not None else range_mode_low(range_mode)
+        midis = _range_midis(chord, range_mode, low)
     return [KeyHighlight(midi_note=n, color=HIGHLIGHT_COLOR) for n in midis]
