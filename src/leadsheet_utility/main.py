@@ -76,7 +76,7 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 
-_HUD_SIZE = (800, 500)
+_HUD_SIZE = (1200, 750)
 _FPS = 60
 _TEMPO_STEP = 5
 _TEMPO_MIN = 40
@@ -610,7 +610,7 @@ class App:
         """Minimal HUD while calibrating — directs the user to the projector."""
         surface = self._hud_window.get_surface()
         surface.fill((30, 30, 30))
-        font = pygame.font.SysFont("consolas", 22)
+        font = pygame.font.SysFont("consolas", 33)
         text = font.render(
             "Calibrating — see projector window", True, (220, 220, 220),
         )
@@ -622,7 +622,7 @@ class App:
         """Draw an animated 'Rendering audio...' screen while the render thread runs."""
         surface = self._hud_window.get_surface()
         surface.fill((30, 30, 30))
-        font = pygame.font.SysFont("consolas", 22)
+        font = pygame.font.SysFont("consolas", 33)
         n_dots = 1 + (int(time.perf_counter() * 3) % 3)
         text = font.render(f"{message}{'.' * n_dots}", True, (220, 220, 220))
         w, h = surface.get_size()

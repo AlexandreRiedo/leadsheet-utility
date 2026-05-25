@@ -47,10 +47,10 @@ _fonts: dict[str, pygame.font.Font] = {}
 
 def _get_fonts() -> dict[str, pygame.font.Font]:
     if not _fonts:
-        _fonts["title"] = pygame.font.SysFont("consolas", 26, bold=True)
-        _fonts["heading"] = pygame.font.SysFont("consolas", 20, bold=True)
-        _fonts["body"] = pygame.font.SysFont("consolas", 18)
-        _fonts["small"] = pygame.font.SysFont("consolas", 15)
+        _fonts["title"] = pygame.font.SysFont("consolas", 39, bold=True)
+        _fonts["heading"] = pygame.font.SysFont("consolas", 30, bold=True)
+        _fonts["body"] = pygame.font.SysFont("consolas", 27)
+        _fonts["small"] = pygame.font.SysFont("consolas", 20)
     return _fonts
 
 
@@ -88,27 +88,27 @@ def render_hud(
         return
 
     # -- Title bar -----------------------------------------------------------
-    pygame.draw.rect(surface, _TITLE_BG, (0, 0, w, 40))
-    _blit(surface, fonts["title"], "leadsheet-utility", 14, 7, _TEXT)
-    y = 50
+    pygame.draw.rect(surface, _TITLE_BG, (0, 0, w, 60))
+    _blit(surface, fonts["title"], "leadsheet-utility", 20, 10, _TEXT)
+    y = 75
 
     if lead_sheet is None:
-        _blit(surface, fonts["body"], "No lead sheet loaded.", 14, y, _DIM)
-        y += 26
-        _blit(surface, fonts["body"], 'Press O to open a .tsv file.', 14, y, _DIM)
-        y += 50
+        _blit(surface, fonts["body"], "No lead sheet loaded.", 20, y, _DIM)
+        y += 40
+        _blit(surface, fonts["body"], 'Press O to open a .tsv file.', 20, y, _DIM)
+        y += 75
         _render_shortcuts(surface, fonts, y)
         return
 
     # -- Song info -----------------------------------------------------------
     song_line = f"{lead_sheet.title}  --  {lead_sheet.composer}"
-    _blit(surface, fonts["heading"], song_line, 14, y, _TEXT)
-    y += 28
+    _blit(surface, fonts["heading"], song_line, 20, y, _TEXT)
+    y += 42
 
     ts = lead_sheet.time_signature
     info = f"Key: {lead_sheet.key}    Time: {ts[0]}/{ts[1]}    Tempo: {tempo} BPM"
-    _blit(surface, fonts["body"], info, 14, y, _DIM)
-    y += 34
+    _blit(surface, fonts["body"], info, 20, y, _DIM)
+    y += 50
 
     # -- Current / next chord ------------------------------------------------
     if frozen_mode:
@@ -120,11 +120,11 @@ def render_hud(
             f"(bar {chord.bar_number}/{lead_sheet.total_bars})  "
             f"[FROZEN {idx + 1}/{len(chords)}]"
         )
-        _blit(surface, fonts["heading"], cur_line, 14, y, _ACCENT)
-        y += 26
+        _blit(surface, fonts["heading"], cur_line, 20, y, _ACCENT)
+        y += 40
         nxt = chords[(idx + 1) % len(chords)].chord_symbol if chords else "--"
-        _blit(surface, fonts["body"], f"Next:    {nxt}", 14, y, _DIM)
-        y += 34
+        _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
+        y += 50
     elif timeline_state is not None:
         chord = timeline_state.current_chord
         bar = chord.bar_number
@@ -137,8 +137,8 @@ def render_hud(
             f"(bar {bar}/{total_bars})  "
             f"[Form {form_rep}/{form_total}]"
         )
-        _blit(surface, fonts["heading"], cur_line, 14, y, _TEXT)
-        y += 26
+        _blit(surface, fonts["heading"], cur_line, 20, y, _TEXT)
+        y += 40
 
         # Next chord
         chords = lead_sheet.chords
@@ -149,15 +149,15 @@ def render_hud(
             nxt = chords[0].chord_symbol
         else:
             nxt = "--"
-        _blit(surface, fonts["body"], f"Next:    {nxt}", 14, y, _DIM)
-        y += 34
+        _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
+        y += 50
     else:
-        _blit(surface, fonts["body"], f"Current: {lead_sheet.chords[0].chord_symbol}", 14, y, _DIM)
-        y += 34
+        _blit(surface, fonts["body"], f"Current: {lead_sheet.chords[0].chord_symbol}", 20, y, _DIM)
+        y += 50
 
     # -- Exercise selection --------------------------------------------------
     _render_exercises(surface, fonts, exercise_idx, y)
-    y += 60
+    y += 90
 
     # -- Transport / progress ------------------------------------------------
     if frozen_mode:
@@ -177,24 +177,24 @@ def render_hud(
         surface,
         fonts["body"],
         f"Status: {status_label}    Metronome: {met_label}    Comping: {comp_label}",
-        14, y, _ACCENT,
+        20, y, _ACCENT,
     )
-    y += 22
+    y += 33
     _blit(
         surface,
         fonts["body"],
         f"Root: {root_label}    Small: {small_label}    Chord tones: {tones_label}",
-        14, y, _ACCENT,
+        20, y, _ACCENT,
     )
-    y += 30
+    y += 45
 
     # Progress bar
     if timeline_state is not None and lead_sheet is not None:
         progress = _compute_progress(timeline_state, lead_sheet)
     else:
         progress = 0.0
-    _render_progress_bar(surface, 14, y, w - 28, 16, progress)
-    y += 34
+    _render_progress_bar(surface, 20, y, w - 40, 24, progress)
+    y += 50
 
     # -- Keyboard shortcuts --------------------------------------------------
     _render_shortcuts(surface, fonts, y)
@@ -228,8 +228,8 @@ def _render_count_in(
     filled = min(int(count_in_beat) + 1, total_count_in_beats)  # +1: fill on the beat, not after
 
     beats_per_bar = total_count_in_beats // 2
-    sq_size = 60
-    gap = 16
+    sq_size = 90
+    gap = 24
 
     # Two rows, beats_per_bar squares each
     grid_w = beats_per_bar * sq_size + (beats_per_bar - 1) * gap
@@ -239,7 +239,7 @@ def _render_count_in(
 
     # Title
     title = "Get Ready..."
-    _blit(surface, fonts["heading"], title, (w - fonts["heading"].size(title)[0]) // 2, y_start - 50, _TEXT)
+    _blit(surface, fonts["heading"], title, (w - fonts["heading"].size(title)[0]) // 2, y_start - 75, _TEXT)
 
     for i in range(total_count_in_beats):
         row = i // beats_per_bar
@@ -259,7 +259,7 @@ def _render_count_in(
         _blit(
             surface, fonts["heading"], beat_label,
             (w - fonts["heading"].size(beat_label)[0]) // 2,
-            y_start + row_h + 14,
+            y_start + row_h + 21,
             _ACCENT,
         )
 
@@ -270,17 +270,17 @@ def _render_exercises(
     active_idx: int,
     y: int,
 ) -> None:
-    x = 14
+    x = 20
     font = fonts["body"]
     for i, name in enumerate(EXERCISE_NAMES):
         label = f"[{i + 1}] {name}"
         color = _ACCENT if i == active_idx else _DIM
         _blit(surface, font, label, x, y, color)
-        x += font.size(label)[0] + 16
+        x += font.size(label)[0] + 24
         if i == 2:
             # Wrap to second row
-            y += 24
-            x = 14
+            y += 36
+            x = 20
 
 
 def _render_progress_bar(
@@ -303,18 +303,37 @@ def _render_shortcuts(
     y: int,
 ) -> None:
     font = fonts["small"]
-    shortcuts = [
-        "[SPACE] Play/Pause    [S] Stop",
-        "[+/-] Tempo           [O] Open file",
-        "[M] Metronome         [G] Comping",
-        "[R] Root highlight    [B] Small (free)",
-        "[T] Chord tones       [C] Calibrate",
-        "[F] Frozen mode       [<-/->] Step chord",
-        "[Q] Quit",
+    line_h = 22
+
+    columns: list[tuple[str, list[str]]] = [
+        (
+            "TRANSPORT",
+            [
+                "[SPACE] Play/Pause",
+                "[S] Stop",
+                "[+/-] Tempo",
+                "[O] Open file",
+                "[Q] Quit",
+            ],
+        ),
+        ("CALIBRATION", ["[C] Calibrate"]),
+        ("BACKING", ["[M] Metronome", "[G] Comping"]),
+        ("DISPLAY", ["[R] Root highlight", "[B] Small", "[T] Chord tones"]),
+        ("FROZEN", ["[F] Frozen mode", "[<-/->] Step chord"]),
     ]
-    for line in shortcuts:
-        _blit(surface, font, line, 14, y, _DIM)
-        y += 20
+
+    w = surface.get_width()
+    margin = 20
+    col_w = (w - 2 * margin) // len(columns)
+
+    for i, (title, items) in enumerate(columns):
+        x = margin + i * col_w
+        cy = y
+        _blit(surface, font, title, x, cy, _TEXT)
+        cy += line_h
+        for line in items:
+            _blit(surface, font, line, x, cy, _DIM)
+            cy += line_h
 
 
 def _compute_progress(state: TimelineState, lead_sheet: LeadSheet) -> float:
