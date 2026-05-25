@@ -69,7 +69,7 @@ def render_hud(
     metronome_on: bool = False,
     backing_mode: str = "FULL",
     highlight_root: bool = False,
-    small_mode: str = "OFF",
+    range_mode: str = "FULL",
     chord_tone_mode: str = "OFF",
     count_in_beat: float | None = None,
     count_in_total_beats: int = 0,
@@ -170,11 +170,11 @@ def render_hud(
         }[playback_state]
     met_label = "ON" if metronome_on else "OFF"
     root_label = "ON" if highlight_root else "OFF"
-    small_label = small_mode  # OFF / 1-OCT / 2-OCT
+    range_label = range_mode  # FULL / 2 OCT / 1 OCT
     tones_label = chord_tone_mode  # OFF / ONLY / OVERLAY
     status_grid = [
         [("Status", status_label), ("Metronome", met_label), ("Backing", backing_mode)],
-        [("Root", root_label), ("Small", small_label), ("Chord tones", tones_label)],
+        [("Root", root_label), ("Range", range_label), ("Chord tones", tones_label)],
     ]
     col_x = [20, 310, 600]
     for row in status_grid:
@@ -313,7 +313,7 @@ def _render_shortcuts(
         ),
         ("CALIBRATION", ["[C] Calibrate"]),
         ("BACKING", ["[M] Metronome", "[G] Cycle backing"]),
-        ("DISPLAY", ["[R] Root highlight", "[B] Small", "[T] Chord tones"]),
+        ("DISPLAY", ["[R] Root highlight", "[B] Range", "[T] Chord tones"]),
         ("FROZEN", ["[F] Frozen mode", "[<-/->] Step chord"]),
     ]
 

@@ -5,10 +5,10 @@ The projector lights up exactly the notes the player can use over the
 current chord, leaving the choice of *which* ones to play entirely to
 them.
 
-A "small" sub-toggle collapses the highlight set to a single ascending
+A "range" sub-toggle collapses the highlight set to a single ascending
 1- or 2-octave run of scale degrees so the player can practice the scale
 shape in one position instead of seeing it tiled across the whole
-keyboard. The two ranges are chosen so every chromatic root has a slot:
+keyboard. The two windows are chosen so every chromatic root has a slot:
 
 - 1 octave: Bb3-A5 (root in Bb3..A4, octave above in Bb4..A5)
 - 2 octave: Ab3-G6 (root in Ab3..G4, 2-octave above in Ab5..G6)
@@ -39,47 +39,43 @@ ONE_OCTAVE_RANGE_HIGH = 81  # A5
 TWO_OCTAVE_RANGE_LOW = 56   # Ab3
 TWO_OCTAVE_RANGE_HIGH = 91  # G6
 
-# Back-compat aliases for callers that imported the originals.
-SMALL_RANGE_LOW = ONE_OCTAVE_RANGE_LOW
-SMALL_RANGE_HIGH = ONE_OCTAVE_RANGE_HIGH
 
-
-class SmallMode(Enum):
-    OFF = auto()
-    ONE_OCTAVE = auto()
+class RangeMode(Enum):
+    FULL = auto()
     TWO_OCTAVE = auto()
+    ONE_OCTAVE = auto()
 
 
-SMALL_CYCLE: tuple[SmallMode, ...] = (
-    SmallMode.OFF,
-    SmallMode.ONE_OCTAVE,
-    SmallMode.TWO_OCTAVE,
+RANGE_CYCLE: tuple[RangeMode, ...] = (
+    RangeMode.FULL,
+    RangeMode.TWO_OCTAVE,
+    RangeMode.ONE_OCTAVE,
 )
 
 
-def next_small_mode(mode: SmallMode) -> SmallMode:
-    """Return the next mode in the cycle (OFF -> 1-OCT -> 2-OCT -> OFF)."""
-    idx = SMALL_CYCLE.index(mode)
-    return SMALL_CYCLE[(idx + 1) % len(SMALL_CYCLE)]
+def next_range_mode(mode: RangeMode) -> RangeMode:
+    """Return the next mode in the cycle (FULL -> 2-OCT -> 1-OCT -> FULL)."""
+    idx = RANGE_CYCLE.index(mode)
+    return RANGE_CYCLE[(idx + 1) % len(RANGE_CYCLE)]
 
 
-def small_range_low(mode: SmallMode) -> int:
+def range_mode_low(mode: RangeMode) -> int:
     """Lowest MIDI note in the band selected by `mode`."""
-    if mode is SmallMode.ONE_OCTAVE:
+    if mode is RangeMode.ONE_OCTAVE:
         return ONE_OCTAVE_RANGE_LOW
-    if mode is SmallMode.TWO_OCTAVE:
+    if mode is RangeMode.TWO_OCTAVE:
         return TWO_OCTAVE_RANGE_LOW
-    raise ValueError(f"small_range_low: not applicable for {mode}")
+    raise ValueError(f"range_mode_low: not applicable for {mode}")
 
 
-def _small_midis(chord: ChordEvent, mode: SmallMode) -> list[int]:
+def _range_midis(chord: ChordEvent, mode: RangeMode) -> list[int]:
     """Scale degrees 1..(8 or 15), one or two octaves, starting at the
     lowest root inside the active band. Empty list if no scale.
     """
     if not chord.scale_notes:
         return []
-    octaves = 1 if mode is SmallMode.ONE_OCTAVE else 2
-    band_low = small_range_low(mode)
+    octaves = 1 if mode is RangeMode.ONE_OCTAVE else 2
+    band_low = range_mode_low(mode)
     root_pc = NOTE_TO_PC[chord.root]
     root_midi = band_low + (root_pc - band_low) % 12
     pcs = sorted(
@@ -97,16 +93,16 @@ def _small_midis(chord: ChordEvent, mode: SmallMode) -> list[int]:
 def free_mode_highlights(
     chord: ChordEvent,
     *,
-    small: SmallMode = SmallMode.OFF,
+    range_mode: RangeMode = RangeMode.FULL,
 ) -> list[KeyHighlight]:
     """Return one KeyHighlight per MIDI note in the chord-scale.
 
-    When ``small`` is ``ONE_OCTAVE`` or ``TWO_OCTAVE``, only that many
+    When ``range_mode`` is ``ONE_OCTAVE`` or ``TWO_OCTAVE``, only that many
     ascending octaves of scale degrees inside the corresponding band are
     returned (plus the final octave repeat).
     """
-    if small is SmallMode.OFF:
+    if range_mode is RangeMode.FULL:
         midis = chord.scale_notes
     else:
-        midis = _small_midis(chord, small)
+        midis = _range_midis(chord, range_mode)
     return [KeyHighlight(midi_note=n, color=HIGHLIGHT_COLOR) for n in midis]

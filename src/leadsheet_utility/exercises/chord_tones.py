@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from enum import Enum, auto
 
-from leadsheet_utility.exercises.free import SmallMode, small_range_low
+from leadsheet_utility.exercises.free import RangeMode, range_mode_low
 from leadsheet_utility.harmony.constants import NOTE_TO_PC
 from leadsheet_utility.leadsheet.models import ChordEvent
 from leadsheet_utility.projection import KeyHighlight
@@ -71,12 +71,12 @@ def chord_tone_pitch_classes(chord: ChordEvent) -> set[int]:
 def chord_tone_only_highlights(
     chord: ChordEvent,
     *,
-    small: SmallMode = SmallMode.OFF,
+    range_mode: RangeMode = RangeMode.FULL,
     color: tuple[int, int, int] = CHORD_TONE_COLOR,
 ) -> list[KeyHighlight]:
     """Return only the chord-tone highlights, hiding the rest of the scale.
 
-    When ``small`` is ``ONE_OCTAVE``/``TWO_OCTAVE`` emits the chord tones
+    When ``range_mode`` is ``ONE_OCTAVE``/``TWO_OCTAVE`` emits the chord tones
     within the corresponding band, starting at the lowest root in the band.
     For ``ONE_OCTAVE`` of C7 → C4 E4 G4 Bb4. For ``TWO_OCTAVE`` → C4 E4 G4
     Bb4 C5 E5 G5 Bb5. No octave-of-root repeat is added — the chord-tone
@@ -85,11 +85,11 @@ def chord_tone_only_highlights(
     pcs = chord_tone_pitch_classes(chord)
     if not pcs:
         return []
-    if small is SmallMode.OFF:
+    if range_mode is RangeMode.FULL:
         midis = [n for n in range(21, 109) if n % 12 in pcs]
     else:
-        octaves = 1 if small is SmallMode.ONE_OCTAVE else 2
-        band_low = small_range_low(small)
+        octaves = 1 if range_mode is RangeMode.ONE_OCTAVE else 2
+        band_low = range_mode_low(range_mode)
         root_pc = NOTE_TO_PC[chord.root]
         root_midi = band_low + (root_pc - band_low) % 12
         ordered = sorted(pcs, key=lambda pc: (pc - root_pc) % 12)

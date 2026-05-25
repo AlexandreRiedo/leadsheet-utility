@@ -1,5 +1,6 @@
 # WIP
 - Think about getting white tape?
+- Cleaner Calibration (setup whole range, compact range, delay, )
 - Guide Tone Exercice
 
 # LONG TERM

@@ -47,13 +47,13 @@ from leadsheet_utility.calibration import (
 )
 from leadsheet_utility.exercises import (
     ChordToneMode,
-    SmallMode,
+    RangeMode,
     apply_chord_tone_highlight,
     apply_root_highlight,
     chord_tone_only_highlights,
     free_mode_highlights,
     next_chord_tone_mode,
-    next_small_mode,
+    next_range_mode,
 )
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
@@ -125,12 +125,12 @@ def _next_backing_mode(mode: BackingMode) -> BackingMode:
     return _BACKING_CYCLE[(i + 1) % len(_BACKING_CYCLE)]
 
 
-def _small_mode_label(mode: SmallMode) -> str:
-    """Short HUD label for the small-mode cycle."""
+def _range_mode_label(mode: RangeMode) -> str:
+    """Short HUD label for the range cycle."""
     return {
-        SmallMode.OFF: "OFF",
-        SmallMode.ONE_OCTAVE: "1-OCT",
-        SmallMode.TWO_OCTAVE: "2-OCT",
+        RangeMode.FULL: "FULL",
+        RangeMode.TWO_OCTAVE: "2 OCT",
+        RangeMode.ONE_OCTAVE: "1 OCT",
     }[mode]
 
 
@@ -258,7 +258,7 @@ class App:
         self._metronome_on: bool = False
         self._backing_mode: BackingMode = BackingMode.FULL
         self._highlight_root: bool = False
-        self._small_mode: SmallMode = SmallMode.OFF
+        self._range_mode: RangeMode = RangeMode.FULL
         self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
 
         # -- Frozen mode state ------------------------------------------------
@@ -370,9 +370,9 @@ class App:
             self._highlight_root = not self._highlight_root
             logger.info("Root highlight %s", "ON" if self._highlight_root else "OFF")
 
-        elif action is Action.TOGGLE_FREE_SMALL:
-            self._small_mode = next_small_mode(self._small_mode)
-            logger.info("Small mode: %s", self._small_mode.name)
+        elif action is Action.TOGGLE_RANGE_MODE:
+            self._range_mode = next_range_mode(self._range_mode)
+            logger.info("Range: %s", self._range_mode.name)
 
         elif action is Action.TOGGLE_CHORD_TONES:
             self._chord_tone_mode = next_chord_tone_mode(self._chord_tone_mode)
@@ -924,9 +924,9 @@ class App:
 
         if projected_chord is not None:
             if self._chord_tone_mode is ChordToneMode.ONLY:
-                highlights = chord_tone_only_highlights(projected_chord, small=self._small_mode)
+                highlights = chord_tone_only_highlights(projected_chord, range_mode=self._range_mode)
             else:
-                highlights = free_mode_highlights(projected_chord, small=self._small_mode)
+                highlights = free_mode_highlights(projected_chord, range_mode=self._range_mode)
                 if self._chord_tone_mode is ChordToneMode.OVERLAY:
                     highlights = apply_chord_tone_highlight(highlights, projected_chord)
             # Root overlay applied last so the root keeps its own color
@@ -965,7 +965,7 @@ class App:
             self._metronome_on,
             backing_mode=_BACKING_LABELS[self._backing_mode],
             highlight_root=self._highlight_root,
-            small_mode=_small_mode_label(self._small_mode),
+            range_mode=_range_mode_label(self._range_mode),
             chord_tone_mode=self._chord_tone_mode.name,
             count_in_beat=self._get_count_in_beat(),
             count_in_total_beats=self._count_in_total_beats,

@@ -7,9 +7,9 @@ from leadsheet_utility.exercises.chord_tones import (
     next_chord_tone_mode,
 )
 from leadsheet_utility.exercises.free import (
-    SmallMode,
+    RangeMode,
     free_mode_highlights,
-    next_small_mode,
+    next_range_mode,
 )
 from leadsheet_utility.exercises.root import ROOT_COLOR, apply_root_highlight
 
@@ -17,12 +17,12 @@ __all__ = [
     "CHORD_TONE_COLOR",
     "ChordToneMode",
     "ROOT_COLOR",
-    "SmallMode",
+    "RangeMode",
     "apply_chord_tone_highlight",
     "apply_root_highlight",
     "chord_tone_only_highlights",
     "chord_tone_pitch_classes",
     "free_mode_highlights",
     "next_chord_tone_mode",
-    "next_small_mode",
+    "next_range_mode",
 ]
