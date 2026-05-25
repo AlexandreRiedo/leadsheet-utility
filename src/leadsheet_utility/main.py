@@ -398,9 +398,13 @@ class App:
         if self._timeline is None or self._lead_sheet is None:
             return
 
-        # Frozen mode owns the projection and does not advance with audio.
+        # In frozen mode, SPACE exits frozen and continues into normal play.
+        # The frozen-entry path already called _stop_playback(), so the
+        # timeline is STOPPED and the fall-through below will trigger a
+        # count-in from the start.
         if self._frozen_mode:
-            return
+            self._frozen_mode = False
+            logger.info("Frozen mode OFF (exited via play/pause)")
 
         # During count-in, treat play/pause as stop
         if self._count_in_active:
