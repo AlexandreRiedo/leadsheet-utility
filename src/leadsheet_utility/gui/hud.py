@@ -58,6 +58,7 @@ EXERCISE_NAMES: list[str] = [
 # the panel never advertises a key that does nothing in the current mode.
 _EXERCISE_EXTRA_KEYS: dict[int, tuple[str, ...]] = {
     1: ("[H] GT path", "[Up/Dn] GT octave", "[N] Next GT preview"),  # Guide Tone
+    3: ("[D] Flow phrasing",),  # Flow
 }
 
 # ---------------------------------------------------------------------------
@@ -103,6 +104,7 @@ def render_hud(
     guide_tone_path_count: int = 0,
     guide_tone_octave: int = 0,
     show_next_guide_tone: bool = False,
+    flow_phrasing: str = "MEDIUM",
 ) -> None:
     """Draw the full HUD onto *surface*.  Called once per frame."""
     fonts = _get_fonts()
@@ -218,6 +220,8 @@ def render_hud(
             ("GT octave", oct_label),
             ("Next GT", next_label),
         ])
+    elif exercise_idx == 3:
+        status_grid.append([("Phrasing", flow_phrasing)])
     col_x = [20, 310, 600]
     for row in status_grid:
         for (key, val), x in zip(row, col_x):

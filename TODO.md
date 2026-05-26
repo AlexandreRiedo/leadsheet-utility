@@ -1,6 +1,5 @@
 # WIP
 - Start And End Note Exercice
-- Flow Exercice
 - Contour Exercice
 
 # LONG TERM

@@ -117,7 +117,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar, frozen-mode indicator, count-in grid |
 | `projection` | **Done (wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame with audio-delay compensated lead time |
 | `calibration` | **Done (wired into main)** | 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay); loaded by main on startup, re-entered in-session via `C` |
-| `exercises` | **Free Mode done with sub-toggles; others not started** | Free Mode (all scale notes) wired with `RangeMode` (FULL / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone / Contour / Flow / Start & End Note pending |
+| `exercises` | **Free, Guide Tone, Flow done; Contour / Start & End pending** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's voice-led line. Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D` |
 
 ### Application States
 
@@ -282,14 +282,15 @@ These overlays are pure post-processing passes over a `list[KeyHighlight]`, so f
   - Highlight only chord-scale notes within ±3 semitones of the contour center.
   - The illuminated window drifts left/right on the keyboard.
 
-### 6.4 Flow Game (Jeu du Flux)
+### 6.4 Flow Game (Jeu du Flux) — Implemented
 
-- **Projection**: Chord-scale in **white** when "open", **nothing** when "closed".
-- **Purpose**: Train rhythmic phrasing by forcing silence.
-- **Logic**:
-  - Pre-generate an on/off pattern (e.g., 2 bars on, 1 bar off, or random pattern).
-  - When "on": highlight all scale notes. When "off": blackout.
-  - Configurable parameter: `flow_density` (0.0–1.0).
+- **Projection**: Whatever the base exercise (Free Mode + sub-toggles) would have shown when the pattern is "open"; **blackout** when "closed".
+- **Purpose**: Train rhythmic phrasing by forcing silence and pushing the player to think in phrases that cross chord and barline boundaries.
+- **Logic** (`exercises/flow.py`):
+  - `generate_flow_pattern(total_beats, density, seed)` pre-generates a list of `(start_beat, end_beat)` "open" windows spanning every form repeat. Switches do **not** align to bars or chord boundaries — a window can start on beat 4 of one bar and end on beat 3 of the next-next chord.
+  - Three phrasings cycled with `D` (SHORT / MEDIUM / LONG) selected from `_PHRASING_PARAMS`: each band gives `(min_play, max_play, min_rest, max_rest)` in beats, tuned so playing always dominates resting on average (MEDIUM = play 6–12, rest 2–4). The total play *fraction* is similar across phrasings — what varies is phrase length: SHORT chops the form into many short runs, LONG spreads long uninterrupted phrases across long rests.
+  - Pattern is regenerated on phrasing change and on lead-sheet load (length depends on the form); tempo changes do not invalidate it since the pattern is measured in beats.
+  - Frozen mode and the stopped state bypass the gate entirely so the player can still study a chord with no flow noise.
 
 ### 6.5 Start & End Note Game
 
@@ -470,6 +471,7 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `T` | Cycle chord-tone mode: OFF → ONLY → OVERLAY |
 | `F` | Enter / exit frozen mode (pin projection to one chord) |
 | `←` / `→` | In frozen mode, step to previous / next chord |
+| `D` | Cycle Flow phrasing: SHORT → MEDIUM → LONG |
 | `C` | Enter calibration mode |
 | `Q` / `Esc` | Quit |
 
@@ -534,12 +536,12 @@ ruff = ">=0.4"
 
 ### TODO (MVP)
 
-- [ ] Guide Tone exercise
+- [x] Guide Tone exercise
+- [x] Flow exercise
 
 ### Stretch Goals
 
 - [ ] Contour exercise
-- [ ] Flow exercise
 - [ ] Start & End Note exercise
 - [ ] Camera-based automatic calibration
 - [ ] Piano comping track

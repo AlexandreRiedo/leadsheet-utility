@@ -38,6 +38,7 @@ class Action(Enum):
     GUIDE_TONE_OCTAVE_DOWN = auto()
     GUIDE_TONE_OCTAVE_UP = auto()
     TOGGLE_GUIDE_TONE_NEXT = auto()
+    CYCLE_FLOW_PHRASING = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -64,6 +65,7 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_DOWN: Action.GUIDE_TONE_OCTAVE_DOWN,
     pygame.K_UP: Action.GUIDE_TONE_OCTAVE_UP,
     pygame.K_n: Action.TOGGLE_GUIDE_TONE_NEXT,
+    pygame.K_d: Action.CYCLE_FLOW_PHRASING,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,

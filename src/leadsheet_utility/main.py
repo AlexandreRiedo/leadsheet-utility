@@ -50,15 +50,19 @@ from leadsheet_utility.calibration import (
 from leadsheet_utility.exercises import (
     NEXT_GUIDE_TONE_COLOR,
     ChordToneMode,
+    FlowPhrasing,
+    FlowPattern,
     RangeMode,
     apply_chord_tone_highlight,
     apply_guide_tone_highlight,
     apply_root_highlight,
     chord_tone_only_highlights,
     free_mode_highlights,
+    generate_flow_pattern,
     guide_tone_midi,
     guide_tone_path_count,
     next_chord_tone_mode,
+    next_flow_phrasing,
     next_range_mode,
 )
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_calibration_hud, render_hud
@@ -285,6 +289,13 @@ class App:
         self._frozen_mode: bool = False
         self._frozen_chord_idx: int = 0
 
+        # -- Flow exercise state ----------------------------------------------
+        # Pattern is regenerated on phrasing change and on lead-sheet load (its
+        # length depends on the form). Tempo doesn't affect it — the pattern is
+        # measured in beats, not seconds.
+        self._flow_phrasing: FlowPhrasing = FlowPhrasing.MEDIUM
+        self._flow_pattern: FlowPattern | None = None
+
         # -- Async render state ----------------------------------------------
         # Layers are cached per-instrument (bass/drums/guitar/metronome) as
         # int16 buffers without normalization, so toggling backing mode or the
@@ -419,6 +430,11 @@ class App:
         elif action is Action.TOGGLE_GUIDE_TONE_NEXT:
             self._show_next_guide_tone = not self._show_next_guide_tone
             logger.info("Next-GT preview %s", "ON" if self._show_next_guide_tone else "OFF")
+
+        elif action is Action.CYCLE_FLOW_PHRASING:
+            self._flow_phrasing = next_flow_phrasing(self._flow_phrasing)
+            self._regenerate_flow_pattern()
+            logger.info("Flow phrasing: %s", self._flow_phrasing.name)
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -856,6 +872,7 @@ class App:
             self._guide_tone_path = 0
             self._guide_tone_octave = 1
             self._show_next_guide_tone = False
+            self._regenerate_flow_pattern()
             _log_harmony_summary(ls)
         except Exception:
             logger.exception("Failed to load %s", path)
@@ -996,6 +1013,19 @@ class App:
             black_key_offsets=black_offsets,
         )
 
+    def _regenerate_flow_pattern(self) -> None:
+        """Rebuild the Flow exercise's on/off pattern for the loaded form.
+
+        Called on lead-sheet load and on phrasing change. The pattern spans
+        every form repeat so the gate keeps progressing across loops; it is
+        measured in beats, so tempo changes don't invalidate it.
+        """
+        if self._lead_sheet is None:
+            self._flow_pattern = None
+            return
+        total = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
+        self._flow_pattern = generate_flow_pattern(total, self._flow_phrasing)
+
     def _active_band_low(self) -> int | None:
         """Calibrated band-low for the active RangeMode, or None for FULL."""
         if self._range_mode is RangeMode.ONE_OCTAVE:
@@ -1020,6 +1050,9 @@ class App:
 
         projected_chord: ChordEvent | None = None
         projected_chord_idx: int | None = None
+        # Absolute lead-compensated beat across all form repeats; only set while
+        # playing. Used by the Flow exercise to drive its on/off gate.
+        projected_abs_beat: float | None = None
         if self._frozen_mode and self._lead_sheet is not None:
             chords = self._lead_sheet.chords
             if chords:
@@ -1039,6 +1072,11 @@ class App:
                 if projected_chord is not None and self._lead_sheet is not None:
                     # ChordEvent identity is stable (same list used by analyzer + timeline)
                     projected_chord_idx = self._lead_sheet.chords.index(projected_chord)
+                    projected_abs_beat = (
+                        tl_state.form_repeat * self._lead_sheet.total_beats
+                        + tl_state.current_beat
+                        + lead_beats
+                    )
 
         band_low = self._active_band_low()
         if projected_chord is not None:
@@ -1094,6 +1132,17 @@ class App:
                 )
                 if gt_midi is not None:
                     highlights = apply_guide_tone_highlight(highlights, gt_midi)
+            # Flow exercise: gate everything on/off based on the pre-generated
+            # pattern. Only applied during real playback (projected_abs_beat is
+            # only set then) — frozen mode and the stopped state always show
+            # the chord so the player can study it.
+            if (
+                self._exercise_idx == 3
+                and self._flow_pattern is not None
+                and projected_abs_beat is not None
+                and not self._flow_pattern.is_open(projected_abs_beat)
+            ):
+                highlights = []
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
             warped = warp_canonical_to_projector(
                 self._canonical_surface, self._homography, self._proj_size,
@@ -1139,6 +1188,7 @@ class App:
             guide_tone_path_count=gt_path_count,
             guide_tone_octave=self._guide_tone_octave,
             show_next_guide_tone=self._show_next_guide_tone,
+            flow_phrasing=self._flow_phrasing.name,
         )
         self._hud_window.flip()
 

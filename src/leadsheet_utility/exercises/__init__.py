@@ -6,6 +6,12 @@ from leadsheet_utility.exercises.chord_tones import (
     chord_tone_pitch_classes,
     next_chord_tone_mode,
 )
+from leadsheet_utility.exercises.flow import (
+    FlowPhrasing,
+    FlowPattern,
+    generate_flow_pattern,
+    next_flow_phrasing,
+)
 from leadsheet_utility.exercises.free import (
     RangeMode,
     free_mode_highlights,
@@ -23,6 +29,8 @@ from leadsheet_utility.exercises.root import ROOT_COLOR, apply_root_highlight
 __all__ = [
     "CHORD_TONE_COLOR",
     "ChordToneMode",
+    "FlowPhrasing",
+    "FlowPattern",
     "GUIDE_TONE_COLOR",
     "NEXT_GUIDE_TONE_COLOR",
     "ROOT_COLOR",
@@ -33,8 +41,10 @@ __all__ = [
     "chord_tone_only_highlights",
     "chord_tone_pitch_classes",
     "free_mode_highlights",
+    "generate_flow_pattern",
     "guide_tone_midi",
     "guide_tone_path_count",
     "next_chord_tone_mode",
+    "next_flow_phrasing",
     "next_range_mode",
 ]
