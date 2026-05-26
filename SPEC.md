@@ -16,10 +16,13 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
 
 1. The user physically mounts the projector above the piano. **The projector stays fixed from this point on.**
 2. The user connects the projector as a secondary display and launches the app: `python -m leadsheet_utility`.
-3. On first launch, no `data/calibration.json` exists, so the app enters **calibration mode**. Four bright markers appear on the projector display.
-4. The user drags the 4 markers until they sit on the physical corners of the keyboard. Presses Enter to confirm.
-5. The app computes the homography, draws a preview of all 88 key outlines. If alignment looks good, the user confirms. If not, re-drag and retry.
-6. Calibration is saved. **These steps never need to be repeated** unless the projector is physically moved.
+3. On first launch the app loads a default identity homography and runs with the spec defaults until the user presses `C` to enter calibration. The UI walks through five phases (Enter advances, Esc cancels):
+   1. **RANGE_EDIT** — drag the low/high endpoints to match the leftmost and rightmost keys the projector light can physically reach. A solid green pad fills that range for visual confirmation.
+   2. **MAIN** — drag the 4 corner markers onto the corners of the keyboard and tune global black-key width/height ratios (Q/W, A/S) so the rendered keys line up.
+   3. **BLACK_KEY_TUNE** — step through each black key with Tab and nudge its canonical position to absorb per-key drift the homography can't model.
+   4. **BAND_EDIT** — set the 1-OCT and 2-OCT exercise bands somewhere inside the FULL range. The bands are highlighted on the real piano so the user can pick a comfortable practice region.
+   5. **AUDIO_DELAY** — tune the audio/projection offset in milliseconds until the lit-up scale tones land with the audio.
+4. Calibration is saved to `data/calibration.json`. **These steps never need to be repeated** unless the projector is physically moved.
 
 ### Normal Usage (every session)
 
@@ -29,14 +32,17 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
 4. The HUD shows: title, chord chart, tempo, exercise selection.
 5. User selects an exercise with keys `1`–`5` (default: Free Mode) and adjusts tempo with `+`/`-`.
 6. User presses `Space` to play:
-   - The backing track is rendered via FluidSynth on a background thread. The HUD shows an animated "Rendering audio..." indicator while the render is in flight.
-   - Once the render completes, a 2-bar count-in plays (side-stick clicks with a visual grid in the HUD).
+   - The four backing layers (bass, drums, guitar, metronome) are rendered in parallel on a worker thread (one FluidSynth instance per layer). The HUD shows an animated "Rendering audio..." indicator while the render is in flight.
+   - Once the render completes, layers are cached as int16 buffers and the active mix is summed via numpy. A 2-bar count-in plays (side-stick clicks with a visual grid in the HUD).
    - After the count-in, `pygame.mixer` starts the backing-track buffer and the timeline starts.
-   - The projector lights up the appropriate keys on the piano, updating in sync with the audio.
+   - The projector lights up the appropriate keys on the piano, leading the audio by ~`_PROJECTION_LEAD_SECONDS - audio_delay_ms` so projector input lag is masked.
    - The HUD shows the current chord, bar number, and a progress bar.
-7. The user improvises on the piano, guided by the colored lights.
+7. The user improvises on the piano, guided by the colored lights. While playing they can adjust overlays without restarting:
+   - `M` toggles the metronome; `G` cycles the backing density (NONE → DRUMS → DRUMS_BASS → FULL). Both remix from the cached layers instantly.
+   - `R` toggles a root-pitch-class overlay (blue). `B` cycles the Free-Mode range (FULL / 2-OCT / 1-OCT) within the calibrated bands. `T` cycles the chord-tone mode (OFF / ONLY / OVERLAY).
+   - `F` enters/exits frozen mode: playback halts and the projection pins to one chord, stepped with `←`/`→` for static practice. `Space` resumes from the top.
 8. When the form ends (or loops), the user presses `Space` to pause or `S` to stop.
-9. The user can switch exercises, change the tune, or adjust tempo at any time while stopped.
+9. The user can switch exercises, change the tune, or adjust tempo at any time while stopped. Tempo changes invalidate the layer cache; the next play triggers a re-render.
 10. Press `Q` to quit.
 
 ### Re-Calibration (rare)
@@ -90,9 +96,9 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 
 ### Key Architectural Decisions
 
-1. **Single framework, single thread (pygame-ce)** — `pygame-ce` provides `pygame.Window` for multiple windows in one process (projector fullscreen + HUD windowed). One event loop, zero thread conflicts.
+1. **Single framework, one main loop (pygame-ce)** — `pygame.Window` lets both windows live in one process (projector fullscreen + HUD windowed). The main loop is single-threaded; the only background work is offline audio rendering (see below), which the loop polls each frame.
 
-2. **Pre-rendered backing track** — chord chart and tempo are fully known before playback, so audio is synthesized into a NumPy array *before* pressing play using FluidSynth offline. Eliminates all real-time MIDI timing concerns.
+2. **Pre-rendered backing, per-instrument layer cache** — chord chart and tempo are fully known before playback, so audio is synthesized into NumPy arrays *before* pressing play using FluidSynth offline. The four instruments (bass / drums / guitar / metronome) are rendered in parallel as separate int16 layers and cached in memory. Toggling the metronome or cycling backing density remixes via a numpy sum — no FluidSynth re-render. Mid-stream remix splices from the current playhead.
 
 3. **Pure Python harmony** — chord-to-scale mapping is a dictionary of interval patterns plus modulo-12 arithmetic. No music21.
 
@@ -107,11 +113,11 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `leadsheet` | **Done** | Parse MIR-style `.tsv` + `.meta.json` into `LeadSheet`/`ChordEvent` dataclasses |
 | `harmony` | **Done** | Chord symbol → scale pitches, chord tones, guide tones (lookup + 6 context rules) |
 | `timeline` | **Done** | Musical clock deriving beat position from audio playback, resolving current chord |
-| `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering |
-| `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar |
-| `projection` | **Done (wired into main for Free Mode)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame |
-| `calibration` | **Done (wired into main)** | Two-phase 4-point marker + ratio + per-black-key tuning UI; loaded by main on startup, re-entered in-session via `C` |
-| `exercises` | **Free Mode done; others not started** | Free Mode (all scale notes white) wired; Guide Tone / Contour / Flow / Start & End Note pending |
+| `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering with per-instrument layer cache for instant remix |
+| `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar, frozen-mode indicator, count-in grid |
+| `projection` | **Done (wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame with audio-delay compensated lead time |
+| `calibration` | **Done (wired into main)** | 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay); loaded by main on startup, re-entered in-session via `C` |
+| `exercises` | **Free Mode done with sub-toggles; others not started** | Free Mode (all scale notes) wired with `RangeMode` (FULL / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone / Contour / Flow / Start & End Note pending |
 
 ### Application States
 
@@ -249,9 +255,17 @@ class KeyHighlight:
 
 ### 6.1 Free Mode (Mode Libre) — Implemented
 
-- **Projection**: All chord-scale notes in **white**.
+- **Projection**: All chord-scale notes in **green** (debug colour during prototyping; will return to white once projection calibration is finalised).
 - **Purpose**: Introductory mode; the player sees which notes are "safe" and improvises freely.
-- **Logic**: Return all `scale_notes` in white. Implemented in `exercises/free.py` as `free_mode_highlights(chord)`; called once per frame by `App._render_projection` against the timeline's current chord, then rendered → warped → blitted onto the projector window.
+- **Logic**: Implemented in `exercises/free.py` as `free_mode_highlights(chord, range_mode, band_low)`. Called once per frame by `App._render_projection` against a chord resolved with projection-lead compensation, then rendered → warped → blitted onto the projector window.
+
+Three orthogonal sub-toggles compose with Free Mode:
+
+- **RangeMode** (`exercises/free.py`, key `B`) — `FULL` highlights every scale tone on the keyboard; `TWO_OCTAVE` and `ONE_OCTAVE` collapse the set to a single ascending run of scale degrees starting at the lowest root inside the calibrated band. Lets the player practice the scale shape in one position.
+- **ChordToneMode** (`exercises/chord_tones.py`, key `T`) — `OFF` (no treatment), `ONLY` (replace scale with just R, 3, 5/#11/b6, 7), `OVERLAY` (keep scale, recolour chord-tone pitch classes in cyan-blue). Honours the same `#11`/`b5`/`maj7#11` → #11 and `b9`/`b13`-without-13 → b6 substitutions as the comping voicings.
+- **Root overlay** (`exercises/root.py`, key `R`) — recolours every highlight whose pitch class matches the chord root in saturated blue. Applied last so the root keeps its colour over the chord-tone overlay.
+
+These overlays are pure post-processing passes over a `list[KeyHighlight]`, so future exercises can adopt them by emitting highlights and letting `App._render_projection` run the overlays.
 
 ### 6.2 Guide Tone Game
 
@@ -298,9 +312,9 @@ Black background is critical: the projector emits no light for black pixels, so 
 
 ---
 
-## 7. Projection Engine — Implemented (not yet wired into main)
+## 7. Projection Engine — Implemented
 
-Implemented in `projection/layout.py` (88-key `KeyRect` geometry with configurable MIDI range and per-instrument `black_width_ratio`/`black_height_ratio`), `projection/renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), and `projection/warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`). Default range is **F2–E6** so both edges align to the left side of an F-key — a single physical landmark for both calibration corners. Range endpoints are validated to be white keys. The standalone `scripts/preview_projector.py` exercises the full render → warp → blit pipeline on the projector display. Wiring into `main.py` (replacing the `_render_projection()` stub) is the next step.
+Implemented in `projection/layout.py` (88-key `KeyRect` geometry with configurable MIDI range, per-instrument `black_width_ratio`/`black_height_ratio`, and per-black-key `(dx, dy)` offsets), `projection/renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), and `projection/warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`). Default range is **F2–E6** so both edges align to the left side of an F-key — a single physical landmark for both calibration corners. Range endpoints are validated to be white keys. Wired into `main.py`: each frame, the timeline's current beat is shifted by `+_PROJECTION_LEAD_SECONDS - audio_delay_ms/1000` to mask projector input lag, the chord at that beat is resolved, Free-Mode (plus overlays) produces a `list[KeyHighlight]`, those are rendered → warped → blitted onto the projector window. `scripts/preview_projector.py` still exercises the same pipeline against a static C-minor highlight.
 
 ### Reference Specification
 
@@ -331,30 +345,21 @@ The canonical image is a fixed-size buffer (e.g., 1920×200 pixels) containing a
 2. `cv2.warpPerspective(canonical, H, projector_size)` — one call warps the entire frame
 3. Convert BGR→RGB, blit to the projection `pygame.Window`
 
-### Calibration — Implemented (not yet wired into main)
+### Calibration — Implemented
 
-The calibration module lives in `calibration/models.py` (`Calibration` dataclass + `homography()` via `cv2.getPerspectiveTransform`), `calibration/persistence.py` (JSON load/save, legacy-file fallback for the ratio fields), and `calibration/ui.py` (`CalibrationUI` state machine handling marker drag, Tab/1-4 selection, arrow-key nudge with Shift=×10, Q/W width and A/S height ratio tuning with Shift=×5, R reset, Enter/Esc confirm/cancel). The overlay renders the warped keyboard with green-filled white keys and pink-filled black keys for clear visibility against the piano. Currently exercised via `scripts/preview_calibration.py`; entering calibration mode from within the main app (on first launch when `calibration.json` is missing, or via `C` keypress) is not yet wired.
+The calibration module lives in `calibration/models.py` (`Calibration` dataclass holding markers, global black-key ratios, per-key `black_key_offsets`, full/1-OCT/2-OCT MIDI bands, and `audio_delay_ms`; `homography()` via `cv2.getPerspectiveTransform`), `calibration/persistence.py` (JSON load/save, missing fields fall back to defaults), and `calibration/ui.py` (`CalibrationUI` 5-phase state machine). Loaded by `main.py` on startup and re-entered in-session via `C`. Exercised standalone by `scripts/preview_calibration.py`.
 
-A single planar homography cannot fully correct black-key parallax (black-key tops sit on a higher physical plane than whites). The per-instrument `black_width_ratio`/`black_height_ratio` knobs are a pragmatic mitigation: they don't fix parallax but let the canonical proportions match the specific piano. A small residual black-key drift is expected and accepted.
+A single planar homography cannot fully correct black-key parallax (black-key tops sit on a higher physical plane than whites). Two mitigations: the global `black_width_ratio`/`black_height_ratio` knobs adjust the canonical proportions for the specific piano, and the BLACK_KEY_TUNE phase records per-key `(dx, dy)` offsets to absorb residual drift on individual keys.
 
-#### Calibration Flow (original spec, for reference once wired into main)
+#### Calibration Flow (5 phases, advanced with Enter)
 
-#### Calibration Flow
+1. **RANGE_EDIT** — set the FULL MIDI range the projector light can physically reach. A solid green pad covers the active range so it's verifiable visually. Endpoints must be white keys.
+2. **MAIN** — drag the 4 corner markers (TL, TR, BR, BL) onto the corners of the physical keyboard within the range; arrow keys nudge (Shift=×10), Tab cycles markers, Q/W tune black-key width and A/S tune black-key height (Shift=×5), R resets.
+3. **BLACK_KEY_TUNE** — Tab steps through each black key; arrows nudge its canonical `(dx, dy)` offset to fix per-key drift the homography can't model.
+4. **BAND_EDIT** — set the 1-OCT and 2-OCT exercise band endpoints (clipped to the FULL range, must satisfy ≥1 octave of headroom for the FreeMode runs).
+5. **AUDIO_DELAY** — tune `audio_delay_ms` (positive = projection should appear N ms later than audio) until the lit-up scale lines up with the backing track.
 
-1. Display 4 bright marker circles on the projector, initially at screen corners. Each corresponds to a known corner in the canonical keyboard image (top-left/right of A0/C8, bottom-left/right of A0/C8).
-2. User drags each marker to the corresponding corner of the physical piano. Arrow keys nudge for precision. Tab cycles markers.
-3. Compute homography: `H = cv2.getPerspectiveTransform(src, dst)` where `src` = canonical corners, `dst` = marker positions.
-4. Preview: render all 88 key outlines through the homography for visual verification.
-5. Save to `data/calibration.json` (per-machine, gitignored):
-
-```json
-{
-    "projector_resolution": [1920, 1080],
-    "canonical_size": [1920, 200],
-    "marker_positions_px": [[45, 62], [1875, 58], [42, 890], [1878, 895]],
-    "homography_matrix": [[1.02, -0.01, 45.0], [0.003, 0.98, 62.0], [0.0, 0.0, 1.0]]
-}
-```
+On Enter past phase 5 the calibration is saved to `data/calibration.json` (per-machine, gitignored) with all five layers of state. Escape at any phase cancels and discards changes.
 
 ### Multi-Display Architecture
 
@@ -366,17 +371,19 @@ Target **60 FPS**. Per-frame work: ~7–15 filled rectangles into a small canoni
 
 ---
 
-## 8. Backing Track Engine — Partially Implemented
+## 8. Backing Track Engine — Implemented
 
 ### Current State
 
-Fully implemented. `backing/events.py` has the `MidiEvent` dataclass, metronome click generator, count-in generator, and swing drum pattern (`generate_drums`). `backing/walking_bass.py` implements the full algorithmic walking bass (`generate_walking_bass`). `backing/comping.py` + `comping_voicings.py` + `comping_rhythms.py` implement jazz guitar comping with drop-2/drop-3 voicings and a pool of Phil DeGreg swing rhythm patterns. `backing/renderer.py` does offline FluidSynth rendering to a NumPy int16 buffer for `pygame.mixer`.
+`backing/events.py` has the `MidiEvent` dataclass, metronome click generator, count-in generator, and swing drum pattern (`generate_drums`). `backing/walking_bass.py` implements the full algorithmic walking bass (`generate_walking_bass`). `backing/comping.py` + `comping_voicings.py` + `comping_rhythms.py` implement jazz guitar comping with drop-2/drop-3 voicings and a pool of Phil DeGreg swing rhythm patterns. `backing/renderer.py` does offline FluidSynth rendering per layer (`render_layer`) and mixes with `mix_layers`.
 
-### Architecture: Generate Events → Offline FluidSynth Render → Play
+### Architecture: Generate Events → Render Layers in Parallel → Mix → Play
 
-1. **Event generation** (pure Python): walking bass + drum algorithms produce `MidiEvent` objects.
-2. **Offline rendering** (FluidSynth): `Synth` object processes events, outputs raw audio via `get_samples()`. No disk I/O — all in memory.
-3. **Playback** (`pygame.mixer`): buffer loaded as `pygame.mixer.Sound`.
+1. **Event generation** (pure Python): bass / drums / guitar / metronome algorithms each produce a `list[MidiEvent]`.
+2. **Parallel per-layer rendering** (FluidSynth): a worker thread spins a `ThreadPoolExecutor` and runs `render_layer` for each layer concurrently. Each layer gets its own `Synth` instance (own SoundFont load, own state — no shared mutable state), and FluidSynth's `get_samples` releases the GIL, so layers actually overlap on multiple cores. Each layer returns a raw float32 buffer, unclipped, so dense moments don't get pre-shorn.
+3. **Layer cache**: the four buffers are kept in memory (`App._layers`).
+4. **Mix** (`mix_layers`): sums the active layers, clips, and converts to int16. Called every time the mix changes (metronome toggle, BackingMode cycle). Mid-stream changes slice the new mix from the current playhead so audio continues seamlessly.
+5. **Playback** (`pygame.mixer`): final int16 buffer loaded as `pygame.mixer.Sound`.
 
 ### SoundFont
 
@@ -430,7 +437,8 @@ Each hit emits note-on/off pairs with swing applied to offbeat 8ths, ±8 velocit
 
 ### Tempo / Toggle Changes
 
-Tempo, metronome toggle, and comping toggle → re-render the buffer on a background thread. The HUD shows an animated "Rendering audio..." screen during the render. User is stopped when triggering a re-render.
+- **Tempo change** invalidates the layer cache (the new tempo would change every layer's timing). Playback stops; the next play triggers a fresh parallel re-render with the "Rendering audio..." HUD screen.
+- **Metronome toggle (`M`)** and **BackingMode cycle (`G`: NONE → DRUMS → DRUMS_BASS → FULL)** only change *which* cached layers are summed. They run a `mix_layers` pass (microseconds) and splice from the current playhead, so toggles are inaudibly instant and never restart the song.
 
 ---
 
@@ -450,13 +458,18 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 
 | Key | Action |
 |---|---|
-| `Space` | Play / Pause |
+| `Space` | Play / Pause (also exits frozen mode and starts from the top) |
 | `S` | Stop (reset to beginning) |
 | `O` | Open file dialog (`tkinter.filedialog`) |
-| `1`–`5` | Select exercise mode |
-| `+` / `-` | Tempo up/down by 5 BPM |
-| `M` | Toggle metronome |
-| `G` | Toggle guitar comping |
+| `1`–`5` | Select exercise mode (only Free is implemented) |
+| `+` / `-` | Tempo up/down by 5 BPM (invalidates layer cache) |
+| `M` | Toggle metronome (instant remix from cache) |
+| `G` | Cycle backing density: NONE → DRUMS → DRUMS_BASS → FULL |
+| `R` | Toggle root-pitch-class overlay (blue) |
+| `B` | Cycle Free-Mode range: FULL → 2-OCT → 1-OCT |
+| `T` | Cycle chord-tone mode: OFF → ONLY → OVERLAY |
+| `F` | Enter / exit frozen mode (pin projection to one chord) |
+| `←` / `→` | In frozen mode, step to previous / next chord |
 | `C` | Enter calibration mode |
 | `Q` / `Esc` | Quit |
 
@@ -504,19 +517,20 @@ ruff = ">=0.4"
 - [x] Walking bass generator (algorithmic, quarter notes, phrase-direction arcs)
 - [x] Drum pattern (swing ride + hi-hat on 2 & 4, ghost snares, humanization)
 - [x] Jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing rhythm patterns, anticipations)
-- [x] Async background-thread audio rendering with HUD loading animation
+- [x] Parallel per-layer FluidSynth rendering (bass/drums/guitar/metronome), int16 layer cache, instant mid-stream remix on toggle, "Rendering audio..." HUD screen
 - [x] Count-in (visual grid in HUD + side-stick audio)
 - [x] Keyboard-shortcut-driven Pygame UI with HUD
 - [x] Metronome (toggleable, `M`)
-- [x] Guitar comping (toggleable, `G`)
+- [x] Backing density cycle (NONE / DRUMS / DRUMS_BASS / FULL, `G`)
 - [x] 14 example lead sheet files
 
-- [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, standalone preview script)
-- [x] Calibration (4-point marker drag UI + Q/W/A/S per-instrument black-key ratio tuning + JSON persistence, standalone preview script)
+- [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, per-black-key offsets, projection-lead compensation, standalone preview script)
+- [x] Calibration: 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay) + JSON persistence, standalone preview script
 - [x] Main-app integration of projection: calibration loaded on startup, Free Mode rendered through the saved homography during playback
-- [x] Free Mode exercise
-
-- [x] In-app calibration entry (`C` keybinding) — stops playback, runs the `CalibrationUI` on the projector, reloads homography/layout on confirm
+- [x] Free Mode exercise with `RangeMode` (FULL / 2-OCT / 1-OCT, `B`), `ChordToneMode` (OFF / ONLY / OVERLAY, `T`), and root overlay (`R`) sub-toggles
+- [x] Frozen mode (`F` + arrow keys) for static per-chord practice
+- [x] In-app calibration entry (`C` keybinding) — stops playback, runs the `CalibrationUI` on the projector, reloads homography/layout/bands/audio-delay on confirm
+- [x] Windows per-monitor DPI awareness opt-in (projector window opens at true physical resolution)
 
 ### TODO (MVP)
 
