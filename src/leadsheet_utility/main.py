@@ -48,12 +48,16 @@ from leadsheet_utility.calibration import (
     save_calibration,
 )
 from leadsheet_utility.exercises import (
+    NEXT_GUIDE_TONE_COLOR,
     ChordToneMode,
     RangeMode,
     apply_chord_tone_highlight,
+    apply_guide_tone_highlight,
     apply_root_highlight,
     chord_tone_only_highlights,
     free_mode_highlights,
+    guide_tone_midi,
+    guide_tone_path_count,
     next_chord_tone_mode,
     next_range_mode,
 )
@@ -81,7 +85,7 @@ logger = logging.getLogger(__name__)
 # Constants
 # ---------------------------------------------------------------------------
 
-_HUD_SIZE = (1200, 840)
+_HUD_SIZE = (1500, 840)
 _FPS = 60
 _TEMPO_STEP = 5
 _TEMPO_MIN = 40
@@ -264,6 +268,17 @@ class App:
         self._highlight_root: bool = False
         self._range_mode: RangeMode = RangeMode.FULL
         self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
+        # Which precomputed voice-led path the Guide Tone exercise follows.
+        # The harmony analyzer emits up to two paths (3rd-led / 7th-led);
+        # `H` swaps between them.
+        self._guide_tone_path: int = 0
+        # Octave nudge applied to the voice-led MIDI before band-snapping.
+        # Default +1 lifts the analyzer's E3-E5 line into E4-E6, which is
+        # where most right-hand improvisation lives. Up/Down arrows shift it.
+        self._guide_tone_octave: int = 1
+        # Preview the next chord's voice-led GT in orange so the player can
+        # set up the resolution. Toggled with `N`.
+        self._show_next_guide_tone: bool = False
 
         # -- Frozen mode state ------------------------------------------------
         self._frozen_mode: bool = False
@@ -391,6 +406,19 @@ class App:
         elif action is Action.FROZEN_NEXT:
             self._frozen_step(1)
 
+        elif action is Action.TOGGLE_GUIDE_TONE_PATH:
+            self._cycle_guide_tone_path()
+
+        elif action is Action.GUIDE_TONE_OCTAVE_DOWN:
+            self._shift_guide_tone_octave(-1)
+
+        elif action is Action.GUIDE_TONE_OCTAVE_UP:
+            self._shift_guide_tone_octave(1)
+
+        elif action is Action.TOGGLE_GUIDE_TONE_NEXT:
+            self._show_next_guide_tone = not self._show_next_guide_tone
+            logger.info("Next-GT preview %s", "ON" if self._show_next_guide_tone else "OFF")
+
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
             if 0 <= idx < len(EXERCISE_NAMES):
@@ -476,6 +504,33 @@ class App:
             "Frozen mode ON — chord %d/%d: %s",
             self._frozen_chord_idx + 1, len(self._lead_sheet.chords), chord.chord_symbol,
         )
+
+    # -- guide tone path -------------------------------------------------------
+
+    def _cycle_guide_tone_path(self) -> None:
+        """Swap which voice-led guide-tone path (3rd-led / 7th-led) is active.
+
+        No-op when no lead sheet is loaded or the analyzer produced fewer
+        than two paths. The Guide Tone exercise reads this each frame; the
+        cycle is reflected immediately, no audio re-render needed.
+        """
+        if self._lead_sheet is None:
+            return
+        n = guide_tone_path_count(self._lead_sheet)
+        if n <= 1:
+            return
+        self._guide_tone_path = (self._guide_tone_path + 1) % n
+        logger.info("Guide-tone path: %d/%d", self._guide_tone_path + 1, n)
+
+    def _shift_guide_tone_octave(self, delta: int) -> None:
+        """Nudge the Guide Tone exercise's octave offset by ``delta``.
+
+        Clamped to ±3 octaves — beyond that the GT runs off the keyboard
+        even in FULL range. In 1/2-OCT range the band-snap normalises any
+        offset, so the clamp is purely a guard against accumulating noise.
+        """
+        self._guide_tone_octave = max(-3, min(3, self._guide_tone_octave + delta))
+        logger.info("Guide-tone octave offset: %+d", self._guide_tone_octave)
 
     def _frozen_step(self, delta: int) -> None:
         if not self._frozen_mode or self._lead_sheet is None:
@@ -797,6 +852,9 @@ class App:
             self._prev_chord_symbol = None  # reset chord-change tracker
             self._frozen_mode = False
             self._frozen_chord_idx = 0
+            self._guide_tone_path = 0
+            self._guide_tone_octave = 1
+            self._show_next_guide_tone = False
             _log_harmony_summary(ls)
         except Exception:
             logger.exception("Failed to load %s", path)
@@ -960,11 +1018,13 @@ class App:
         screen.fill((0, 0, 0))
 
         projected_chord: ChordEvent | None = None
+        projected_chord_idx: int | None = None
         if self._frozen_mode and self._lead_sheet is not None:
             chords = self._lead_sheet.chords
             if chords:
                 idx = max(0, min(self._frozen_chord_idx, len(chords) - 1))
                 projected_chord = chords[idx]
+                projected_chord_idx = idx
         else:
             timeline = self._timeline
             tl_state = timeline.get_state() if timeline else None
@@ -975,6 +1035,9 @@ class App:
                 effective_lead_s = _PROJECTION_LEAD_SECONDS - self._audio_delay_ms / 1000.0
                 lead_beats = effective_lead_s * (self._tempo / 60.0)
                 projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
+                if projected_chord is not None and self._lead_sheet is not None:
+                    # ChordEvent identity is stable (same list used by analyzer + timeline)
+                    projected_chord_idx = self._lead_sheet.chords.index(projected_chord)
 
         band_low = self._active_band_low()
         if projected_chord is not None:
@@ -988,10 +1051,48 @@ class App:
                 )
                 if self._chord_tone_mode is ChordToneMode.OVERLAY:
                     highlights = apply_chord_tone_highlight(highlights, projected_chord)
-            # Root overlay applied last so the root keeps its own color
-            # (root is always a chord tone).
+            # Root overlay applied before guide tone so the GT (3rd or 7th)
+            # can still beat the root colour when both overlays are on.
             if self._highlight_root:
                 highlights = apply_root_highlight(highlights, projected_chord)
+            # Guide Tone exercise: red voice-led 3rd/7th on top of everything.
+            # Optionally preview the *next* chord's GT in orange first so the
+            # player can set up the resolution; the current GT (red) is then
+            # applied on top, so a same-MIDI collision still lands on red.
+            if self._exercise_idx == 1 and self._lead_sheet is not None and projected_chord_idx is not None:
+                if self._show_next_guide_tone:
+                    next_chord_idx = (projected_chord_idx + 1) % len(self._lead_sheet.chords)
+                    next_gt_midi = guide_tone_midi(
+                        self._lead_sheet,
+                        next_chord_idx,
+                        path_idx=self._guide_tone_path,
+                        octave_offset=self._guide_tone_octave,
+                        range_mode=self._range_mode,
+                        band_low=band_low,
+                    )
+                    if next_gt_midi is not None:
+                        # If the next-chord target isn't in the *current*
+                        # chord-scale, playing it now sounds wrong — stripe
+                        # it so the player sees the target without being
+                        # invited to land on it early.
+                        current_scale_pcs = {n % 12 for n in projected_chord.scale_notes}
+                        outside_scale = (next_gt_midi % 12) not in current_scale_pcs
+                        highlights = apply_guide_tone_highlight(
+                            highlights,
+                            next_gt_midi,
+                            color=NEXT_GUIDE_TONE_COLOR,
+                            striped=outside_scale,
+                        )
+                gt_midi = guide_tone_midi(
+                    self._lead_sheet,
+                    projected_chord_idx,
+                    path_idx=self._guide_tone_path,
+                    octave_offset=self._guide_tone_octave,
+                    range_mode=self._range_mode,
+                    band_low=band_low,
+                )
+                if gt_midi is not None:
+                    highlights = apply_guide_tone_highlight(highlights, gt_midi)
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
             warped = warp_canonical_to_projector(
                 self._canonical_surface, self._homography, self._proj_size,
@@ -1014,6 +1115,9 @@ class App:
             if self._timeline
             else PlaybackState.STOPPED
         )
+        gt_path_count = (
+            guide_tone_path_count(self._lead_sheet) if self._lead_sheet else 0
+        )
         render_hud(
             surface,
             self._lead_sheet,
@@ -1030,6 +1134,10 @@ class App:
             count_in_total_beats=self._count_in_total_beats,
             frozen_mode=self._frozen_mode,
             frozen_chord_idx=self._frozen_chord_idx,
+            guide_tone_path=self._guide_tone_path,
+            guide_tone_path_count=gt_path_count,
+            guide_tone_octave=self._guide_tone_octave,
+            show_next_guide_tone=self._show_next_guide_tone,
         )
         self._hud_window.flip()
 

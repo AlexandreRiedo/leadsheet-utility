@@ -1,5 +1,4 @@
 # WIP
-- Guide Tone Exercice
 - Start And End Note Exercice
 - Flow Exercice
 - Contour Exercice

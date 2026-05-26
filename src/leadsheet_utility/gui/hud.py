@@ -52,6 +52,14 @@ EXERCISE_NAMES: list[str] = [
     "Start/End",
 ]
 
+# Per-exercise extra keys for the CONTROLS panel. Keyed by exercise index;
+# entries are merged after the universal "[1-5] Select" line. Keep entries
+# scoped to keys whose binding is only meaningful for that exercise — so
+# the panel never advertises a key that does nothing in the current mode.
+_EXERCISE_EXTRA_KEYS: dict[int, tuple[str, ...]] = {
+    1: ("[H] GT path", "[Up/Dn] GT octave", "[N] Next GT preview"),  # Guide Tone
+}
+
 # ---------------------------------------------------------------------------
 # Font cache (initialised on first call)
 # ---------------------------------------------------------------------------
@@ -91,6 +99,10 @@ def render_hud(
     count_in_total_beats: int = 0,
     frozen_mode: bool = False,
     frozen_chord_idx: int = 0,
+    guide_tone_path: int = 0,
+    guide_tone_path_count: int = 0,
+    guide_tone_octave: int = 0,
+    show_next_guide_tone: bool = False,
 ) -> None:
     """Draw the full HUD onto *surface*.  Called once per frame."""
     fonts = _get_fonts()
@@ -113,7 +125,7 @@ def render_hud(
         y += 40
         _blit(surface, fonts["body"], 'Press O to open a .tsv file.', 20, y, _DIM)
         y += 75
-        _render_shortcuts(surface, fonts, y)
+        _render_shortcuts(surface, fonts, y, exercise_idx)
         return
 
     # -- Song info -----------------------------------------------------------
@@ -197,6 +209,15 @@ def render_hud(
         [("Status", status_label), ("Metronome", met_label), ("Backing", backing_mode)],
         [("Root", root_label), ("Range", range_label), ("Chord tones", tones_label)],
     ]
+    if exercise_idx == 1 and guide_tone_path_count > 0:
+        gt_label = f"{guide_tone_path + 1}/{guide_tone_path_count}"
+        oct_label = f"{guide_tone_octave:+d}"
+        next_label = "ON" if show_next_guide_tone else "OFF"
+        status_grid.append([
+            ("GT path", gt_label),
+            ("GT octave", oct_label),
+            ("Next GT", next_label),
+        ])
     col_x = [20, 310, 600]
     for row in status_grid:
         for (key, val), x in zip(row, col_x):
@@ -215,7 +236,7 @@ def render_hud(
     # -- Keyboard shortcuts --------------------------------------------------
     _blit(surface, fonts["section"], "CONTROLS", 20, y, _TEXT)
     y += _HEADER_GAP
-    _render_shortcuts(surface, fonts, y)
+    _render_shortcuts(surface, fonts, y, exercise_idx)
 
 
 # ---------------------------------------------------------------------------
@@ -319,9 +340,15 @@ def _render_shortcuts(
     surface: pygame.Surface,
     fonts: dict[str, pygame.font.Font],
     y: int,
+    exercise_idx: int = 0,
 ) -> None:
     font = fonts["small"]
     line_h = 30
+
+    # Generic select + only this exercise's specific keys, so the panel
+    # never advertises a key that does nothing in the current mode.
+    exercise_lines = ["[1-5] Select"]
+    exercise_lines.extend(_EXERCISE_EXTRA_KEYS.get(exercise_idx, ()))
 
     columns: list[tuple[str, list[str]]] = [
         (
@@ -338,6 +365,7 @@ def _render_shortcuts(
         ("BACKING", ["[M] Metronome", "[G] Cycle backing"]),
         ("DISPLAY", ["[R] Root highlight", "[B] Range", "[T] Chord tones"]),
         ("FROZEN", ["[F] Frozen mode", "[<-/->] Step chord"]),
+        ("EXERCISE", exercise_lines),
     ]
 
     w = surface.get_width()
