@@ -52,17 +52,22 @@ from leadsheet_utility.exercises import (
     ChordToneMode,
     FlowPhrasing,
     FlowPattern,
+    PhraseLength,
     RangeMode,
+    StartEndPattern,
     apply_chord_tone_highlight,
     apply_guide_tone_highlight,
     apply_root_highlight,
+    apply_start_end_highlight,
     chord_tone_only_highlights,
     free_mode_highlights,
     generate_flow_pattern,
+    generate_start_end_pattern,
     guide_tone_midi,
     guide_tone_path_count,
     next_chord_tone_mode,
     next_flow_phrasing,
+    next_phrase_length,
     next_range_mode,
 )
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_calibration_hud, render_hud
@@ -145,6 +150,15 @@ def _range_mode_label(mode: RangeMode) -> str:
         RangeMode.TWO_OCTAVE: "2 OCT",
         RangeMode.ONE_OCTAVE: "1 OCT",
     }[mode]
+
+
+def _phrase_length_label(p: PhraseLength) -> str:
+    """Short HUD label for the Start/End phrase-length cycle."""
+    return {
+        PhraseLength.TWO_BARS: "2 BAR",
+        PhraseLength.FOUR_BARS: "4 BAR",
+        PhraseLength.EIGHT_BARS: "8 BAR",
+    }[p]
 
 
 # ---------------------------------------------------------------------------
@@ -296,6 +310,15 @@ class App:
         self._flow_phrasing: FlowPhrasing = FlowPhrasing.MEDIUM
         self._flow_pattern: FlowPattern | None = None
 
+        # -- Start/End exercise state ----------------------------------------
+        # Picks are pre-rolled per lead-sheet load, and re-rolled whenever the
+        # user changes phrase length, range mode, or hits Shift+P. ``_seed``
+        # bumps on each manual re-roll so identical settings still produce a
+        # fresh pattern.
+        self._phrase_length: PhraseLength = PhraseLength.FOUR_BARS
+        self._start_end_pattern: StartEndPattern | None = None
+        self._start_end_seed: int = 0
+
         # -- Async render state ----------------------------------------------
         # Layers are cached per-instrument (bass/drums/guitar/metronome) as
         # int16 buffers without normalization, so toggling backing mode or the
@@ -354,7 +377,7 @@ class App:
                     self._finish_calibration()
                 continue
             if event.type == pygame.KEYDOWN:
-                self._handle_action(key_to_action(event.key))
+                self._handle_action(key_to_action(event.key, event.mod))
 
     def _handle_action(self, action: Action) -> None:
         if action is Action.NONE:
@@ -435,6 +458,17 @@ class App:
             self._flow_phrasing = next_flow_phrasing(self._flow_phrasing)
             self._regenerate_flow_pattern()
             logger.info("Flow phrasing: %s", self._flow_phrasing.name)
+
+        elif action is Action.CYCLE_PHRASE_LENGTH:
+            self._phrase_length = next_phrase_length(self._phrase_length)
+            self._regenerate_start_end_pattern()
+            logger.info("Phrase length: %s", self._phrase_length.name)
+
+        elif action is Action.REGENERATE_START_END:
+            # Bump the seed so identical settings still produce a fresh roll.
+            self._start_end_seed += 1
+            self._regenerate_start_end_pattern()
+            logger.info("Start/End picks regenerated (seed=%d)", self._start_end_seed)
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -873,6 +907,7 @@ class App:
             self._guide_tone_octave = 1
             self._show_next_guide_tone = False
             self._regenerate_flow_pattern()
+            self._regenerate_start_end_pattern()
             _log_harmony_summary(ls)
         except Exception:
             logger.exception("Failed to load %s", path)
@@ -1026,6 +1061,25 @@ class App:
         total = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
         self._flow_pattern = generate_flow_pattern(total, self._flow_phrasing)
 
+    def _regenerate_start_end_pattern(self) -> None:
+        """Roll fresh Start/End picks for the active phrase length and range.
+
+        Called on lead-sheet load, phrase-length change, range-mode change,
+        and Shift+P. The pattern is keyed on the current ``_start_end_seed``
+        so successive Shift+P presses produce a sequence of distinct rolls
+        even when nothing else has changed.
+        """
+        if self._lead_sheet is None:
+            self._start_end_pattern = None
+            return
+        self._start_end_pattern = generate_start_end_pattern(
+            self._lead_sheet,
+            self._phrase_length,
+            midi_full_low=self._midi_full_low,
+            midi_full_high=self._midi_full_high,
+            seed=self._start_end_seed,
+        )
+
     def _active_band_low(self) -> int | None:
         """Calibrated band-low for the active RangeMode, or None for FULL."""
         if self._range_mode is RangeMode.ONE_OCTAVE:
@@ -1143,6 +1197,20 @@ class App:
                 and not self._flow_pattern.is_open(projected_abs_beat)
             ):
                 highlights = []
+            # Start/End exercise: paint the phrase's start (red) and end
+            # (orange) on top of the Free Mode base. Only active during real
+            # playback so the picks line up with the absolute-beat schedule.
+            if (
+                self._exercise_idx == 4
+                and self._start_end_pattern is not None
+                and projected_abs_beat is not None
+            ):
+                phrase = self._start_end_pattern.phrase_at(projected_abs_beat)
+                if phrase is not None:
+                    current_pcs = {n % 12 for n in projected_chord.scale_notes}
+                    highlights = apply_start_end_highlight(
+                        highlights, phrase, current_pcs,
+                    )
             render_canonical(self._canonical_surface, highlights, self._keyboard_layout)
             warped = warp_canonical_to_projector(
                 self._canonical_surface, self._homography, self._proj_size,
@@ -1189,6 +1257,7 @@ class App:
             guide_tone_octave=self._guide_tone_octave,
             show_next_guide_tone=self._show_next_guide_tone,
             flow_phrasing=self._flow_phrasing.name,
+            phrase_length=_phrase_length_label(self._phrase_length),
         )
         self._hud_window.flip()
 

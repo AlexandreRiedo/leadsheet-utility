@@ -39,6 +39,8 @@ class Action(Enum):
     GUIDE_TONE_OCTAVE_UP = auto()
     TOGGLE_GUIDE_TONE_NEXT = auto()
     CYCLE_FLOW_PHRASING = auto()
+    CYCLE_PHRASE_LENGTH = auto()
+    REGENERATE_START_END = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -66,6 +68,7 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_UP: Action.GUIDE_TONE_OCTAVE_UP,
     pygame.K_n: Action.TOGGLE_GUIDE_TONE_NEXT,
     pygame.K_d: Action.CYCLE_FLOW_PHRASING,
+    pygame.K_p: Action.CYCLE_PHRASE_LENGTH,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,
@@ -74,6 +77,14 @@ _KEY_MAP: dict[int, Action] = {
 }
 
 
-def key_to_action(key: int) -> Action:
-    """Map a ``pygame.KEYDOWN`` key code to an :class:`Action`."""
+def key_to_action(key: int, mod: int = 0) -> Action:
+    """Map a ``pygame.KEYDOWN`` key code (+ modifier mask) to an :class:`Action`.
+
+    Shift is treated as a meaningful modifier on a handful of keys — e.g.
+    ``Shift+P`` regenerates the Start/End picks while plain ``P`` cycles
+    the phrase length. All other modifier combinations fall back to the
+    unmodified action so existing bindings keep working.
+    """
+    if key == pygame.K_p and mod & pygame.KMOD_SHIFT:
+        return Action.REGENERATE_START_END
     return _KEY_MAP.get(key, Action.NONE)

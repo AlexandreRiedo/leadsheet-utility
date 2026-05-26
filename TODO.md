@@ -1,5 +1,4 @@
 # WIP
-- Start And End Note Exercice
 - Contour Exercice
 
 # LONG TERM

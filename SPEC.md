@@ -117,7 +117,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar, frozen-mode indicator, count-in grid |
 | `projection` | **Done (wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame with audio-delay compensated lead time |
 | `calibration` | **Done (wired into main)** | 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay); loaded by main on startup, re-entered in-session via `C` |
-| `exercises` | **Free, Guide Tone, Flow done; Contour / Start & End pending** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's voice-led line. Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D` |
+| `exercises` | **Free, Guide Tone, Flow, Start & End done; Contour pending** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's voice-led line. Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D`. Start & End paints a red entry note + orange target per phrase (2/4/8 bars, cycled with `P`; Shift+P re-rolls), drawn from chord tones of the phrase's first/last chord and hashed when outside the current chord-scale |
 
 ### Application States
 
@@ -292,21 +292,24 @@ These overlays are pure post-processing passes over a `list[KeyHighlight]`, so f
   - Pattern is regenerated on phrasing change and on lead-sheet load (length depends on the form); tempo changes do not invalidate it since the pattern is measured in beats.
   - Frozen mode and the stopped state bypass the gate entirely so the player can still study a chord with no flow noise.
 
-### 6.5 Start & End Note Game
+### 6.5 Start & End Note Game — Implemented
 
-- **Projection**: Chord-scale in **white** + one note in **green** (start) + one note in **red** (end/target).
-- **Purpose**: Give the player an entry point and a target.
-- **Logic**:
-  - For each chord, randomly pick a start and end note from chord tones or scale tones.
-  - End note of one phrase should ideally be near the start note of the next.
+- **Projection**: Whatever the base Free Mode would have shown + one note in **red** (start) + one note in **orange** (end/target), layered on top.
+- **Purpose**: Give the player an entry point and a target so they can compose a phrase between them.
+- **Logic** (`exercises/start_end.py`):
+  - `generate_start_end_pattern(lead_sheet, phrase_length, *, midi_full_low, midi_full_high, seed)` pre-rolls one `StartEndPhrase` per fixed-bar window across every form repeat. Phrase length cycled with `P` (`PhraseLength.TWO_BARS` / `FOUR_BARS` / `EIGHT_BARS`); `Shift+P` bumps an internal seed and re-rolls in place.
+  - For each phrase, `start_midi` is a chord tone of the phrase's *first* chord and `end_midi` is a random chord tone of the phrase's *last* chord (using the same `#11` / `b6` substitutions as the comping voicings via `chord_tone_pitch_classes`). Each successive phrase's `start_midi` is biased toward the previous phrase's `end_midi` (within a perfect fifth — `_VOICE_LEADING_WINDOW = 7` semitones) so the line voice-leads between phrases instead of leaping. End notes themselves stay fully random.
+  - Picks always land in the right-hand register `[max(C4, midi_full_low), midi_full_high]`, independent of the active `RangeMode`. Start & End is a *targeting* exercise — the targets sit where solo lines are normally played, while the Free Mode base underneath continues to honour the user's 1-OCT / 2-OCT / R.HAND / FULL choice.
+  - `apply_start_end_highlight` runs after all other overlays so red/orange win the colour collision. When a target's pitch class isn't in the *currently sounding* chord-scale (common mid-phrase across chord changes), the key is hatched using the same striped flag as Guide Tone's next-chord preview — the player sees the target without being invited to play it yet.
+  - Pattern is regenerated on lead-sheet load, phrase-length change, and Shift+P. Frozen mode bypasses the overlay so the player can study a single chord without distractions.
 
 ### Color Palette
 
 | Element | Color | RGB |
 |---|---|---|
 | Chord-scale notes (base) | White | `(255, 255, 255)` |
-| Guide tone / target / end note | Red | `(255, 50, 50)` |
-| Start note | Green | `(50, 255, 50)` |
+| Guide tone / Start & End start note | Red | `(255, 50, 50)` |
+| Start & End target note | Orange | `(255, 140, 40)` |
 | All other keys / blackout | Black | `(0, 0, 0)` — **no light** |
 
 Black background is critical: the projector emits no light for black pixels, so only highlighted keys are visible on the physical piano.
@@ -472,6 +475,8 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `F` | Enter / exit frozen mode (pin projection to one chord) |
 | `←` / `→` | In frozen mode, step to previous / next chord |
 | `D` | Cycle Flow phrasing: SHORT → MEDIUM → LONG |
+| `P` | Cycle Start/End phrase length: 2 → 4 → 8 bars |
+| `Shift+P` | Regenerate Start/End picks |
 | `C` | Enter calibration mode |
 | `Q` / `Esc` | Quit |
 
@@ -538,11 +543,11 @@ ruff = ">=0.4"
 
 - [x] Guide Tone exercise
 - [x] Flow exercise
+- [x] Start & End Note exercise
 
 ### Stretch Goals
 
 - [ ] Contour exercise
-- [ ] Start & End Note exercise
 - [ ] Camera-based automatic calibration
 - [ ] Piano comping track
 
