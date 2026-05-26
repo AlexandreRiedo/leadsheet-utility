@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from enum import Enum, auto
 
-from leadsheet_utility.exercises.free import RangeMode, range_mode_low
+from leadsheet_utility.exercises.free import RIGHT_HAND_LOW, RangeMode, range_mode_low
 from leadsheet_utility.harmony.constants import NOTE_TO_PC
 from leadsheet_utility.leadsheet.models import ChordEvent
 from leadsheet_utility.projection import KeyHighlight
@@ -89,6 +89,8 @@ def chord_tone_only_highlights(
         return []
     if range_mode is RangeMode.FULL:
         midis = [n for n in range(21, 109) if n % 12 in pcs]
+    elif range_mode is RangeMode.RIGHT_HAND:
+        midis = [n for n in range(RIGHT_HAND_LOW, 109) if n % 12 in pcs]
     else:
         octaves = 1 if range_mode is RangeMode.ONE_OCTAVE else 2
         low = band_low if band_low is not None else range_mode_low(range_mode)

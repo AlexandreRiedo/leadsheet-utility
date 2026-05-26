@@ -137,6 +137,7 @@ def _range_mode_label(mode: RangeMode) -> str:
     """Short HUD label for the range cycle."""
     return {
         RangeMode.FULL: "FULL",
+        RangeMode.RIGHT_HAND: "R.HAND",
         RangeMode.TWO_OCTAVE: "2 OCT",
         RangeMode.ONE_OCTAVE: "1 OCT",
     }[mode]

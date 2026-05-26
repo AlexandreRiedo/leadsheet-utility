@@ -22,7 +22,7 @@ beats any base / chord-tone / root colour at the same MIDI.
 
 from __future__ import annotations
 
-from leadsheet_utility.exercises.free import RangeMode
+from leadsheet_utility.exercises.free import RIGHT_HAND_LOW, RangeMode
 from leadsheet_utility.leadsheet.models import LeadSheet
 from leadsheet_utility.projection import KeyHighlight
 
@@ -80,7 +80,15 @@ def guide_tone_midi(
     if chord_idx < 0 or chord_idx >= len(path):
         return None
     midi = path[chord_idx] + 12 * octave_offset
-    if range_mode is RangeMode.FULL or band_low is None:
+    if range_mode is RangeMode.FULL:
+        return midi
+    if range_mode is RangeMode.RIGHT_HAND:
+        # No upper bound; just lift the GT into the right-hand register if
+        # the user's octave_offset left it below middle C.
+        while midi < RIGHT_HAND_LOW:
+            midi += 12
+        return midi
+    if band_low is None:
         return midi
     octaves = 1 if range_mode is RangeMode.ONE_OCTAVE else 2
     return _snap_into_band(midi, band_low, octaves)

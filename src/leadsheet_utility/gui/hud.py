@@ -403,6 +403,7 @@ _PHASE_LABELS: dict[CalibrationPhase, str] = {
 
 _RANGE_LABELS: dict[RangeMode, str] = {
     RangeMode.FULL: "FULL",
+    RangeMode.RIGHT_HAND: "R.HAND",
     RangeMode.TWO_OCTAVE: "2-OCT",
     RangeMode.ONE_OCTAVE: "1-OCT",
 }

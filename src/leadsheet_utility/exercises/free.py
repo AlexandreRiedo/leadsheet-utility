@@ -13,6 +13,10 @@ keyboard. The two windows are chosen so every chromatic root has a slot:
 - 1 octave: Bb3-A5 (root in Bb3..A4, octave above in Bb4..A5)
 - 2 octave: Ab3-G6 (root in Ab3..G4, 2-octave above in Ab5..G6)
 
+A wider ``RIGHT_HAND`` mode keeps the FULL-style "every scale note" set
+but clamps it from C4 (middle C) up — the conventional right-hand
+register for solo improvisation.
+
 Other Free-mode emphases (chord-tone overlay, root overlay) are pure
 post-processing passes that live in sibling modules — see
 :mod:`leadsheet_utility.exercises.chord_tones` and
@@ -38,23 +42,28 @@ ONE_OCTAVE_RANGE_HIGH = 81  # A5
 # 2-octave range: 36 semitones (12 root slots + 24 for two octaves above).
 TWO_OCTAVE_RANGE_LOW = 56   # Ab3
 TWO_OCTAVE_RANGE_HIGH = 91  # G6
+# Right-hand register: middle C upward. No upper bound — the calibrated
+# keyboard layout drops anything above the projector's high key.
+RIGHT_HAND_LOW = 60  # C4
 
 
 class RangeMode(Enum):
     FULL = auto()
+    RIGHT_HAND = auto()
     TWO_OCTAVE = auto()
     ONE_OCTAVE = auto()
 
 
 RANGE_CYCLE: tuple[RangeMode, ...] = (
     RangeMode.FULL,
+    RangeMode.RIGHT_HAND,
     RangeMode.TWO_OCTAVE,
     RangeMode.ONE_OCTAVE,
 )
 
 
 def next_range_mode(mode: RangeMode) -> RangeMode:
-    """Return the next mode in the cycle (FULL -> 2-OCT -> 1-OCT -> FULL)."""
+    """Return the next mode in the cycle (FULL -> R.HAND -> 2-OCT -> 1-OCT -> FULL)."""
     idx = RANGE_CYCLE.index(mode)
     return RANGE_CYCLE[(idx + 1) % len(RANGE_CYCLE)]
 
@@ -108,6 +117,8 @@ def free_mode_highlights(
     """
     if range_mode is RangeMode.FULL:
         midis = chord.scale_notes
+    elif range_mode is RangeMode.RIGHT_HAND:
+        midis = [n for n in chord.scale_notes if n >= RIGHT_HAND_LOW]
     else:
         low = band_low if band_low is not None else range_mode_low(range_mode)
         midis = _range_midis(chord, range_mode, low)

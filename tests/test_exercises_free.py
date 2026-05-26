@@ -330,8 +330,9 @@ def test_chord_tone_mode_cycle_order():
 
 
 def test_range_mode_cycle_order():
-    """B key cycles FULL -> 2-OCT -> 1-OCT -> FULL."""
-    assert next_range_mode(RangeMode.FULL) is RangeMode.TWO_OCTAVE
+    """B key cycles FULL -> R.HAND -> 2-OCT -> 1-OCT -> FULL."""
+    assert next_range_mode(RangeMode.FULL) is RangeMode.RIGHT_HAND
+    assert next_range_mode(RangeMode.RIGHT_HAND) is RangeMode.TWO_OCTAVE
     assert next_range_mode(RangeMode.TWO_OCTAVE) is RangeMode.ONE_OCTAVE
     assert next_range_mode(RangeMode.ONE_OCTAVE) is RangeMode.FULL
 
@@ -377,6 +378,29 @@ def test_two_octave_chord_tones_only_no_octave_repeat():
     midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, range_mode=RangeMode.TWO_OCTAVE))
     # C4=60, E4=64, G4=67, Bb4=70, C5=72, E5=76, G5=79, Bb5=82
     assert midis == [60, 64, 67, 70, 72, 76, 79, 82]
+
+
+# --- right-hand range mode ---------------------------------------------------
+
+
+def test_right_hand_mode_filters_scale_notes_to_c4_and_above():
+    """RIGHT_HAND keeps the FULL-style spread but clamped from middle C up."""
+    chord = _g_lydian_chord()
+    midis = [h.midi_note for h in free_mode_highlights(chord, range_mode=RangeMode.RIGHT_HAND)]
+    assert midis  # non-empty
+    assert all(m >= 60 for m in midis)
+    # Every scale note >= 60 should be present.
+    expected = [n for n in chord.scale_notes if n >= 60]
+    assert midis == expected
+
+
+def test_right_hand_chord_tones_only_filters_to_c4_and_above():
+    """C7 + RIGHT_HAND + chord-tones-only: every chord tone from C4 to top of MIDI."""
+    chord = _resolved_chord("C:7")
+    midis = sorted(h.midi_note for h in chord_tone_only_highlights(chord, range_mode=RangeMode.RIGHT_HAND))
+    assert midis
+    assert all(m >= 60 for m in midis)
+    assert {m % 12 for m in midis} == {0, 4, 7, 10}
 
 
 def test_two_octave_composes_with_root_overlay():
