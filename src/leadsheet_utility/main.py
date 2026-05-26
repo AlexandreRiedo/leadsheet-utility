@@ -50,25 +50,32 @@ from leadsheet_utility.calibration import (
 from leadsheet_utility.exercises import (
     NEXT_GUIDE_TONE_COLOR,
     ChordToneMode,
+    ContourPattern,
+    ContourSpeed,
     FlowPhrasing,
     FlowPattern,
     PhraseLength,
     RangeMode,
     StartEndPattern,
+    WindowWidth,
     apply_chord_tone_highlight,
+    apply_contour_window,
     apply_guide_tone_highlight,
     apply_root_highlight,
     apply_start_end_highlight,
     chord_tone_only_highlights,
     free_mode_highlights,
+    generate_contour_pattern,
     generate_flow_pattern,
     generate_start_end_pattern,
     guide_tone_midi,
     guide_tone_path_count,
     next_chord_tone_mode,
+    next_contour_speed,
     next_flow_phrasing,
     next_phrase_length,
     next_range_mode,
+    next_window_width,
 )
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_calibration_hud, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
@@ -159,6 +166,24 @@ def _phrase_length_label(p: PhraseLength) -> str:
         PhraseLength.FOUR_BARS: "4 BAR",
         PhraseLength.EIGHT_BARS: "8 BAR",
     }[p]
+
+
+def _window_width_label(w: WindowWidth) -> str:
+    """Short HUD label for the Contour window-width cycle."""
+    return {
+        WindowWidth.NARROW: "NARROW",
+        WindowWidth.MEDIUM: "MEDIUM",
+        WindowWidth.WIDE: "WIDE",
+    }[w]
+
+
+def _contour_speed_label(s: ContourSpeed) -> str:
+    """Short HUD label for the Contour speed cycle."""
+    return {
+        ContourSpeed.SLOW: "SLOW",
+        ContourSpeed.MEDIUM: "MEDIUM",
+        ContourSpeed.FAST: "FAST",
+    }[s]
 
 
 # ---------------------------------------------------------------------------
@@ -319,6 +344,16 @@ class App:
         self._start_end_pattern: StartEndPattern | None = None
         self._start_end_seed: int = 0
 
+        # -- Contour exercise state ------------------------------------------
+        # Smoothed random walk over absolute beats; regenerated on lead-sheet
+        # load, on speed change, and on Shift+W (seed bump). Width is the
+        # half-width in semitones either side of the curve's current center;
+        # speed controls how many bars one arc lasts.
+        self._window_width: WindowWidth = WindowWidth.MEDIUM
+        self._contour_speed: ContourSpeed = ContourSpeed.MEDIUM
+        self._contour_pattern: ContourPattern | None = None
+        self._contour_seed: int = 0
+
         # -- Async render state ----------------------------------------------
         # Layers are cached per-instrument (bass/drums/guitar/metronome) as
         # int16 buffers without normalization, so toggling backing mode or the
@@ -469,6 +504,22 @@ class App:
             self._start_end_seed += 1
             self._regenerate_start_end_pattern()
             logger.info("Start/End picks regenerated (seed=%d)", self._start_end_seed)
+
+        elif action is Action.CYCLE_WINDOW_WIDTH:
+            self._window_width = next_window_width(self._window_width)
+            logger.info("Window width: %s", self._window_width.name)
+
+        elif action is Action.CYCLE_CONTOUR_SPEED:
+            # Speed change reshapes the arc spacing, so a fresh roll is needed.
+            self._contour_speed = next_contour_speed(self._contour_speed)
+            self._regenerate_contour_pattern()
+            logger.info("Contour speed: %s", self._contour_speed.name)
+
+        elif action is Action.REGENERATE_CONTOUR:
+            # Bump the seed so the same lead-sheet/state still rolls a new curve.
+            self._contour_seed += 1
+            self._regenerate_contour_pattern()
+            logger.info("Contour curve regenerated (seed=%d)", self._contour_seed)
 
         elif action.name.startswith("EXERCISE_"):
             idx = int(action.name[-1]) - 1
@@ -908,6 +959,7 @@ class App:
             self._show_next_guide_tone = False
             self._regenerate_flow_pattern()
             self._regenerate_start_end_pattern()
+            self._regenerate_contour_pattern()
             _log_harmony_summary(ls)
         except Exception:
             logger.exception("Failed to load %s", path)
@@ -1061,6 +1113,29 @@ class App:
         total = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
         self._flow_pattern = generate_flow_pattern(total, self._flow_phrasing)
 
+    def _regenerate_contour_pattern(self) -> None:
+        """Roll a fresh smoothed-random-walk contour for the loaded form.
+
+        Called on lead-sheet load and on Shift+W. The pattern lives in
+        absolute beats across every form repeat, so tempo changes don't
+        invalidate it; only the seed (bumped manually) or a different
+        lead sheet does. The right-hand-register bounds come from the
+        loaded calibration so the curve never leaves the projector's
+        physical reach.
+        """
+        if self._lead_sheet is None:
+            self._contour_pattern = None
+            return
+        total = self._lead_sheet.total_beats * self._lead_sheet.form_repeats
+        self._contour_pattern = generate_contour_pattern(
+            total,
+            midi_full_low=self._midi_full_low,
+            midi_full_high=self._midi_full_high,
+            beats_per_bar=self._lead_sheet.time_signature[0],
+            speed=self._contour_speed,
+            seed=self._contour_seed,
+        )
+
     def _regenerate_start_end_pattern(self) -> None:
         """Roll fresh Start/End picks for the active phrase length and range.
 
@@ -1142,8 +1217,25 @@ class App:
                 highlights = free_mode_highlights(
                     projected_chord, range_mode=self._range_mode, band_low=band_low,
                 )
-                if self._chord_tone_mode is ChordToneMode.OVERLAY:
-                    highlights = apply_chord_tone_highlight(highlights, projected_chord)
+            # Contour exercise: filter the base highlights to a sliding
+            # window around the pre-rolled curve's current center. Runs
+            # *before* the colour overlays so chord-tone / root / Start
+            # & End all paint on whichever scale notes survive. Frozen
+            # mode and the stopped/count-in state bypass the filter so
+            # the player can still see the full chord-scale.
+            if (
+                self._exercise_idx == 2
+                and self._contour_pattern is not None
+                and projected_abs_beat is not None
+            ):
+                highlights = apply_contour_window(
+                    highlights,
+                    projected_abs_beat,
+                    self._contour_pattern,
+                    self._window_width,
+                )
+            if self._chord_tone_mode is ChordToneMode.OVERLAY:
+                highlights = apply_chord_tone_highlight(highlights, projected_chord)
             # Root overlay applied before guide tone so the GT (3rd or 7th)
             # can still beat the root colour when both overlays are on.
             if self._highlight_root:
@@ -1258,6 +1350,8 @@ class App:
             show_next_guide_tone=self._show_next_guide_tone,
             flow_phrasing=self._flow_phrasing.name,
             phrase_length=_phrase_length_label(self._phrase_length),
+            window_width=_window_width_label(self._window_width),
+            contour_speed=_contour_speed_label(self._contour_speed),
         )
         self._hud_window.flip()
 

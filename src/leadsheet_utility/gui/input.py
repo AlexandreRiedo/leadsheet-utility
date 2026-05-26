@@ -41,6 +41,9 @@ class Action(Enum):
     CYCLE_FLOW_PHRASING = auto()
     CYCLE_PHRASE_LENGTH = auto()
     REGENERATE_START_END = auto()
+    CYCLE_WINDOW_WIDTH = auto()
+    CYCLE_CONTOUR_SPEED = auto()
+    REGENERATE_CONTOUR = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -69,6 +72,8 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_n: Action.TOGGLE_GUIDE_TONE_NEXT,
     pygame.K_d: Action.CYCLE_FLOW_PHRASING,
     pygame.K_p: Action.CYCLE_PHRASE_LENGTH,
+    pygame.K_w: Action.CYCLE_WINDOW_WIDTH,
+    pygame.K_x: Action.CYCLE_CONTOUR_SPEED,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,
@@ -87,4 +92,6 @@ def key_to_action(key: int, mod: int = 0) -> Action:
     """
     if key == pygame.K_p and mod & pygame.KMOD_SHIFT:
         return Action.REGENERATE_START_END
+    if key == pygame.K_w and mod & pygame.KMOD_SHIFT:
+        return Action.REGENERATE_CONTOUR
     return _KEY_MAP.get(key, Action.NONE)

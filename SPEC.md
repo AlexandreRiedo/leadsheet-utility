@@ -117,7 +117,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar, frozen-mode indicator, count-in grid |
 | `projection` | **Done (wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame with audio-delay compensated lead time |
 | `calibration` | **Done (wired into main)** | 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay); loaded by main on startup, re-entered in-session via `C` |
-| `exercises` | **Free, Guide Tone, Flow, Start & End done; Contour pending** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's voice-led line. Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D`. Start & End paints a red entry note + orange target per phrase (2/4/8 bars, cycled with `P`; Shift+P re-rolls), drawn from chord tones of the phrase's first/last chord and hashed when outside the current chord-scale |
+| `exercises` | **Done** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's voice-led line. Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D`. Start & End paints a red entry note + orange target per phrase (2/4/8 bars, cycled with `P`; Shift+P re-rolls), drawn from chord tones of the phrase's first/last chord and hashed when outside the current chord-scale. Contour filters the base highlights to a sliding ±N-semitone window around a pre-rolled smoothed random walk (right-hand register; width cycled with `W`, speed cycled with `X` — SLOW/MEDIUM/FAST = 4-8 / 2-4 / 1-2 bars per arc; re-rolled with `Shift+W`) |
 
 ### Application States
 
@@ -273,14 +273,17 @@ These overlays are pure post-processing passes over a `list[KeyHighlight]`, so f
 - **Purpose**: Train the player to target the 3rd or 7th, outlining the harmony.
 - **Logic**: Use the pre-computed voice-led guide-tone line. Highlight the chosen guide tone in red.
 
-### 6.3 Contour Game
+### 6.3 Contour Game — Implemented
 
-- **Projection**: A *window* of ~5–7 consecutive chord-scale notes in **white**, moving up or down the keyboard over time.
-- **Purpose**: Force the player to think about melodic direction at a macro level.
-- **Logic**:
-  - Pre-generate a contour curve (slow sine wave or random walk) mapping `form_position → register (MIDI note center)`.
-  - Highlight only chord-scale notes within ±3 semitones of the contour center.
-  - The illuminated window drifts left/right on the keyboard.
+- **Projection**: Whatever the base Free Mode (plus chord-tone / root overlays) would have shown, *filtered* to a sliding ±N-semitone window around the contour center. Survivors keep their Free-Mode colours, so overlays still read through.
+- **Purpose**: Force the player to think about melodic direction at a macro level — the lit window drifts up and down the keyboard over time, so phrases naturally arc with it.
+- **Logic** (`exercises/contour.py`):
+  - `generate_contour_pattern(total_beats, *, midi_full_low, midi_full_high, beats_per_bar, speed, seed)` pre-rolls a list of `(beat, midi_center)` control points spanning every form repeat. Control points are placed at random intervals determined by ``speed`` (see below) and sampled as a *bounded* random walk inside the right-hand register `[max(C4, midi_full_low), midi_full_high]` — each step is at most ~60% of the projector range so the curve explores the keyboard naturally without wild leaps.
+  - Between control points the curve uses **smoothstep** interpolation (cubic Hermite with zero tangents), so the contour has continuous slope and never jerks at arc boundaries. `ContourPattern.center_at(beat)` returns a float MIDI center.
+  - `WindowWidth` enum cycled with `W` (NARROW / MEDIUM / WIDE = ±2 / ±3 / ±5 semitones). `apply_contour_window(highlights, beat, pattern, width)` filters the base list to highlights whose MIDI is within `±width` of the current center; ties to `abs(midi - center)`. If no scale note falls inside the window the projection blacks out — no auto-widen.
+  - `ContourSpeed` enum cycled with `X` (SLOW / MEDIUM / FAST = 4–8 / 2–4 / 1–2 bars per arc). Speed scales only the arc spacing; the random-walk step bound stays the same, so FAST genuinely covers ground faster. Changing speed regenerates the pattern (arc spacing is baked in at roll time).
+  - The filter runs **before** the chord-tone, root, Guide Tone, and Start & End overlays, so those keep painting on whichever scale notes survive.
+  - Pattern is regenerated on lead-sheet load, on speed change (`X`), and on `Shift+W` (seed bump). Tempo changes do not invalidate it (the pattern is measured in beats). Frozen mode and the stopped state bypass the filter entirely so the player can study a single chord without the window.
 
 ### 6.4 Flow Game (Jeu du Flux) — Implemented
 
@@ -477,6 +480,9 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `D` | Cycle Flow phrasing: SHORT → MEDIUM → LONG |
 | `P` | Cycle Start/End phrase length: 2 → 4 → 8 bars |
 | `Shift+P` | Regenerate Start/End picks |
+| `W` | Cycle Contour window width: NARROW → MEDIUM → WIDE |
+| `X` | Cycle Contour speed: SLOW → MEDIUM → FAST |
+| `Shift+W` | Regenerate Contour curve |
 | `C` | Enter calibration mode |
 | `Q` / `Esc` | Quit |
 
@@ -544,10 +550,10 @@ ruff = ">=0.4"
 - [x] Guide Tone exercise
 - [x] Flow exercise
 - [x] Start & End Note exercise
+- [x] Contour exercise
 
 ### Stretch Goals
 
-- [ ] Contour exercise
 - [ ] Camera-based automatic calibration
 - [ ] Piano comping track
 
