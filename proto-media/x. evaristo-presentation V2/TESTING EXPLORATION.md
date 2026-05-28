@@ -1,7 +1,7 @@
 # Questions générales
 ## QR
 - QR actuel (à revoir)
-![QR actuel](image-6.png)
+![QR actuel](md-images/image-6.png)
 
 ## Quoi évaluer?
 - Quoi evaluer? 
@@ -13,38 +13,38 @@
 # Evaluation à voix haute (pour des protos, mais pk pas?)
 ## Idées de déroulement général
 Déroulement des tests au CPMDT?
-![Slide 22 IPM](image.png)
+![Slide 22 IPM](md-images/image.png)
 
 Plan exp?
-![Plan exp](image-4.png)
+![Plan exp](md-images/image-4.png)
 
 # Tâches/Tests à faire?
 Que sont ces tests?
-![Une liste de tests](image-5.png)
+![Une liste de tests](md-images/image-5.png)
 
 Faire des tâches avec les jeux? (mais comment mesurer le succès???)
-![Définit une tâche](image-3.png)
+![Définit une tâche](md-images/image-3.png)
 
 # Utilisabilité
 ## Questionnaires post-exp
 Exemple de questionnaire post-exp?
-![Questionnaire post-expérimental](image-1.png)
+![Questionnaire post-expérimental](md-images/image-1.png)
 
 Faire un SUS?
-![SUS](image-2.png)
+![SUS](md-images/image-2.png)
 
 Autres types de questionnaires post-exp?
-![autres types](image-9.png)
+![autres types](md-images/image-9.png)
 
 ## Tests d'utilisabilité
 Faire le "sommatif"
-![sommatif](image-7.png)
+![sommatif](md-images/image-7.png)
 
 Tests pilote "réalisés"
-![processus](image-8.png)
+![processus](md-images/image-8.png)
 
 Faire un attrakdiff?
-![attrakdiff](image-10.png)
+![attrakdiff](md-images/image-10.png)
 
 Le résumé
-![en bref](image-11.png)
+![en bref](md-images/image-11.png)
