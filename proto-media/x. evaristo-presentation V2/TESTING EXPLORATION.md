@@ -48,3 +48,22 @@ Faire un attrakdiff?
 
 Le résumé
 ![en bref](md-images/image-11.png)
+
+# Inspiration
+## IMPROVISAR
+The RQ
+![RQ](md-images/improvisar-rq.png)
+
+Experiment protocol (4 ways)
+![improvisar exp protocol](md-images/improvisar-exp-protocol.png)
+
+The goal the of the study
+![goal](md-images/improvisar-goal.png)
+![goal 2](md-images/improvisar-goal-2.png)
+
+### Post-Study Interview Themes
+![alt text](md-images/improvisar-post-study-1.png)
+![alt text](md-images/improvisar-post-study-2.png)
+![alt text](md-images/improvisar-post-study-3.png)
+![alt text](md-images/improvisar-post-study-4.png)
+![alt text](md-images/improvisar-post-study-5.png)

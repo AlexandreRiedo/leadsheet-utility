@@ -37,3 +37,4 @@ Bonne conduite de voix (max 3 demitons to aim it)
 - Pouvoir juste explorer un accord en boucle, ou bien éviter le changement de notes
 - Des plages de jeux simplifiées styles iRealPro
 - Afficher la grille sur un 2ème écran pour indiquer aux personnes ou on en est
+- Pouvoir looper des bouts!
