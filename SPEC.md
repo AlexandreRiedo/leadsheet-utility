@@ -117,7 +117,7 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar, frozen-mode indicator, count-in grid |
 | `projection` | **Done (wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame with audio-delay compensated lead time |
 | `calibration` | **Done (wired into main)** | 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay); loaded by main on startup, re-entered in-session via `C` |
-| `exercises` | **Done** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's voice-led line. Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D`. Start & End paints a red entry note + orange target per phrase (2/4/8 bars, cycled with `P`; Shift+P re-rolls), drawn from chord tones of the phrase's first/last chord and hashed when outside the current chord-scale. Contour filters the base highlights to a sliding ±N-semitone window around a pre-rolled smoothed random walk (right-hand register; width cycled with `W`, speed cycled with `X` — SLOW/MEDIUM/FAST = 4-8 / 2-4 / 1-2 bars per arc; re-rolled with `Shift+W`) |
+| `exercises` | **Done** | Free Mode (all scale notes) wired with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT), `ChordToneMode` (OFF / ONLY / OVERLAY), and a root-overlay pass. Guide Tone post-overlay using the analyzer's two voice-led paths (cycled with `H`), with octave shift on `↑`/`↓` and an orange next-chord preview on `N` (hashed when outside the current chord-scale). Flow gates the projection on/off across barlines via a pre-generated pattern, density cycled with `D`. Start & End paints a red entry note + orange target per phrase (2/4/8 bars, cycled with `P`; Shift+P re-rolls), drawn from chord tones of the phrase's first/last chord and hashed when outside the current chord-scale. Contour filters the base highlights to a sliding ±N-semitone window around a pre-rolled smoothed random walk (right-hand register; width cycled with `W`, speed cycled with `X` — SLOW/MEDIUM/FAST = 4-8 / 2-4 / 1-2 bars per arc; re-rolled with `Shift+W`) |
 
 ### Application States
 
@@ -188,7 +188,7 @@ Companion `.meta.json` with same base name:
 }
 ```
 
-Defaults if missing: 4/4, tempo 120, unknown title. 14 lead sheet pairs ship in `data/leadsheets/`.
+Defaults if missing: 4/4, tempo 120, unknown title. 17 lead sheet pairs ship in `data/leadsheets/`.
 
 ---
 
@@ -227,7 +227,7 @@ Pre-computed as two voice-led paths across the form (`LeadSheet.guide_tone_line`
 
 ---
 
-## 6. Exercises (Projection Modes) — Not Implemented
+## 6. Exercises (Projection Modes) — Implemented
 
 All exercises share a common interface:
 
@@ -267,11 +267,15 @@ Three orthogonal sub-toggles compose with Free Mode:
 
 These overlays are pure post-processing passes over a `list[KeyHighlight]`, so future exercises can adopt them by emitting highlights and letting `App._render_projection` run the overlays.
 
-### 6.2 Guide Tone Game
+### 6.2 Guide Tone Game — Implemented
 
-- **Projection**: Chord-scale in **white** + one guide tone in **red**.
+- **Projection**: Whatever the base Free Mode (plus chord-tone / root overlays) would have shown + one voice-led guide tone in **red**, plus an optional **orange** preview of the *next* chord's guide tone.
 - **Purpose**: Train the player to target the 3rd or 7th, outlining the harmony.
-- **Logic**: Use the pre-computed voice-led guide-tone line. Highlight the chosen guide tone in red.
+- **Logic** (`exercises/guide_tone.py`):
+  - Reads the analyzer's two pre-computed voice-led paths (`LeadSheet.guide_tone_line`). `H` cycles between paths; `↑`/`↓` shift the line by octaves in FULL range mode (in 1/2-OCT mode the line is band-snapped so octave shifts are absorbed).
+  - When `RangeMode` is 1-OCT/2-OCT the guide-tone MIDI is octave-snapped into the calibrated band so it's always visible inside the practice region. `RIGHT_HAND` lifts it above middle C if the offset would drop it below.
+  - `apply_guide_tone_highlight` runs as a post-overlay so the red wins over any base / chord-tone / root colour at the same MIDI; if Free Mode hid the pitch (range collapse), it is re-added so the guide tone is always visible.
+  - `N` toggles a one-chord-ahead preview painted in orange, with hashed stripes when the next guide-tone's pitch class isn't in the *current* chord-scale — the same "see but don't play yet" convention reused by Start & End.
 
 ### 6.3 Contour Game — Implemented
 
@@ -468,7 +472,7 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `Space` | Play / Pause (also exits frozen mode and starts from the top) |
 | `S` | Stop (reset to beginning) |
 | `O` | Open file dialog (`tkinter.filedialog`) |
-| `1`–`5` | Select exercise mode (only Free is implemented) |
+| `1`–`5` | Select exercise mode (Free / Guide Tone / Contour / Flow / Start & End) |
 | `+` / `-` | Tempo up/down by 5 BPM (invalidates layer cache) |
 | `M` | Toggle metronome (instant remix from cache) |
 | `G` | Cycle backing density: NONE → DRUMS → DRUMS_BASS → FULL |
@@ -477,6 +481,9 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `T` | Cycle chord-tone mode: OFF → ONLY → OVERLAY |
 | `F` | Enter / exit frozen mode (pin projection to one chord) |
 | `←` / `→` | In frozen mode, step to previous / next chord |
+| `H` | Cycle Guide Tone path (3rd ↔ 7th voice) |
+| `↑` / `↓` | Shift Guide Tone line up / down by an octave (FULL range) |
+| `N` | Toggle next-chord Guide Tone preview (orange) |
 | `D` | Cycle Flow phrasing: SHORT → MEDIUM → LONG |
 | `P` | Cycle Start/End phrase length: 2 → 4 → 8 bars |
 | `Shift+P` | Regenerate Start/End picks |
@@ -535,7 +542,7 @@ ruff = ">=0.4"
 - [x] Keyboard-shortcut-driven Pygame UI with HUD
 - [x] Metronome (toggleable, `M`)
 - [x] Backing density cycle (NONE / DRUMS / DRUMS_BASS / FULL, `G`)
-- [x] 14 example lead sheet files
+- [x] 17 example lead sheet files
 
 - [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, per-black-key offsets, projection-lead compensation, standalone preview script)
 - [x] Calibration: 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay) + JSON persistence, standalone preview script
@@ -544,13 +551,10 @@ ruff = ">=0.4"
 - [x] Frozen mode (`F` + arrow keys) for static per-chord practice
 - [x] In-app calibration entry (`C` keybinding) — stops playback, runs the `CalibrationUI` on the projector, reloads homography/layout/bands/audio-delay on confirm
 - [x] Windows per-monitor DPI awareness opt-in (projector window opens at true physical resolution)
-
-### TODO (MVP)
-
-- [x] Guide Tone exercise
-- [x] Flow exercise
-- [x] Start & End Note exercise
-- [x] Contour exercise
+- [x] Guide Tone exercise (voice-led 3rd/7th in red, path cycle `H`, octave shift `↑`/`↓`, next-chord preview `N`)
+- [x] Flow exercise (pre-generated on/off gate, phrasing cycle `D`)
+- [x] Start & End Note exercise (red entry + orange target per phrase, phrase length `P`, re-roll `Shift+P`)
+- [x] Contour exercise (sliding window filter over a smoothed random walk, width `W`, speed `X`, re-roll `Shift+W`)
 
 ### Stretch Goals
 

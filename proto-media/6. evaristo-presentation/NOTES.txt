@@ -26,6 +26,7 @@ Metronome aussi : un truc disruptif.
 NOTE
 - Prendre un cantus firmus (pas juste guide tone, EG: Dm7 target 9th -> G7 13th -> Cmaj7 R/9th)
 Bonne conduite de voix (max 3 demitons to aim it)
+- Volume du backing pas assez fort comparé au piano (prendre enceinte)
 - Random hits that depend on each time
 - Stressant: ça va trop vite! Il n'y a pas le temps de le faire
 - Stressant: savoir les notes en avances
@@ -34,3 +35,5 @@ Bonne conduite de voix (max 3 demitons to aim it)
 - C'est un peu déstabilisant, même pour un pro comme Evaristo!
 - Mode Guidetone: on est hyper focus sur les notes guide tones, comme si elles sont obligées
 - Pouvoir juste explorer un accord en boucle, ou bien éviter le changement de notes
+- Des plages de jeux simplifiées styles iRealPro
+- Afficher la grille sur un 2ème écran pour indiquer aux personnes ou on en est
