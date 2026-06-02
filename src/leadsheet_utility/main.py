@@ -77,6 +77,7 @@ from leadsheet_utility.exercises import (
     next_range_mode,
     next_window_width,
 )
+from leadsheet_utility.gui.chart import render_chart
 from leadsheet_utility.gui.hud import EXERCISE_NAMES, render_calibration_hud, render_hud
 from leadsheet_utility.gui.input import Action, key_to_action
 from leadsheet_utility.harmony import analyze, midi_note_name, pc_name
@@ -293,6 +294,17 @@ class App:
             position=pygame.WINDOWPOS_CENTERED,
         )
 
+        # -- Chord chart window (primary display, fullscreen) -----------------
+        # iReal Pro-style grid the player reads during playback. Borderless
+        # fullscreen on the primary display (covers the HUD — Alt-Tab to the
+        # HUD when you need the controls). The grid auto-scales to the size.
+        self._chart_window = pygame.Window(
+            title="Chart",
+            size=(primary_w, primary_h),
+            position=(0, 0),
+            fullscreen_desktop=True,
+        )
+
         # -- Application state ------------------------------------------------
         self._lead_sheet: LeadSheet | None = None
         self._timeline: Timeline | None = None
@@ -392,6 +404,7 @@ class App:
                 self._check_chord_change(tl_state)
                 self._render_projection()
                 self._render_hud(tl_state)
+                self._render_chart(tl_state)
                 self._clock.tick(_FPS)
         finally:
             pygame.quit()
@@ -1354,6 +1367,29 @@ class App:
             contour_speed=_contour_speed_label(self._contour_speed),
         )
         self._hud_window.flip()
+
+    def _render_chart(self, tl_state: TimelineState | None) -> None:
+        """Render the iReal Pro-style chord chart window."""
+        surface = self._chart_window.get_surface()
+
+        # Pick the beat to highlight: the frozen chord's start when frozen, the
+        # live playhead while playing/paused, otherwise no cursor (static chart).
+        highlight_beat: float | None = None
+        if self._lead_sheet is not None:
+            if self._frozen_mode:
+                chords = self._lead_sheet.chords
+                idx = max(0, min(self._frozen_chord_idx, len(chords) - 1))
+                highlight_beat = chords[idx].start_beat
+            elif (
+                tl_state is not None
+                and self._timeline is not None
+                and self._timeline.playback_state
+                in (PlaybackState.PLAYING, PlaybackState.PAUSED)
+            ):
+                highlight_beat = tl_state.current_beat
+
+        render_chart(surface, self._lead_sheet, highlight_beat)
+        self._chart_window.flip()
 
 
 # ---------------------------------------------------------------------------
