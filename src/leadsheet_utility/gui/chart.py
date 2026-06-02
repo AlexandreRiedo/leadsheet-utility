@@ -33,6 +33,8 @@ _HIGHLIGHT_INK = (20, 28, 22)  # dark text for contrast on the bright fill
 _TITLE = (220, 220, 220)
 _TITLE_BG = (45, 45, 45)
 _DIM = (130, 130, 130)
+_LOOP_SELECT = (230, 180, 70)  # amber band while editing the selection
+_LOOP_ACTIVE = (90, 170, 230)  # blue band once the loop is confirmed
 
 BARS_PER_ROW = 4
 
@@ -150,6 +152,9 @@ def render_chart(
     surface: pygame.Surface,
     lead_sheet: LeadSheet | None,
     highlight_beat: float | None,
+    *,
+    loop_select: tuple[int, int] | None = None,
+    loop_active: tuple[int, int] | None = None,
 ) -> None:
     """Draw the full chord chart onto *surface*.
 
@@ -162,6 +167,12 @@ def render_chart(
     highlight_beat:
         Absolute beat position within one form (0 .. total_beats) to highlight,
         or ``None`` to draw the static chart with no playback cursor.
+    loop_select:
+        ``(start_bar, end_bar_exclusive)`` of the loop band currently being
+        edited, drawn in amber, or ``None``.
+    loop_active:
+        ``(start_bar, end_bar_exclusive)`` of a confirmed/running loop, drawn
+        in blue, or ``None``. Ignored when *loop_select* is set.
     """
     surface.fill(_BG)
     w, h = surface.get_size()
@@ -272,3 +283,70 @@ def render_chart(
         pygame.draw.line(
             surface, _BARLINE, (int(rx), int(ry) + 4), (int(rx), int(ry + row_h) - 4), 2
         )
+
+    # -- Loop band (selection in amber, active loop in blue) -----------------
+    band = loop_select if loop_select is not None else loop_active
+    if band is not None:
+        color = _LOOP_SELECT if loop_select is not None else _LOOP_ACTIVE
+        start_bar, end_bar = band
+        start_bar = max(0, min(start_bar, total_bars - 1))
+        end_bar = max(start_bar + 1, min(end_bar, total_bars))
+        _draw_loop_band(
+            surface,
+            grid_x=grid_x,
+            grid_y=grid_y,
+            bar_w=bar_w,
+            row_h=row_h,
+            start_bar=start_bar,
+            end_bar=end_bar,
+            color=color,
+        )
+        # Status line in the title band, right-aligned.
+        if loop_select is not None:
+            status = f"SELECT LOOP  bars {start_bar + 1}-{end_bar}   [Enter] confirm  [K] cancel"
+        else:
+            status = f"LOOP  bars {start_bar + 1}-{end_bar}   [K] clear"
+        st = _font(22, bold=True).render(status, True, color)
+        surface.blit(st, (w - margin - st.get_width(), 17))
+
+
+def _draw_loop_band(
+    surface: pygame.Surface,
+    *,
+    grid_x: float,
+    grid_y: float,
+    bar_w: float,
+    row_h: float,
+    start_bar: int,
+    end_bar: int,
+    color: tuple[int, int, int],
+) -> None:
+    """Tint the looped bars and bracket the range start/end (iReal-style)."""
+    fill = pygame.Surface((max(1, int(bar_w)), max(1, int(row_h))), pygame.SRCALPHA)
+    fill.fill((*color, 55))
+    for bar_idx in range(start_bar, end_bar):
+        row = bar_idx // BARS_PER_ROW
+        col = bar_idx % BARS_PER_ROW
+        x = grid_x + col * bar_w
+        y = grid_y + row * row_h
+        surface.blit(fill, (int(x), int(y)))
+        # Top / bottom edges → the tint reads as a continuous band per row.
+        pygame.draw.line(
+            surface, color, (int(x), int(y) + 2), (int(x + bar_w), int(y) + 2), 2
+        )
+        pygame.draw.line(
+            surface,
+            color,
+            (int(x), int(y + row_h) - 2),
+            (int(x + bar_w), int(y + row_h) - 2),
+            2,
+        )
+
+    # Heavy bracket at the very start and very end of the range.
+    sx = grid_x + (start_bar % BARS_PER_ROW) * bar_w
+    sy = grid_y + (start_bar // BARS_PER_ROW) * row_h
+    pygame.draw.rect(surface, color, (int(sx), int(sy) + 2, 5, int(row_h) - 4))
+    last = end_bar - 1
+    ex = grid_x + ((last % BARS_PER_ROW) + 1) * bar_w
+    ey = grid_y + (last // BARS_PER_ROW) * row_h
+    pygame.draw.rect(surface, color, (int(ex) - 5, int(ey) + 2, 5, int(row_h) - 4))

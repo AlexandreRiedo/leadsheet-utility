@@ -61,7 +61,6 @@ class TimelineState(NamedTuple):
     """0-indexed repeat counter."""
 
 
-
 # ---------------------------------------------------------------------------
 # Timeline engine
 # ---------------------------------------------------------------------------
@@ -85,6 +84,7 @@ class Timeline:
         lead_sheet: LeadSheet,
         tempo: int,
         clock: ClockSource | None = None,
+        wrap_around: bool = False,
     ) -> None:
         if not lead_sheet.chords:
             raise ValueError("LeadSheet must contain at least one chord")
@@ -92,6 +92,10 @@ class Timeline:
         self._lead_sheet = lead_sheet
         self._tempo = tempo
         self._clock: ClockSource = clock or PerfCounterClock()
+        # When True, playback wraps modulo the total length instead of clamping
+        # at the end — used by loop-practice mode, where a short temporary form
+        # repeats indefinitely so the exercises keep progressing across passes.
+        self._wrap_around = wrap_around
 
         self._form_beats: float = lead_sheet.total_beats
         self._form_repeats: int = lead_sheet.form_repeats
@@ -161,9 +165,12 @@ class Timeline:
 
         beat_absolute = elapsed * (self._tempo / 60.0)
 
-        # Clamp at the end of all repeats
+        # End of all repeats: wrap (loop-practice) or clamp (normal playback).
         if beat_absolute >= self._total_beats:
-            beat_absolute = self._total_beats - 1e-9
+            if self._wrap_around:
+                beat_absolute %= self._total_beats
+            else:
+                beat_absolute = self._total_beats - 1e-9
 
         form_repeat = int(beat_absolute // self._form_beats)
         beat_in_form = beat_absolute % self._form_beats

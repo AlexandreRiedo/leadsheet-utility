@@ -36,9 +36,9 @@ _COUNT_IN_ACCENT = (100, 200, 120)
 # Vertical rhythm
 # ---------------------------------------------------------------------------
 
-_LINE_H = 32         # space between consecutive body lines inside a group
-_HEADER_GAP = 36     # space between a SECTION title and the first content line
-_SECTION_GAP = 36    # extra vertical air between sibling groups
+_LINE_H = 32  # space between consecutive body lines inside a group
+_HEADER_GAP = 36  # space between a SECTION title and the first content line
+_SECTION_GAP = 36  # extra vertical air between sibling groups
 
 # ---------------------------------------------------------------------------
 # Exercise names
@@ -130,7 +130,7 @@ def render_hud(
     if lead_sheet is None:
         _blit(surface, fonts["body"], "No lead sheet loaded.", 20, y, _DIM)
         y += 40
-        _blit(surface, fonts["body"], 'Press O to open a .tsv file.', 20, y, _DIM)
+        _blit(surface, fonts["body"], "Press O to open a .tsv file.", 20, y, _DIM)
         y += 75
         _render_shortcuts(surface, fonts, y, exercise_idx)
         return
@@ -188,7 +188,14 @@ def render_hud(
         _blit(surface, fonts["body"], f"Next:    {nxt}", 20, y, _DIM)
         y += _LINE_H + _SECTION_GAP
     else:
-        _blit(surface, fonts["body"], f"Current: {lead_sheet.chords[0].chord_symbol}", 20, y, _DIM)
+        _blit(
+            surface,
+            fonts["body"],
+            f"Current: {lead_sheet.chords[0].chord_symbol}",
+            20,
+            y,
+            _DIM,
+        )
         y += _LINE_H + _SECTION_GAP
 
     # -- Exercise selection --------------------------------------------------
@@ -220,11 +227,13 @@ def render_hud(
         gt_label = f"{guide_tone_path + 1}/{guide_tone_path_count}"
         oct_label = f"{guide_tone_octave:+d}"
         next_label = "ON" if show_next_guide_tone else "OFF"
-        status_grid.append([
-            ("GT path", gt_label),
-            ("GT octave", oct_label),
-            ("Next GT", next_label),
-        ])
+        status_grid.append(
+            [
+                ("GT path", gt_label),
+                ("GT octave", oct_label),
+                ("Next GT", next_label),
+            ]
+        )
     elif exercise_idx == 2:
         status_grid.append([("Window", window_width), ("Speed", contour_speed)])
     elif exercise_idx == 3:
@@ -277,7 +286,9 @@ def _render_count_in(
 ) -> None:
     """Draw a two-row grid of squares that fill in one-by-one during count-in."""
     w, h = surface.get_size()
-    filled = min(int(count_in_beat) + 1, total_count_in_beats)  # +1: fill on the beat, not after
+    filled = min(
+        int(count_in_beat) + 1, total_count_in_beats
+    )  # +1: fill on the beat, not after
 
     beats_per_bar = total_count_in_beats // 2
     sq_size = 90
@@ -291,7 +302,14 @@ def _render_count_in(
 
     # Title
     title = "Get Ready..."
-    _blit(surface, fonts["heading"], title, (w - fonts["heading"].size(title)[0]) // 2, y_start - 75, _TEXT)
+    _blit(
+        surface,
+        fonts["heading"],
+        title,
+        (w - fonts["heading"].size(title)[0]) // 2,
+        y_start - 75,
+        _TEXT,
+    )
 
     for i in range(total_count_in_beats):
         row = i // beats_per_bar
@@ -309,7 +327,9 @@ def _render_count_in(
     beat_label = str(filled) if filled <= total_count_in_beats else ""
     if beat_label:
         _blit(
-            surface, fonts["heading"], beat_label,
+            surface,
+            fonts["heading"],
+            beat_label,
             (w - fonts["heading"].size(beat_label)[0]) // 2,
             y_start + row_h + 21,
             _ACCENT,
@@ -378,6 +398,16 @@ def _render_shortcuts(
         ("BACKING", ["[M] Metronome", "[G] Cycle backing"]),
         ("DISPLAY", ["[R] Root highlight", "[B] Range", "[T] Chord tones"]),
         ("FROZEN", ["[F] Frozen mode", "[<-/->] Step chord"]),
+        (
+            "LOOP",
+            [
+                "[L] Select range",
+                "[Alt+<-/->] Move",
+                "[Shift+<-/->] Resize",
+                "[Enter] Confirm",
+                "[K] Clear/cancel",
+            ],
+        ),
         ("EXERCISE", exercise_lines),
     ]
 

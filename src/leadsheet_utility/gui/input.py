@@ -44,6 +44,14 @@ class Action(Enum):
     CYCLE_WINDOW_WIDTH = auto()
     CYCLE_CONTOUR_SPEED = auto()
     REGENERATE_CONTOUR = auto()
+    # Loop selection (iReal-style chart): pick a bar range and loop over it.
+    TOGGLE_LOOP_SELECT = auto()
+    LOOP_MOVE_LEFT = auto()
+    LOOP_MOVE_RIGHT = auto()
+    LOOP_SHRINK = auto()
+    LOOP_EXPAND = auto()
+    LOOP_CONFIRM = auto()
+    LOOP_CANCEL = auto()
 
 
 _KEY_MAP: dict[int, Action] = {
@@ -74,6 +82,10 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_p: Action.CYCLE_PHRASE_LENGTH,
     pygame.K_w: Action.CYCLE_WINDOW_WIDTH,
     pygame.K_x: Action.CYCLE_CONTOUR_SPEED,
+    pygame.K_l: Action.TOGGLE_LOOP_SELECT,
+    pygame.K_k: Action.LOOP_CANCEL,
+    pygame.K_RETURN: Action.LOOP_CONFIRM,
+    pygame.K_KP_ENTER: Action.LOOP_CONFIRM,
     pygame.K_1: Action.EXERCISE_1,
     pygame.K_2: Action.EXERCISE_2,
     pygame.K_3: Action.EXERCISE_3,
@@ -94,4 +106,14 @@ def key_to_action(key: int, mod: int = 0) -> Action:
         return Action.REGENERATE_START_END
     if key == pygame.K_w and mod & pygame.KMOD_SHIFT:
         return Action.REGENERATE_CONTOUR
+    # Loop selection: Alt+arrows slide the window, Shift+arrows resize it.
+    # Checked before the plain Left/Right bindings (frozen-mode stepping).
+    if key == pygame.K_LEFT and mod & pygame.KMOD_ALT:
+        return Action.LOOP_MOVE_LEFT
+    if key == pygame.K_RIGHT and mod & pygame.KMOD_ALT:
+        return Action.LOOP_MOVE_RIGHT
+    if key == pygame.K_LEFT and mod & pygame.KMOD_SHIFT:
+        return Action.LOOP_SHRINK
+    if key == pygame.K_RIGHT and mod & pygame.KMOD_SHIFT:
+        return Action.LOOP_EXPAND
     return _KEY_MAP.get(key, Action.NONE)
