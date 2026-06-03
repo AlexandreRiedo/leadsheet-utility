@@ -151,6 +151,29 @@ def _assign_chain_overrides(chords: list[ChordEvent]) -> dict[int, str]:
                 if degree == 0:    # I → Ionian (same as default; explicit for clarity)
                     overrides[idx] = "ionian"
 
+    # Rule 7: minor ii-V-i — iiø7 → V7 (P4 up) → i min7 (V resolves down a P5).
+    # The tonic min7 would otherwise default to Dorian; pin it to Aeolian
+    # (natural minor) to match the iiø/V7♭9 minor-key context. Only fires when the
+    # min7 is a resting tonic: if another min7 or dominant 7 immediately follows,
+    # the chord is functioning as fresh ii-V material (e.g. the deceptive D:min7 in
+    # Stella by Starlight) and keeps its Dorian default.
+    for i in range(n - 2):
+        iio, dom, tonic = chords[i], chords[i + 1], chords[i + 2]
+        if not (iio.quality.startswith("hdim")
+                and dom.quality.startswith("7")
+                and tonic.quality == "min7"):
+            continue
+        iio_pc = NOTE_TO_PC[iio.root]
+        dom_pc = NOTE_TO_PC[dom.root]
+        tonic_pc = NOTE_TO_PC[tonic.root]
+        if (dom_pc - iio_pc) % 12 != 5 or (dom_pc - tonic_pc) % 12 != 7:
+            continue
+        after = chords[i + 3] if i + 3 < n else None
+        if after is not None and (after.quality.startswith("min")
+                                  or after.quality.startswith("7")):
+            continue
+        overrides[i + 2] = "aeolian"
+
     return overrides
 
 
