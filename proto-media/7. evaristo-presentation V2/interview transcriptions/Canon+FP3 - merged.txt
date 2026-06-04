@@ -1,0 +1,1408 @@
+============================================================
+  Canon 01
+============================================================
+
+[STUDENT]: Tu vas me croire fantastique.
+[TEACHER]: Ah oui, bien sûr, bien sûr.
+[TEACHER]: Non, mais il faut juste... Non, non, il ne faut pas.
+[TEACHER]: Si je vois un truc, par exemple, l'autre fois, j'avais déjà constaté un petit détail, je me suis dit, ça, il faudrait
+           réfléchir comment faire.
+[STUDENT]: Ouais, ok, d'accord, d'accord, d'accord.
+[TEACHER]: C'est ça l'idée.
+[STUDENT]: Ouais, ouais, c'est ça.
+[STUDENT]: Sois libre de dire ce que tu as envie de dire.
+[STUDENT]: D'accord, d'accord.
+[STUDENT]: Alors j'essaie, puis tu me cadres.
+[STUDENT]: Disons que je ne vais pas être pénalisé si c'est nul.
+[STUDENT]: Le but, c'est qu'on a...
+[STUDENT]: On veut du data.
+[STUDENT]: Que la réponse est négative ou positive.
+[STUDENT]: C'est pas la première fois, on veut du data.
+[STUDENT]: Est-ce que ça marche, que ça marche pas ?
+[STUDENT]: La question c'est si ça marche, c'est pas ça qui compte, c'est est-ce que ça va ?
+[STUDENT]: Ouais, ouais, ok.
+[STUDENT]: Qu'est-ce qu'on peut en extraire de cet artefact ?
+[TEACHER]: Ouais, bien sûr, bien sûr.
+[TEACHER]: Ok, alors vas-y, go.
+[TEACHER]: Mais il faut lancer l'enregistrement.
+[TEACHER]: Ah ouais, il est... Ça tourne.
+[STUDENT]: Eh, mon backup sur mon téléphone, c'est...
+[STUDENT]: Là, je crois que c'est bon.
+[TEACHER]: La caméra, elle filme aussi ?
+[STUDENT]: Oui, mais c'est juste pour avoir l'audio en réalité.
+[STUDENT]: Ce n'est pas ce qui compte.
+[STUDENT]: J'ai prévu de me présenter un peu.
+[STUDENT]: Ça, c'est mon travail de bachelor dans le cadre de mes études en système d'information et sciences des services à
+           l'UNIGE.
+[STUDENT]: Je suis avec Patrick Roth.
+[STUDENT]: Ce qu'on va faire ici...
+[STUDENT]: l'interview c'est que dans un premier temps je vais montrer toutes les fonctionnalités de mon artefact, je vais faire
+           une petite démonstration moi-même, puis après j'ai préparé quelques questions avec l'aide de mon professeur.
+[TEACHER]: Et tu vas interviewer combien de personnes ?
+[STUDENT]: Euh... 1, 2, 3, 10, 20... Non, alors, je vais t'interviewer toi, mais pour les...
+[STUDENT]: Pour ce qui concerne les tests des utilisateurs, je ne sais pas trop.
+[STUDENT]: Je pense qu'on serait dans la... Vers la dizaine, probablement.
+[STUDENT]: On verra, en fait, on verra s'il y a des gens qui viennent ou pas.
+[STUDENT]: Si j'arrive à trouver des personnes.
+[TEACHER]: Non, mais parce que je pourrais te trouver un autre collègue qui serait intéressé de venir... Ah, un autre professeur !
+[TEACHER]: Peut-être quelqu'un du classique, je sais pas.
+[TEACHER]: Ok, on...
+[TEACHER]: Je dis juste, peut-être quelqu'un du classique ultra néophyte.
+[TEACHER]: Moi je sais déjà, tu vois, moi je vais comparer mon database intérieur avec ce que me propose l'artefact, le
+           système, tu vois.
+[TEACHER]: Parce que faire majeure 7, je sais quoi jouer sur le piano.
+[TEACHER]: Je me dis, s'il y a un gars qui ne connaît rien, qui ne comprend rien...
+[STUDENT]: Moi, la visée de ce travail, en tout cas, comme j'ai discuté avec mon prof, c'était en priorité pour les musiciens de
+           jazz.
+[STUDENT]: Puisque déjà, pour comprendre ce qui se passe là, c'est la notion d'une grille, des gammes, il y a beaucoup à savoir.
+[STUDENT]: C'est plutôt pour des jazz.
+[STUDENT]: Plutôt, oui.
+[STUDENT]: Moi, je pensais...
+[STUDENT]: Un bon profil pour ça serait peut-être les élèves en prépo qui prennent le piano en deuxième instrument.
+[STUDENT]: Les gars qui connaissent les gris-marches, qui savent qu'en gros, sur un 2-5-1, j'ai cette gamme-là, mais qui
+           n'arrivent pas à voir, qui n'ont pas la capacité mécanique de naviguer le piano.
+[TEACHER]: J'en ai un comme ça, il s'appelle Mathias, il est hyper sympa.
+[TEACHER]: C'est un jeune, il a 16 ans, il joue bien le piano.
+[TEACHER]: Il faut qu'il se débrouille, mais il apprend.
+[TEACHER]: C'est un deuxième instrument, celui-là.
+[STUDENT]: Ok, ok.
+[TEACHER]: Un guitariste deuxième instrument.
+[STUDENT]: Ah mais oui, je vois, c'est qui ?
+[TEACHER]: Oui, oui, exactement.
+[TEACHER]: Donc lui, il pourrait être intéressant éventuellement comme entraîneur.
+[STUDENT]: Ok, d'accord.
+[STUDENT]: On retient.
+[STUDENT]: Je vais montrer un petit coup l'artefact dans les grandes lignes.
+[STUDENT]: le principe le truc c'est d'avoir un contexte musical un backing track synchronisé avec des projections sur le piano
+           qui affiche la gamme correspondante à l'accord au moment donné du coup là si on est sur Béatrice là vous voyez que
+           c'est Fmaj7 du coup la note bleue indique la fondamentale.
+[TEACHER]: C'est le Si que je dois éviter.
+[STUDENT]: Exactement, le Si Bécarre qui n'est pas illuminé, on l'évite.
+[TEACHER]: Donc là, ça c'était la gamme de Fa.
+[STUDENT]: Ça c'est Fa Ionia, exactement.
+[STUDENT]: Et la gamme ensuite c'est Sol Bémol, et de suite Fa Ionia.
+[STUDENT]: Puis là c'est le mode gelé du coup, statique, on montre juste la gamme, mais on n'a pas de backing qui va avec.
+[STUDENT]: et si je l'active c'est en train de charger la projection suit la grille
+[STUDENT]: Il y a des modalités de projection qui sont là pour ajouter, enlever d'informations, changer le mode de projection.
+[STUDENT]: Là, c'est le mode normal, on a fait juste la gamme.
+[STUDENT]: Je peux aussi afficher les Chord Tones, 1, 3, 5, 7.
+[STUDENT]: Attends, que je regarde.
+[STUDENT]: Sol B, Fa, Mi D.
+[STUDENT]: Ok ?
+[TEACHER]: C'est quoi ça ?
+[STUDENT]: Tu peux voir ici.
+[STUDENT]: Ouais, non.
+[STUDENT]: Mi, la, ré.
+[STUDENT]: Ok, sur le la, j'ai mis la B13.
+[STUDENT]: D'accord, d'accord.
+[STUDENT]: Pour colorer un petit peu.
+[STUDENT]: C'est le truc de base.
+[STUDENT]: Mon idée aussi, c'est d'avoir des sortes de jeux que tu peux faire avec.
+[STUDENT]: D'un fois, on avait vu cette idée où tu...
+[STUDENT]: Je surligne un guide tone, puis l'improvisateur, il va essayer de tourner autour de ses notes.
+[STUDENT]: Le principe, c'est que sur l'accord actuel, c'est la note rouge, et le suivant, c'est l'orange.
+[STUDENT]: Sur le mi, et là, on attend sur le ré.
+[STUDENT]: Sur le fa...
+[STUDENT]: sur le Sol B. Après, on va aller sur le Mi, ici, et sur le Sol B. Une petite démonstration.
+...
+[STUDENT]: j'ai prévu un autre mode en gros c'est c'est juste afficher un petit bout de la gamme sur une petite
+           fenêtre qui pivote à gauche à droite puis le but c'est de quand tu improvises tu es juste limité à
+[STUDENT]: ce pool en fait, qui monte, qui descend aléatoirement.
+[STUDENT]: Ça te force un peu à faire des phrases, ça sort un peu de tes habitudes.
+[STUDENT]: En tout cas, c'était mon idée.
+[STUDENT]: Pour régler la vitesse à laquelle la fenêtre se bouge, on peut régler...
+[TEACHER]: Les vitesses où elle se déplace, c'est ça ?
+[STUDENT]: Ouais, exactement.
+[STUDENT]: La vitesse de dépassement, puis la taille de la fenêtre aussi.
+[STUDENT]: Là, c'est très serré.
+[STUDENT]: Là, c'est un peu plus gros.
+[STUDENT]: Et là, c'est genre une demi-octave.
+[STUDENT]: Là j'ai prévu un truc en gros c'est de temps en temps le projecteur va s'éteindre et de temps en temps il va s'allumer.
+[STUDENT]: Le but c'est que tu joues quand le projecteur est allumé et quand elle est éteinte tu es en silence en fait.
+[STUDENT]: Et quand elle est allumée tu débites de l'accroche en fait.
+[STUDENT]: Hop, là ça ferme.
+[STUDENT]: Là je ne joue pas et là je devrais jouer.
+[STUDENT]: Et puis mon dernier jeu, c'est un truc en fait.
+[STUDENT]: C'est sur quatre mesures du coup.
+[STUDENT]: On commence sur la note en rouge et on va atterrir à la fin de la quatrième mesure sur la note orange.
+[STUDENT]: C'est une démonstration.
+[STUDENT]: Il y a un nouveau cycle qui doit commencer.
+[STUDENT]: Je commence sur le rouge.
+...
+[STUDENT]: Un autre cycle.
+[STUDENT]: Un autre.
+[STUDENT]: Et du coup ça c'était...
+[STUDENT]: Alors attends, j'ai des questions.
+[TEACHER]: Ouais ouais, bien sûr, vas-y.
+[TEACHER]: Non, le dernier, ça m'intéressait parce que tu donnes un chemin de départ, un point de départ et un point d'arrivée.
+[TEACHER]: Exactement, oui.
+[TEACHER]: Et tu as quatre mesures pour y arriver.
+[STUDENT]: Exactement, oui.
+[STUDENT]: En tout cas, ça change après quatre mesures.
+[TEACHER]: Donc, on a la fenêtre plus ou moins grande qui se déplace plus ou moins vite.
+[TEACHER]: Exactement, oui.
+[TEACHER]: On a tout allumé sans notre guide.
+[TEACHER]: Oui, le truc de base.
+[TEACHER]: On a tout allumé sans notes guides, on a tout allumé avec les notes guides.
+[TEACHER]: Exactement, ça.
+[TEACHER]: Et puis on a play, note, play.
+[TEACHER]: Oui, exactement.
+[TEACHER]: Alors comme ça a vu d'oeil, le play, note, play, moi je l'avais pas mal étudié avec les élèves en faisant trois mesures
+           de play et deux de note play.
+[TEACHER]: Trois ?
+[TEACHER]: Ok.
+[TEACHER]: Ouais, à cause...
+[TEACHER]: La symétrie, elle est... Ça respire, c'est facile à gérer.
+[TEACHER]: Tu peux gérer.
+[TEACHER]: Là, je trouvais court.
+[TEACHER]: Ouais, ouais.
+[TEACHER]: On peut...
+[TEACHER]: Après, je peux...
+[TEACHER]: Je trouve que... Ok.
+[TEACHER]: Gardons ça en tête pour après, peut-être.
+[TEACHER]: Et dis-moi la suite de ta présentation.
+[STUDENT]: Oui, bien sûr.
+[STUDENT]: Ok, ok.
+[STUDENT]: Bon, du coup, là...
+[STUDENT]: J'ai démontré sur un petit standard en gros les 5 façons de profiter de ce projecteur.
+[STUDENT]: Le mode normal, le mode où je projette le guide tone et optionnellement celui d'après.
+[STUDENT]: Le mode où c'est juste la fenêtre qui se déplace en bas à haut.
+[STUDENT]: Le mode où ça s'allume, ça s'éteint.
+[STUDENT]: Puis le mode où je donne la note de départ et je donne une autre note de fin.
+[STUDENT]: Le but c'est que tu commences, que tu arrives.
+[STUDENT]: après 4 mesures, ou bien 2 ou bien 8 à régler aussi dans le logiciel.
+[STUDENT]: Ok ?
+[TEACHER]: C'est bon ?
+[TEACHER]: C'est pas tous notés mais c'est bon.
+[STUDENT]: Ok, alors maintenant c'est la partie où j'ai quelques questions.
+[STUDENT]: Alors, mon proche m'a beaucoup aidé en ce qui concerne les questions.
+[TEACHER]: Oui.
+[STUDENT]: Du coup, on pense à lui.
+[STUDENT]: Il m'a demandé...
+[STUDENT]: Comment tu enseignes de base, en fait ?
+[STUDENT]: Par exemple, comment enseignent-ils l'impro au quotidien, sans aucun dispositif ?
+[STUDENT]: Quelle est la façon traditionnelle d'enseigner ?
+[STUDENT]: Et tu leur racontes du quoi ?
+[STUDENT]: Comment moi je les raconte ?
+[STUDENT]: On joue des morceaux ?
+[STUDENT]: On joue des morceaux, c'est un peu, on est jeté dans le bain, je trouve, des fois.
+[STUDENT]: Il faut commencer à improviser, il n'y a pas le temps pour paniquer, trop réfléchir.
+[TEACHER]: On fait, alors il y a plusieurs choses.
+[TEACHER]: Oui, les morceaux, c'est le vecteur, c'est un peu l'objet transitionnel, en gros, pour parler éducation.
+[TEACHER]: C'est notre jouet du moment.
+[TEACHER]: C'est possible, on a deux ou trois ou quatre jouets différents.
+[TEACHER]: Comme ça, chacun aborde des problématiques différentes.
+[TEACHER]: Voilà.
+[TEACHER]: Après, il y a le problème du flux, d'être dans le flux.
+[TEACHER]: Moi, ma classe, c'est du 15-25 en général, la tranche d'âge.
+[TEACHER]: Donc, ce n'est pas des petits.
+[TEACHER]: Je suis moins à chouchouter le bazar et je suis plus à essayer de, précisément, éviter trop de parasitages
+           intellectuels tout en étant capable, en pouvant expliquer.
+[TEACHER]: niveau de débutant à avancer tous les problèmes qui nous arrivent dessus, mais je fais gaffe de trouver un dosage,
+           c'est-à-dire de trouver une perception intellectuelle certes, bien expliquer la matière en essayant de la ranger, puis
+           qu'elle soit bien claire et lisible, puis en même temps de passer tout de suite à un truc factuel où il faut jouer.
+[TEACHER]: Et le fait de jouer, on se met dans le flux, et...
+[TEACHER]: Il y a des sortes de petites... Moi, j'ai mes petits vecteurs implicites.
+[TEACHER]: Peut-être que ça, ça peut être intéressant par rapport à ton logiciel.
+[TEACHER]: C'est le fait de... Allez, vas-y, on joue là ce que tu as dit.
+[TEACHER]: On se met dans le bain.
+[TEACHER]: Il y a aussi un petit côté impétueux.
+[TEACHER]: En fait, les artistes, ils ont tous une sorte de petite impétuosité personnelle où ils osent un peu se dévoiler.
+[TEACHER]: Allez, vas-y, je te montre ça.
+[TEACHER]: Et ça, je trouve qu'il faut le susciter parce que sinon, on va être trop arrêté.
+[TEACHER]: On va être à faire...
+[TEACHER]: Tant qu'on n'a pas fait la dentelle du détail, on ne va pas oser, entre guillemets, jouer.
+[STUDENT]: Il faut juste se lancer.
+[TEACHER]: Même si on n'a pas tous les outils, il faut juste y aller.
+[TEACHER]: Il faut y aller un peu.
+[TEACHER]: Et puis, il faut trouver un mix où il y a compréhension, il y a audition, il y a proprioception de sentir ce qui se
+           passe.
+[TEACHER]: Par exemple...
+[TEACHER]: En perception, sur un bateau, c'est plus facile à imaginer.
+[TEACHER]: Quand il penche, tu sens que ça penche.
+[TEACHER]: Mais là aussi, quand tu tiens sur tes pieds, tu sens, puis d'un coup, la grille, elle t'échappe, ou il y a un truc qui
+           t'échappe, tu sens que tu tombes.
+[TEACHER]: Tu vas sentir virtuellement que tu es en train de tomber pour te remettre dessus.
+[TEACHER]: Ça, c'est compliqué.
+[TEACHER]: Et puis, après, il y a...
+[TEACHER]: Heureusement ou malheureusement, il y a un petit trait psy...
+[TEACHER]: Chez tout le monde, de voir quelle est la discussion ou non discussion intérieure.
+[TEACHER]: Il faut que les gens ne parlent pas trop à l'intérieur.
+[TEACHER]: Quand ils jouent ?
+[TEACHER]: Il ne faut pas qu'ils se parlent trop quand ils jouent.
+[TEACHER]: Il ne faut pas trop se dire... Et c'est lié, pour compléter ma réponse, cette discussion intérieure est liée à son
+           auto-validation.
+[TEACHER]: Donc il faut faire hyper gaffe à ce que c'est de la validation et si on en a besoin ou pas.
+[TEACHER]: Et il y a des moments psychologiques différents où
+[TEACHER]: La validation, elle peut rassurer quelqu'un ou aider quelqu'un, ça c'est de l'externe, mais il y a un moment, il faut
+           pouvoir se rassurer ou s'aider soi-même à l'interne aussi.
+[TEACHER]: Puis cette validation, des fois, il faut peut-être se poser la question si ça vaut vraiment la peine de perdre ou
+           d'émettre autant d'énergie dans le fait d'évaluer, de s'auto-trouver bien ou pas bien.
+[TEACHER]: Parce qu'en fait, finalement, l'ordi va un peu à l'essentiel, ce petit kit-là, il va un peu à l'essentiel, finalement,
+[TEACHER]: la créativité elle va être, là il y a le côté atelier que j'aime bien, on se me ressent comme si on était à l'établi.
+[TEACHER]: Tu vois, on a notre pièce de bois, puis on va creuser, puis on va faire des entailles dedans, puis des trous, des
+           trucs.
+[TEACHER]: Puis là, en éclairant le clavier comme ça, tout ça, ça peut, toute cette partie psy, là, dont je viens d'assister,
+           pourrait un peu, on pourrait se dire, tu sais quoi, tu la mets en back-up, de toute façon, t'as qu'à suivre les
+           couleurs dans ta tête.
+[TEACHER]: ta gueule dedans quoi, en fait, pas besoin de parler, le 2, le 5, tu suis la couleur, et comme tu suis, tu as moins de
+           questions, tu es plus dans, ah mais après quand tu appuies, tu es là, ok, ça sonne bien, donc après, voilà, ça c'est
+           comme j'enseigne, parce qu'en fait là je suis en train d'aller à une
+[TEACHER]: Il y a quatre ou cinq...
+[STUDENT]: C'est semi-libre, du coup, c'est bien de digresser, quoi.
+[STUDENT]: C'est toujours des...
+[STUDENT]: Le gaz en or d'informations.
+[TEACHER]: Il faut oser faire des trucs, et puis peut-être aussi installer des notions de base qui sont plutôt, par exemple, moi
+           j'utilise la notion de notes stables et notes instables, au lieu de notes justes ou notes fausses.
+[TEACHER]: quelque chose qui est juste ou faux, il y a un jugement.
+[TEACHER]: Dans stable et instable, il y a précisément proprioception, genre, oh là, hop là, c'est équilibré, c'est déséquilibré,
+           là, comment je rentre ?
+[TEACHER]: Une idée du surf ou du skate, enfin, un peu cette idée comme ça.
+[TEACHER]: Dans cette manière de faire, il n'y a rien de côté, il faut essayer.
+[TEACHER]: Après, ça c'est une chose.
+[TEACHER]: Et puis la deuxième chose, c'est la représentation intérieure de ce qui doit se passer dans le futur.
+[TEACHER]: Parce que si tu ne sais pas où tu vises, tu ne vois pas très bien ce que tu es en train de faire.
+[TEACHER]: Parce que là, tu m'as dit en deux phrases, oui, là, c'est éclairé, il faut faire des phrases en croche.
+[TEACHER]: Oui, mais si tu n'as pas écouté une disque, tu ne vois pas que les mecs font des phrases en croche.
+[TEACHER]: So what ?
+[TEACHER]: Pourquoi faire
+[TEACHER]: artistiquement, on est en train d'aller vers un objet sonore qui a un sens déjà dans sa... à part chez moi qui sont en
+           train d'apprendre, il y a des milliards de personnes qui font ça, donc peut-être faudrait que je comprenne un peu
+           comment ils font quand même, tu vois.
+[TEACHER]: Et pour comprendre ça, il y a une part d'écoute.
+[TEACHER]: Et peut-être là, l'ordi, il a un point fort, c'est que... ça c'est pour ta question suivante.
+[TEACHER]: Il développe cette écoute parce que t'appuies, t'es en sens oriel, mais t'entends que ça se passe bien.
+[TEACHER]: Donc tu dis, ah ok, attends, quand je fais des trucs comme ça, il y a un truc qui, ça se met en phase, il y a le côté
+           jazz, tu vois.
+[STUDENT]: Si tout se passe bien, bien sûr.
+[STUDENT]: Parce qu'après, voilà, il faut voir si vraiment, en testant avec les personnes, s'ils arrivent à accrocher.
+[STUDENT]: Après, j'ai vu qu'on a fait un peu les démos sauvages la dernière fois.
+[STUDENT]: Tu l'as dit, c'était très taxant, au final, de voir toute cette information-là.
+[TEACHER]: Il y avait des trucs compliqués.
+[TEACHER]: On va peut-être en parler plus tard.
+[TEACHER]: Ça, c'était pour répondre à la question.
+[TEACHER]: Comment on enseigne l'impro.
+[TEACHER]: Voici la réponse.
+[TEACHER]: Comment faire ?
+[TEACHER]: comment lancer un peu l'impétuosité intellectuelle, si tu veux, comment oser glisser, tomber, se relever, continuer,
+           sans que ce soit brisant ni arrêtant, puis quelle est la conversation liée à un background artistique aussi, et puis
+           quelle est la conversation intérieure, en essayant de la limiter le plus simple possible pour aller à l'essentiel, donc
+           d'être dans le flux du moment.
+[STUDENT]: C'est une réponse très dans la thématique de psychologie, ce genre de truc.
+[TEACHER]: Ce que j'ai vu un peu, c'est...
+[TEACHER]: Il y a un petit côté comme ça.
+[TEACHER]: Tu peux demander à mes collègues.
+[TEACHER]: Si les gens, ils n'ont pas la bonne disposition pour faire le truc, ça ne marche pas très bien.
+[TEACHER]: C'est ça, oui.
+[TEACHER]: Moi, je skie pas mal.
+[TEACHER]: Et je suis avec des gens qui...
+[TEACHER]: Souvent, je skie avec des gens qui sont vraiment meilleurs que moi, très bons.
+[TEACHER]: Et vraiment, vraiment bons.
+[TEACHER]: Et je les vois.
+[TEACHER]: On est là, au bord de piste, tout détendu.
+[TEACHER]: Et le mec, pour descendre trois trucs dans la poudreuse, il se méga concentre.
+[TEACHER]: Parce qu'il se met dans le flux, il trouve sa trace, il fait son truc.
+[TEACHER]: Puis après, il est en bas, puis il a nouveau le sourire.
+[TEACHER]: Mais pendant qu'il descend, il est vraiment au taquet de chez taquet.
+[TEACHER]: À la limite, là, pour ce sujet-là, moi, j'arrive à le faire en piano, puis en ski.
+[TEACHER]: Je me dis, ouais, mais c'est le loisir.
+[TEACHER]: J'ai pas besoin de me mettre au taquet.
+[TEACHER]: En fait, les gars, ils se prennent vachement ici.
+[TEACHER]: C'est fluide, tu vois.
+[TEACHER]: Attends, mais il y a un autre terme, je ne me rappelle pas.
+[TEACHER]: Enfin, attention les mots, parce que présentement, je me plante en pleine conscience.
+[TEACHER]: Les gars, ils sont vraiment réveillés.
+[TEACHER]: Tu es là, ok, qu'est-ce que je vais faire ?
+[TEACHER]: Peut-être que ce dispositif permet de gommer tout ce côté psychologique compliqué, ou complexe, en fonction des
+           humains.
+[TEACHER]: Et puis, plus on va directement à l'essentiel, qui est l'accord, qui est le gris, on fait quoi ?
+[TEACHER]: On peut juste jouer.
+[TEACHER]: On peut juste jouer, puis se taire.
+[STUDENT]: Parce que moi, mon idée initiale, l'hypothèse que j'ai avec mon professeur, c'est qu'en faisant ça, on réduit ce qu'il
+           appelle la charge mentale, la charge cognitive.
+[TEACHER]: C'est ce que je suis en train de dire à l'instant.
+[STUDENT]: C'est ce que tu dis en fait, c'est exactement ça.
+[TEACHER]: L'idéalement, c'est que tu penses moins au gars, mais tu penses plus, enfin tu joues en fait.
+[TEACHER]: Ouais, tout à fait.
+[TEACHER]: Après, le problème de ça va être...
+[TEACHER]: Après, il faut se mettre en mode Piaget.
+[TEACHER]: Il faut essayer la faille de Piaget.
+[TEACHER]: C'est un des trucs que j'utilise, qui marche assez bien.
+[TEACHER]: Tu es une entité, puis quand tu reçois une nouvelle information, ça crée une fissure, une faille psychologique ou la
+           fissure de Piaget, je ne sais pas quoi.
+[TEACHER]: Et puis, au moment où tu fous une nouvelle, tu as un système qui fonctionne, qui est clos et qui marche.
+[TEACHER]: Tu mets une nouvelle information, le système dysfonctionne.
+[TEACHER]: Ça crée une faille cognitive, en fait.
+[TEACHER]: Il n'y a plus rien qui m'a... B9, c'est quoi ?
+[TEACHER]: Jusqu'à ce que tu as intégré, puis le truc, au bout d'un moment, notre cerveau, il refait pouc, il referme la bulle.
+[TEACHER]: Et là, il a intégré une nouvelle information.
+[TEACHER]: Et peut-être, l'idée de ce genre de système, c'est pas la première fois que j'en vois l'un ou l'autre, dont celui-ci
+           qui m'a l'air top, c'est de peut-être contourner un petit peu ce côté-là, parce que si tu arrives en humain, avec ta...
+[TEACHER]: ton truc standard jazz, et puis tu traces tout droit comme ça, c'est peut-être un petit peu... Et puis tout le monde se
+           met dans le rouge, tu vois.
+[TEACHER]: Ça, c'est aussi de sentir si... Peut-être ce genre de système qui sont détournés.
+[TEACHER]: Mais après, je ne peux pas refuser d'avoir la conversation de ce truc-là.
+[TEACHER]: OK, sensoriel.
+[TEACHER]: Tu vois, il y a plus sensoriel, dans les morceaux, c'est préétabli, il y a moins à réfléchir, tout.
+[TEACHER]: Mais comment on va intégrer tout ce bordel dans notre intérieur, tu vois ?
+[TEACHER]: Parce que je pourrais, entre guillemets, devenir, avec un peu d'entraînement, très adroit à suivre les couleurs, mais
+           je ne peux pas me déplacer avec une caméra, un ordi.
+[TEACHER]: Donc, il y a un moment, je vais devoir dire, ok, ça, c'était cool, ça m'a fait découvrir une manière de faire, plus sur
+           le faire, plus sur l'actif, plus sur le jeu, plus sur une validation plutôt sonore que jugeante, tu vois, de ce qui
+           m'arrive.
+[TEACHER]: Mais après, comment je vais faire ?
+[TEACHER]: Ce truc-là, maintenant j'ai appris à le faire, mais comment ça je vais le connecter avec le background complet ?
+[TEACHER]: Les gammes et compagnie.
+[TEACHER]: Comment je vais mettre ça, pas que dans la théorie, mais dans le background complet ?
+[TEACHER]: Autant la théorie que la pratique, et comment je vais connecter ça avec d'autres personnes ?
+[STUDENT]: C'est intéressant, mon prof, il avait, dans la même thématique que ça, il avait dit, lui, quand il a vu ça, il a pensé
+           à, il est prof à l'Uni, il a pensé à cette idée de la disruption de l'IA dans l'éducation, en fait.
+[STUDENT]: C'est un outil qui arrive, et ça change toute la façon d'apprendre.
+[STUDENT]: Puis lui disait, t'imagines un monde où tous les pianistes jazz se traîneraient avec ce gros machin, puis ils seraient
+           tous avec ces lumières, mais au final... Oui, il y a des bases qui sont négligées, soi-disant.
+[STUDENT]: Il a montré ça à sa fan qui est prof classique de bois, puis il a dit, ouais c'est cool ce machin, mais les gens,
+           enfin, où sont les bases ?
+[STUDENT]: Tu apprends pas tes gammes en réalité.
+[TEACHER]: Oui, alors c'est une remarque intéressante, mais ça faisait réagir par un autre biais.
+[TEACHER]: Dans le côté IA, c'est un truc qu'on peut en parler après, mais attends, qu'est-ce que t'as dit ?
+[TEACHER]: Redis-moi le début de ce que tu m'as expliqué à le prof.
+[TEACHER]: Ton prof, il a dit au début...
+[STUDENT]: C'est un truc disruptif, c'est une technologie...
+[STUDENT]: Ce serait potentiellement une technologie...
+[TEACHER]: Alors, excuse-moi, peut-être que tu ne vois pas, parce que peut-être que tu ne connais pas, mais il y a une référence,
+           tu sais, il y a l'école Kodai, c'est un truc, et puis il y a l'école Suzuki.
+[TEACHER]: Les trucs d'apprentissage.
+[TEACHER]: Oui, mais il y a des... Avant ça, il y a des cahiers, tu colles des gommettes de couleurs sur le piano, tu apprends des
+           chiffres.
+[TEACHER]: Moi, j'ai appris le piano au secours, hein.
+[TEACHER]: Moi, ma première année de piano, la prof, elle marquait dans mon cahier 1, 2, 3, 2, 3, 5, 4, 3, 2, 1.
+[STUDENT]: Ah oui, ça faisait tout de dit, tout de dit, tout de dit, tout de dit, tout de dit, et c'était ma technique.
+[TEACHER]: Après, on a passé à la lecture, mais si tu veux, j'étais dans du numérique.
+[TEACHER]: L'école Suzuki, c'est un truc, tu singes le bordel qu'il y a, mais maintenant, il y a des choses avec, même les audios
+           et tout, là-bas, c'est des cahiers avec des gommettes de couleurs, puis tu joues, puis tout le monde étudie en même
+           temps.
+[TEACHER]: Tu as 25 élèves en même temps, avec 25 canaux, et on joue le truc.
+[TEACHER]: Et ils font tout ça.
+[TEACHER]: Donc, des systèmes d'apprentissage autres, avec un bout, une information partielle par rapport à la globalité, c'est
+           peut-être ça la vraie discussion pour moi, ils existent déjà également, si jamais.
+[TEACHER]: Dans la méthode Suzuki, que je pense que ce que déjà les deux phrases que tu as dit de ton prof, si j'avais mon cahier
+           Suzuki, je te le mettrais.
+[TEACHER]: elle serait valable la même chose, tu vois.
+[TEACHER]: C'est une simplification de la vraie histoire.
+[TEACHER]: C'est insister sur ou mettre un focus sur un des points, un des paramètres d'apprentissage ou de progression humaine
+           dans l'apprentissage d'un sujet et éclairer, enfin éclairer, bref, mettre le focus sur un paramètre et le faire faire
+           beaucoup.
+[TEACHER]: Et ce paramètre te fait augmenter ta courbe.
+[TEACHER]: Le problème, c'est toujours la courbe de progression.
+[TEACHER]: Tu vois, les batteurs, ils ont de monstres courbes de progression.
+[TEACHER]: Parce qu'ils arrivent, en deux semaines, ils arrivent à faire...
+[TEACHER]: Mais après, quand il faut jouer des batteurs, c'est dans le cerveau coupé en quatre, il y a deux jambes, deux bras qui
+           doivent jouer des trucs ordinaux, c'est pas si simple.
+[TEACHER]: Mais là, ils galèrent.
+[TEACHER]: Donc ils font comme ça, et après ils ont un plafond de genre 5 ans.
+[TEACHER]: Nous, les pianistes, c'est le pire.
+[TEACHER]: Nous, on fait comme ça.
+[STUDENT]: On se couvre, on se couvre, on se couvre.
+[STUDENT]: T'es dans la boue pendant des années.
+[TEACHER]: Ouais, et puis après, t'arrives là, et après, en fait, en vrai, moi, je me ressens avec les élèves, je sens qu'il n'y a
+           pas vraiment de plafond.
+[TEACHER]: Il y a une sorte de truc que, si t'arrivais tout le temps, en fait, dès que t'as pris de la hauteur, t'envoies du
+           lourd, en fait.
+[TEACHER]: Alors, tu vois, le batteur, il prend de la hauteur tout de suite.
+[TEACHER]: Tu fais, poum, tchac, tu joues la moitié de la pop en une fois.
+[TEACHER]: C'est ce qu'il faut.
+[TEACHER]: Il suffit juste de jouer un peu vite, un peu lent, et tu peux jouer Prince, Sting, enfin, tout ce que tu veux.
+[TEACHER]: Et nous, avec ce genre de concert,
+[TEACHER]: elle est compliquée parce qu'il y a beaucoup de paramètres et c'est vite difficile.
+[TEACHER]: Motricité fine, compréhension, l'harmonie, le machin, les accords.
+[TEACHER]: C'est full, full, full.
+[TEACHER]: La pente, elle n'est pas très raide.
+[TEACHER]: Elle est douce, mais elle monte longtemps, longtemps.
+[TEACHER]: Mais par contre, quand tu as pris la hauteur, il y a de la vraie hauteur.
+[TEACHER]: C'est du épais.
+[TEACHER]: Donc peut-être que ce genre de système, pour revenir à ce qu'on disait, permettrait de mettre un éclairage sur un
+           endroit où en fait, ça allège
+[TEACHER]: les paramètres d'un côté.
+[STUDENT]: C'est quoi l'endroit ?
+[TEACHER]: Si je pense l'apprentissage comme une sorte de globalité, je dirais que ça, ça focus sur une des zones d'apprentissage.
+[TEACHER]: Et c'est quoi la zone ?
+[TEACHER]: Je ne sais pas, je ne l'ai pas encore trouvé.
+[STUDENT]: En le mettant un certain nombre de choses.
+[STUDENT]: Parce que là, il y a des trucs, si on arrive à trouver ce que c'est cette zone, c'est un truc que moi je pourrais
+           potentiellement tester.
+[STUDENT]: Oui, tout à fait.
+[TEACHER]: des trucs genre, pour moi c'est relié à l'athlétisme, c'est le saut à 100 mètres haies.
+[TEACHER]: Pour moi c'est ce genre d'exercice.
+[STUDENT]: La physicalité, la mécanique...
+[STUDENT]: Mais...
+[STUDENT]: C'est marrant parce que moi ce que j'ai voulu faire initialement c'était justement favoriser des impôts plus créatifs
+           en fait.
+[STUDENT]: Oui mais attends... Avec ces trucs de jeu... Oui mais attends, alors, ok...
+[TEACHER]: Mais oui, oui, oui... Attends, la remarque de la femme de ton prof,
+[TEACHER]: elle est un petit peu empirique à l'ancienne.
+[TEACHER]: C'est comme si la personne, elle ne sait pas qu'il y a d'autres concepts qui existent.
+[TEACHER]: La pédagogie par objectif, la pédagogie par le vécu, c'est ce que je fais moi beaucoup avec les élèves.
+[TEACHER]: Ils foutent dans l'embarras, allez viens on va jouer.
+[TEACHER]: Puis là, ils apprennent en faisant, tu vois.
+[TEACHER]: Oui, mais ça marche très bien si je peux.
+[TEACHER]: Et ça, ça ressemble un peu à la pédagogie par le vécu.
+[TEACHER]: Genre, tu ne sais pas ce qu'est quoi ce morceau, vas-y, balance les couleurs.
+[STUDENT]: Ah putain, je fais des sons là-dessus.
+[TEACHER]: Et puis après, c'est pour ça qu'avant, je disais plutôt comment relier ça avec la globalité du background.
+[TEACHER]: Ça, je le vois vraiment comme une zone qui peut être grande et progresser beaucoup, mais...
+[TEACHER]: qui n'a pas toute la globalité dedans.
+[TEACHER]: Oui, clairement.
+[TEACHER]: Mais néanmoins, l'exercice, il vient d'une intelligence globale de la situation.
+[TEACHER]: Donc ça, c'est OK pour moi.
+[TEACHER]: L'exercice, il est bien, il est complet.
+[TEACHER]: Maintenant, juste pour te répondre par rapport à ce que tu viens d'évoquer, où est cette zone ?
+[TEACHER]: Je ne sais pas, mais maintenant, il faut aussi bien comprendre où est-ce qu'on applique ce truc.
+[TEACHER]: À quel niveau d'apprenant
+[TEACHER]: Ça c'est une question que j'allais te poser.
+[STUDENT]: Ah oui ?
+[TEACHER]: Non mais tu l'as trouvé en fait, tu l'as trouvé naturellement.
+
+============================================================
+  Canon 02
+============================================================
+
+[STUDENT]: Ok, part 2.
+[TEACHER]: Donc, où appliquer ce...
+[TEACHER]: On se trouve à un endroit, si je pense, open mind, où cet outil, on peut l'appliquer dans ce sens-là, dans n'importe
+           quel niveau d'apprenant, je pense.
+[TEACHER]: Mais en même temps, l'outil, il faut l'adapter avec n'importe quel niveau d'épaisseur ou de complexité par rapport à
+           l'apprenant qui est en train d'apprendre.
+[TEACHER]: Et ça, il faut checker.
+[TEACHER]: Parce que, par exemple, un petit, c'est peut-être beaucoup plus sympa d'avoir juste un blouse avec.
+[TEACHER]: Maintenant, si je vais plus loin, si tu me poses la question, par exemple, du peu que j'ai vu dans les tests, là, quand
+           on a fait, pour moi, les lumières, quand il y a de la grille, elles vont beaucoup trop vite.
+[TEACHER]: Je n'arrive pas à les choper.
+[TEACHER]: Donc, il faut réfléchir comment faire ça.
+[TEACHER]: Et par exemple, pour un petit qui apprendrait, disons, il fait un blouse, peut-être devoir trouver là, parce que là, tu
+           es déjà vachement à corps, il faut peut-être trouver des trucs pédagogiques avant
+[TEACHER]: qui serait, quelle est une gamme un peu passe-partout, tu vois, où tu aurais la grille qui tourne, mais quand même, tu
+           vois, un peu ces concepts comme des souffleurs, ou qu'il n'y a pas, par exemple là, la première ligne de ce morceau, en
+           tout cas les trois premiers accords, un fa blues, ça passe bien, donc du coup tu pourras avoir une sorte de fa blues,
+           avec peut-être juste une note rajoutée là, dans la quatrième mesure, puis c'est moins movie, et puis tu peux plus,
+[TEACHER]: Trouver le dosage en proprioception, sensorialité, et puis combien je dois suivre, combien je fais le ginkana, tu vois,
+           combien je fais le 100 mètres R avec le truc accélère, tu vois.
+[STUDENT]: Ouais, ouais.
+[TEACHER]: Et donc là, il y a les niveaux d'apprenant plus ou moins différents, tu vois.
+[TEACHER]: Et après, dans la matière, donc les niveaux d'apprenant comme ça, et puis dans l'épaisseur de la matière comme ça.
+[TEACHER]: Et dans l'épaisseur de la matière, après on pourrait aller à des trucs plus compliqués ou plus complexes qu'on a déjà
+           évoqués ensemble, qui à mon avis seraient un niveau aussi bien intéressant, c'est de proposer dans les dominantes des
+           substitutions.
+[TEACHER]: Je joue mixo, parce que je joue dim, je joue alt, je joue mixo dièse 11, je joue harmonique mineure cinquième degré, je
+           joue harmonique mélodique assez grand, et je joue gamme par ton.
+[TEACHER]: Ça, c'est un peu les six options quand tu arrives à une dominante.
+[TEACHER]: Peut-être ce genre d'outil, il peut être sympa de se dire, ok, ben...
+[TEACHER]: j'invente une application avancée.
+[TEACHER]: Ok, ça tourne, il y a le backing track, ça tourne, tout ce qui est facile, je ne fais rien, pas de lumière.
+[TEACHER]: Et j'ai déjà la lumière allumée sur les trois endroits difficiles où il faut la gamme altérée, par exemple.
+[TEACHER]: Donc au lieu que j'ai tout le truc qui tourne, je n'ai pas besoin, je joue, j'improvise, je fais un truc mixte où j'ai
+           déjà intégré ce que propose cet outil dans mon savoir-faire.
+[TEACHER]: Pour l'enfant, si l'outil est là, il faut peut-être imaginer un truc plus basique.
+[STUDENT]: Une gamme passe-partout.
+[TEACHER]: Avec l'idée du passe-partout, ou de groupe de notes, ou de réservoir de notes.
+[TEACHER]: En tout cas, pour un temps lent, c'est surtout ça.
+[TEACHER]: L'humain, il a le temps.
+[STUDENT]: Moi, j'ai remarqué... Moi, l'idée, j'avais...
+[STUDENT]: J'ai aussi fait ça, c'était en gros que tu pouvais...
+[STUDENT]: Tu peux louper des zones, en fait.
+[TEACHER]: Oui, bien sûr.
+[TEACHER]: Ça, c'est pour travailler.
+[STUDENT]: Tu peux dire, je veux juste travailler.
+[STUDENT]: C'est deux changements.
+[STUDENT]: En boucle, comme ça, tu n'as pas toute la grille, toute la base d'informations.
+[TEACHER]: Ouais, bref, ok.
+[TEACHER]: Il n'a pas fait la lumière, par contre.
+[STUDENT]: Oui, je vais redémarrer le logiciel.
+[STUDENT]: J'avais cette idée-là.
+[STUDENT]: Ou bien des trucs...
+[TEACHER]: J'adore, on dirait les...
+[TEACHER]: C'est l'étalonnage de lumière, on dirait les anneaux de Saturne.
+[STUDENT]: Mais c'est les anneaux de Saturne, c'est l'occasion de mon écran.
+[STUDENT]: Ah ok, trop beau.
+[STUDENT]: J'avais aussi prévu un truc... Ah super, des exos.
+[TEACHER]: Ouais, des trucs dans Aeryl Pro, c'est un jeu où tu as tous les deux cinq armes.
+[TEACHER]: Ouais, ben là, c'est idéal de foutre le sol 7 pour un apprenant avancé de se poser la question de la gamme altérée, tu
+           vois.
+[TEACHER]: Donc, quand tu as le seul set, tu joues dim ou alt et pas mixo.
+[STUDENT]: Et là, ce serait le logiciel, ce serait à lui de montrer le alt, etc.
+[STUDENT]: Les autres options de tension pour les accords dominants.
+[TEACHER]: Peut-être que c'est à toi de choisir une tension, puis tu dis la même option pour toute la séquence.
+[STUDENT]: Oui, d'accord.
+[TEACHER]: Et ça, ça serait intéressant qu'il y ait un logiciel comme ça qui peut bombarder ça dans le dessus, tu vois.
+[TEACHER]: Avec tes cinq possibilités de jeu.
+[TEACHER]: Mais quand je suis sur le 7, il me faut une fois ce mixo, une fois le mixo des 11, une fois diminuer, une fois altérer,
+           une fois la gamme par tronc, les deux mineurs.
+[STUDENT]: Après, ce qu'on peut faire, moi, je n'ai pas vraiment besoin de l'implémenter.
+[STUDENT]: Pour de vrai, c'est un truc où je peux me créer une fausse grille factice, comme tu l'as vu, là, les deux 5K à
+           l'infini.
+[STUDENT]: Mais à chaque fois, là, tu as un seul set, là, tu as un seul altéré, là, tu as un seul B2.
+[STUDENT]: Ça simule un peu.
+[TEACHER]: Oui, ça peut, sauf que si je pense apprentissage, qu'est-ce qui m'est le plus utile ?
+[TEACHER]: Peut-être que je fais...
+[TEACHER]: Deux fois sur sol 7, puis après deux fois sur dos 7, deux fois sur fa 7, parce que là, le cerveau, il faut qu'il
+           mouline à trouver.
+[TEACHER]: Ou alors, je fais, comme tu viens de dire, mais il faut du temps.
+[TEACHER]: Je pense que le...
+[TEACHER]: J'ai l'impression...
+[TEACHER]: Mais là, je ne sais pas si on est dans les questions ou si je dis quand même les trucs que je sens.
+[TEACHER]: Oui, oui, oui.
+[TEACHER]: OK, mais après, ça part un peu.
+[TEACHER]: J'ai l'impression que ce logiciel, il est bien foutu, mais il est très serré.
+[TEACHER]: Je le trouve un poil serré dans ce qu'il y a à faire.
+[TEACHER]: J'ai un peu...
+[TEACHER]: une inquiétude que les apprenants n'aient pas le temps de capter et de le faire, tu vois.
+[TEACHER]: Donc il faudrait étudier les possibilités où il y a le temps humain qui apparaît dans le temps de la machine.
+[TEACHER]: Parce que là tu es pris, toi tu jongles avec les options de la machine, alors que tu sais très bien le faire puisqu'on
+           a parlé la semaine dernière, on a parlé du pourcentage de basse et de notes inside, outside, donc tu comprends bien
+           qu'il y a un...
+[TEACHER]: un dosage esthétique humain à mettre dans ce langage machine.
+[TEACHER]: Et là aussi, je pense que dans l'exercice, il faut trouver le dosage esthétique humain.
+[STUDENT]: D'accord, ouais, c'est mon jugement qui importe un peu là.
+[TEACHER]: C'est en tout cas à toi comme musicien et dans un cadre de pédagogie de voir quels seraient les degrés.
+[TEACHER]: Peut-être au lieu de dire 10 000 degrés, tu te dis 3 degrés.
+[TEACHER]: Qu'est-ce que je fais avec ça avec un débutant débutant ?
+[TEACHER]: Je ne vais pas lui balancer le cycle de quintes comme ça.
+[TEACHER]: Qu'est-ce que je fais avec un moyen ?
+[TEACHER]: Je ne sais pas, il y a plein de morceaux qui vont à la sous-dominante, donc il peut se faire en tout cas deux lignes,
+           il peut... Ouais, d'accord.
+[TEACHER]: Puis deux lignes, puis deux lignes, tu vois, je ne sais pas.
+[STUDENT]: Moi, ma remarque, en tout cas, c'était que vu que ça s'adapte à n'importe quelle grille, genre là, il n'y a pas de back
+           contract qui a été fait en avance, les gammes sont calculées on the fly.
+[STUDENT]: Du coup, tu peux créer une infinité de morceaux factices d'entraînement.
+[STUDENT]: Et puis là, justement, il y a une idée de deux accords dominants.
+[TEACHER]: Parce que tu dis qu'il recrée les couleurs en fonction du chiffre.
+[STUDENT]: Ça analyse un peu l'idée.
+[STUDENT]: Là, il comprend que le ré mineur 7, c'est Dorian parce que c'est dans le cadre d'un 2-5.
+[STUDENT]: Mais si c'était à la fin d'un 2-5 mineur, ce serait le mode éolien ou autre chose.
+[TEACHER]: petit peu d'IA là ?
+[STUDENT]: Non, c'est de l'inférence en fait.
+[STUDENT]: Si l'accord suivant est une carte au-dessus.
+[TEACHER]: Si c'est un mineur avec une quinte au-dessus et en dominante.
+[STUDENT]: Voilà, c'est probablement un dorien.
+[TEACHER]: Ou si l'autre c'est un B9.
+[TEACHER]: Alors ok, je vais essayer de répondre à la partie IA parce que je connais un petit peu, pas très bien mais j'aime bien
+           me poser des questions et voir.
+[TEACHER]: L'IA pour moi il n'y a rien de magique, c'est plutôt
+[TEACHER]: Pour l'instant, on l'utilise comme un énorme database qui est hyper ordré, hyper organisé.
+[TEACHER]: Donc maintenant, peut-être, mettre encore un regard IA par-dessus ou un fonctionnement, il faudra voir quels seraient
+           les trucs utiles et efficaces.
+[TEACHER]: Donc, ce que tu viens de décrire, que toi, tu as programmé, c'est... Hé, là, c'est tout.
+[TEACHER]: J'adore, c'est ce que j'allais te dire, en fait.
+[TEACHER]: J'allais te dire, mais si on pensait IA, peut-être, l'IA devrait être capable, avec tous les analyses de gris qui
+           existent planétaires...
+[TEACHER]: de analyser la grille au fur et à mesure qu'elle arrive, tu vois.
+[TEACHER]: Donc peut-être même de proposer, si je vais un peu plus loin, dans les trucs avancés, après il faudra débuter en mai,
+           de proposer le bon mode dans cette situation tonale.
+[TEACHER]: Par exemple, si j'ai un des deux cinq conjoints,
+[TEACHER]: Ré, Sol, Mi, La, je ne sais pas, demi-diminué, La7.
+[TEACHER]: Oui, les 3, 6, 2, 5.
+[TEACHER]: Oui, ou 2, 5, 2, 5, 2, 5.
+[TEACHER]: Par exemple, Mi bémol mineur 7, La b7, Mi mineur 7, La7.
+[TEACHER]: Tu vois, c'est les deux 5 conjoints, c'est la subsite.
+[TEACHER]: Ah oui, les subsites.
+[TEACHER]: C'est la subsite du 2, 5, 2, 5.
+[TEACHER]: Qu'est-ce que là ?
+[TEACHER]: On va jouer quoi dans les dominantes ?
+[TEACHER]: Parce qu'elles sont tellement proches.
+[TEACHER]: Qu'est-ce qu'on va faire ?
+[TEACHER]: Alors là, par exemple, dans ce genre de cas, si c'est rapide, tu vois, le tempo, on va plutôt jouer sur la gamme du 2.
+[TEACHER]: Donc, en fait, on va jouer du mode mixo.
+[TEACHER]: Donc, ça ne sert à rien de faire un 2-5 en changeant les couleurs.
+[TEACHER]: Ça ne sert à rien.
+[STUDENT]: Juste faire la 7.
+[TEACHER]: Enfin, juste faire la dominante.
+[TEACHER]: Ou bien faire la sous-dominante.
+[TEACHER]: Voilà.
+[TEACHER]: Culturellement, traditionnellement, à l'ancienne, on ne jouait que sur la dominante quand il y avait un 2-5.
+[TEACHER]: Parce que le 2 était la bibopisation du 5, donc c'était un ajout pour rajouter des accords.
+[TEACHER]: Et puis, modernistiquement, après le cool jazz, donc ce qu'il y a eu après, le hard bop et tout ça, quand tu as des 2-5
+           et que c'est un peu rapide, tu joues sur le 2.
+[TEACHER]: Tu ne joues pas sur le 5.
+[TEACHER]: Donc par exemple, ça c'est des trucs qui pourraient être intéressants, ça commence à être un peu IA, ce n'est pas juste
+           des itérations, tu vois.
+[TEACHER]: Ou bien le faire manuellement.
+[STUDENT]: Un des deux.
+[STUDENT]: Mais en tout cas, il n'y a pas de if-else qui peut facilement encoder cette logique.
+[TEACHER]: Oui, tout à fait.
+[TEACHER]: Mais peut-être que c'est là où il y a le...
+[TEACHER]: Je pense qu'il y a un vide là, par exemple.
+[TEACHER]: Ok.
+[TEACHER]: D'analyse, même basiquement d'une situation musicale ou harmonique, d'analysia, de comparer avec divers modèles et de
+           trouver une sorte de solution qui est à 90% sûre que c'est la bonne, tu vois.
+[TEACHER]: On va dire comme ça.
+[TEACHER]: où est la cour de gare, il va te répondre au milieu mais du moment que tu as compris ça l'IA est super forte et après
+           peut-être l'IA plus beaucoup de data parce qu'il y a plein de photos et de trucs qui existent d'analyse des bouquins
+           d'analyse ça peut-être en est sorti du champ mais peut-être l'IA avec pas mal de data d'analyse et des trucs d'internet
+           et tout ça au bout d'un moment pas au début mais en phase 2 elle peut faire un petit peu de deep learning tu vois
+[TEACHER]: peut-être que l'IA elle arrive à le faire le deep learning parce qu'elle le fait dans tellement de sujets que le sujet
+           analyse jazz et trucs tu as peut-être déjà commencé donc du coup tu peux avoir une IA qui est bien affûtée par rapport
+           à ce domaine qui fait que dans n'importe quelle grille d'un logiciel qui tourne elle elle peut te proposer la méta-
+           analyse enfin l'analyse de la méta-information et les solutions et toi l'IA tu lui balances le bordel elle analyse tout
+           seul tu gères rien et elle elle te donne les solutions et elle
+[TEACHER]: j'aurais vu ça comme ça pour l'IA et puis par contre l'IA j'aurais aussi vu dans l'autre sens c'est que là le petit
+           gamin je sais qu'il le fait de faire un truc ou par rapport aux solutions de si on pense progression, pédagogie moi je
+           suis pas sûr que je suis de cette école mais d'écouter ce qui est joué pour avoir un pourcentage de réussite
+[TEACHER]: Parce qu'en fait, le problème qu'on a, c'est l'auto-débriefing.
+[STUDENT]: C'est écouter soi-même, genre s'enregistrer.
+[TEACHER]: Que l'IA, en temps réel, pourrait écouter ce qui est joué et donner un retour, on va le faire déjà simple, un retour
+           mat, bête et basique, donc ce n'est pas IA.
+[TEACHER]: Mais dire, OK, 80% des notes, c'est exactement ce qui est demandé par la couleur.
+[STUDENT]: Genre le pourcentage de notes qui sont dans le pool actuel, qui sont sur le temps, des trucs qu'on peut résoudre
+           mathématiquement.
+[TEACHER]: Après, avec un peu plus de précision musicale ou pas, mais déjà, il faut en donner une stat là-dessus.
+[TEACHER]: Parce qu'en fait, c'est hyper intéressant quand tu es apprenant, est-ce que j'y arrive ou pas ?
+[TEACHER]: Quelle est la notion de validation ?
+[TEACHER]: Il faut faire attention avec le mot validation.
+[TEACHER]: Comment je peux évaluer ou auto-évaluer que la situation est réussie ou pas ?
+[TEACHER]: Parce que là, tu mets une bécane dans les mains, je vais pédaler, il y a des braquets, des freins, des trucs et tout.
+[TEACHER]: Mais il est où mon retour d'investissement sur ce sujet ?
+[TEACHER]: Et ça, c'est un truc, le debriefing, c'est hyper important, en tout cas pour moi en musique.
+[TEACHER]: Même si vous ne vous rendez pas compte, je fais beaucoup avec vous.
+[TEACHER]: Je reste tout le temps.
+[TEACHER]: Et le but étant que l'élève s'auto-débriefe.
+[TEACHER]: C'est pour ça que des fois, je fais l'amibe.
+[TEACHER]: Je suis exprès de ne pas bouger.
+[TEACHER]: Je dis, vas-y, on va aller jusqu'où ?
+[TEACHER]: Parce que du moment que je te vois tracer, tu résous le truc, tu as trouvé la solution, tu changes d'accord.
+[TEACHER]: Et après, tu me dis, bon, tu viens jouer avec moi ?
+[TEACHER]: Je dis, bien sûr.
+[TEACHER]: Je n'ai pas besoin de parler.
+[TEACHER]: Parce que si je dois parler de toutes les étapes, il faut qu'on reste trois jours ensemble.
+[TEACHER]: de plus en plus haut qu'on pourrait imaginer.
+[TEACHER]: Et là, l'IA pourrait peut-être venir croiser ce qu'elle a pensé ou trouvé comme solution, ce qu'elle a proposé
+           lumineusement, qu'est-ce qui se passe au niveau de l'apprenant, au niveau des pourcentages de réussite.
+[TEACHER]: Et après, si on va plus loin, il faudrait peut-être jouer ou voir où est la notion d'esthétique ou de canon esthétique.
+[TEACHER]: Ça, c'est dur.
+[TEACHER]: Oui, oui.
+[TEACHER]: Est-ce qu'il y a des phrases bores ?
+[TEACHER]: Est-ce qu'il y a des notes d'approche ?
+[TEACHER]: appuyer sur les notes d'arpège.
+[TEACHER]: Mais tu vois, peut-être, ça aussi, là, il y a un nœud...
+[TEACHER]: Mais je trouve qu'on est un petit peu hors sujet, mais c'est juste pour élargir le panel par rapport à la question.
+[TEACHER]: C'est bien, c'est bien.
+[TEACHER]: Parce que tu vois, si je fais ça...
+[TEACHER]: Je suis tout juste.
+[TEACHER]: Mais en fait, je suis à côté musicalement.
+[STUDENT]: Ouais.
+[TEACHER]: Si je fais...
+[TEACHER]: C'est pas le son de...
+[TEACHER]: Je suis mille fois mieux alors que j'ai utilisé moins de notes.
+[TEACHER]: Donc statistiquement, je suis beaucoup plus faible dans l'utilisation des notes.
+[TEACHER]: 10% d'infos, mais musicalement je suis hyper haut, alors qu'avant il n'y avait pas de musique.
+[STUDENT]: Comment on va déjà soi-même mesurer ça, puis après si tu veux qu'une machine vienne par-dessus... Ça c'était un peu le
+           souci qu'on s'est rendu compte avec mon professeur, c'est que initialement, moi, la question de recherche c'était dans
+           quelle mesure un tel outil aide, favorise des improvisations plus créatives, plus jazz, plus mélodiques, mais le souci
+           c'est que...
+[STUDENT]: Comment tu mesures ça ?
+[STUDENT]: C'est impossible, en fait.
+[TEACHER]: Nous, on n'a pas trouvé de méthode.
+[TEACHER]: Si tu fais le compte mathématique, ça ne marche pas trop.
+[TEACHER]: Non, c'est parce que je vais te faire la preuve.
+[STUDENT]: Voilà, ça ne marche pas trop.
+[STUDENT]: C'est vraiment dur.
+[STUDENT]: D'autres chercheurs, ils ont fait ce truc.
+[STUDENT]: Ils ont pris des panels de professionnels.
+[STUDENT]: Ils ont dit, voilà, voici ce qu'ont fait les élèves.
+[STUDENT]: Qu'est-ce que vous en pensez, musicalement ?
+[STUDENT]: Et c'est comme ça qu'eux, ils ont trouvé leur solution.
+[STUDENT]: Mais je ne sais pas s'il y a des solutions mathématiques.
+[STUDENT]: Je n'avais pas pensé à élargir.
+[STUDENT]: Toi, tu avais cette idée d'utiliser les LLM pour évaluer s'ils arrivent.
+[TEACHER]: Oui, mais les LLM, on va se parler dans 5 ans si tu pars là-dedans.
+[TEACHER]: Et tu vas me parler pour ton doctorat.
+[TEACHER]: Parce que la route est longue, il n'y a rien.
+[TEACHER]: Je suis très sûr qu'il n'y a rien, pratiquement rien qui existe.
+[TEACHER]: De là à faire du LLM efficace, il y a du boulot.
+[TEACHER]: Il faut de rentrer du data.
+[TEACHER]: Des livres, des analyses, des machins à trouver comment coder, qui captent une image, qui puissent en faire quelque
+           chose.
+[TEACHER]: J'ai un ami à l'EPFL1 qui gère une base de données.
+[TEACHER]: Je l'ai vu évoluer au fil du temps.
+[TEACHER]: Eux, ils sont à l'analyse.
+[TEACHER]: Eux, ils font des photos alimentaires.
+[TEACHER]: et puis l'IA elle te dit les calories qu'il y a dedans et tout machin puis elle te donne le après il y a tout un calcul
+           de diététique par dessus mais il y a 5 ans ou il y a 8 ans je ne sais plus lui ils ont engagé tout un pool d'étudiants
+           de l'Uni à 50 balles chacun tu vois à 25 balles et ils allaient dans tous les supermarchés ils faisaient que des photos
+           produits, glucides, lipides, protéines machin de tout ce qu'il y avait dans les rayons
+[TEACHER]: Et ils ont nourri l'IA avec ça pendant deux ans.
+[TEACHER]: Tu vois, l'envergure du truc.
+[TEACHER]: Ce qui fait que l'IA, maintenant, quand elle voit un truc, tomato, chose, elle a une sorte de range où il se passe des
+           trucs.
+[TEACHER]: Après, tu peux demander du deep learning, mais pas avant.
+[TEACHER]: C'est pour ça que je...
+[TEACHER]: Tu connais mieux que moi, mais ce n'est pas faux ce que je te dis.
+[TEACHER]: Non, non.
+[TEACHER]: C'est logique.
+[TEACHER]: Il faut des données, il faut entraîner.
+[TEACHER]: Là où tu en es, dans ton protocole de vouloir qu'une IA t'aide à valider ou à invalider la situation, il faudrait
+           vraiment bien réfléchir.
+[STUDENT]: C'était pas mon but, c'était pas mon but.
+[STUDENT]: C'est comment évaluer.
+[STUDENT]: Justement, vu qu'on n'a pas trouvé la solution, ou la solution n'est pas trop faisable, j'ai un peu pivoté mon idée.
+[STUDENT]: On est plus sur le truc de charge mentale, de pédagogie.
+[STUDENT]: Oui, mais...
+[STUDENT]: Surtout pour tester, en fait, en gros, il faut qu'on arrive à tester ce qu'on essaie de mesurer.
+[STUDENT]: Ou faire des tests qui nous donnent des mesures qui sont utilisables.
+[TEACHER]: Ok, j'ai compris ce que tu viens de dire, parce que j'ai une sœur qui est statisticienne, un docteur en statistique de
+           la santé.
+[TEACHER]: Et elle m'a souvent repris et expliqué, c'est que quand tu veux avoir une information mesurable, valable, il faut que
+           tu réfléchisses bien à qui...
+[TEACHER]: Qu'est-ce que tu veux demander à qui et comment tu vas le demander ?
+[TEACHER]: C'est plus important de savoir où est le range, où est la fourchette de questionnement que tu ouvres.
+[TEACHER]: Tu vas avoir le bon range pour le bon public cible qui te répond dans ces résultats-là que tu souhaites obtenir.
+[TEACHER]: Et savoir comment poser des questions vides pour ne pas les influencer, ne pas donner la réponse dans la question, pour
+           faire simple.
+[TEACHER]: Après, ton résultat est quantifiable.
+[TEACHER]: Elle ne fait que de la stat, mais...
+[TEACHER]: De toute façon, tu es confronté au truc humain.
+[TEACHER]: Tu vois, c'est plus beau les pantalons jaunes ou les pantalons beiges en été.
+[TEACHER]: Ça va être compliqué.
+[TEACHER]: Moi, j'ai failli m'insulter avec mon ex-beau-père parce que lui me dit « Non, mais les Américains, ils sont 350
+           millions.
+[TEACHER]: Ils boivent des demi-litres de café comme ça.
+[TEACHER]: Le produit qui sort de ma
+[TEACHER]: C'est du jus de chaussettes.
+[TEACHER]: Par contre, tu finis comme ça, parce que comme tu en bois un demi-litre d'un truc dégueulasse.
+[TEACHER]: Et moi, j'étais quand même assis sur la place de Sienne, très bien accompagné, certes, avec mon petit expresso, les
+           petits manons, qui ont pris le soleil toute la journée.
+[TEACHER]: Il y a cette sorte de douceur, tu es assis sur ta petite table comme ça.
+[TEACHER]: c'est un des meilleurs trucs du monde que j'ai goûté mais statistiquement ce truc il est en dessous des ricains donc
+           comment ça se fait que ça c'est le top du top c'est pas moi qui invente c'est la réalité la culture du café et tout il
+           y a quand même tout un code alors que statistiquement c'est les autres il y a plus de bouseux qui boivent leur mille et
+           deux cafés que les gars comme ça tu vas avoir le même problème comment t'évalue le truc
+[TEACHER]: Alors est-ce qu'il faut prendre des canons esthétiques, des canons artistiques, ou est-ce qu'on peut prendre peut-être
+           des canons humains sur l'aisance ?
+[TEACHER]: peut-être que tu pourrais trouver comment évaluer, peut-être un pouls.
+[STUDENT]: Ça, c'est un peu la direction que mon prof suggère.
+[STUDENT]: En tout cas, dans le domaine de l'interface Person-Machine, ce qui est le cas de mon projet, il y a des tests standards
+           pour mesurer ta charge cognitive, ta réaction à l'outil, est-ce que tu as trouvé facile ou pas facile à utiliser.
+[TEACHER]: Mais toi, tu dois inventer ce test ou tu dois juste déterminer quel test tu vas utiliser pour...
+[STUDENT]: Non, non, il m'a suggéré...
+[STUDENT]: Il m'a donné un petit schéma d'un protocole potentiel.
+[STUDENT]: Pour mesurer, en tout cas... Ouais.
+[STUDENT]: Après...
+[STUDENT]: Mais c'est pas mesurer la qualité de l'impro.
+[STUDENT]: Ça, on va pas y arriver.
+[TEACHER]: Mais peut-être qu'on pourrait quand même en parler un petit peu, parce que... Maintenant, on fait un truc basique.
+[TEACHER]: On prend des jeux à peu près de ton niveau, donc c'est du moyen avancé.
+[TEACHER]: Donc on est quand même dans des trucs avancés.
+[TEACHER]: On n'est pas du tout dans des trucs de débutant.
+[TEACHER]: Et puis...
+[TEACHER]: Tu dis, ok gars, tu fais une demeure par jour de ça.
+[TEACHER]: Tu crois que ça donne avec quoi ?
+[TEACHER]: Parce que c'est ça le problème.
+[TEACHER]: C'est que là, on discute d'un truc, mais on n'a pas les...
+[TEACHER]: Il nous faut la clinique, maintenant.
+[TEACHER]: Comme quand ils font les médicaments, maintenant, il nous faut deux ans de test avec du clinique si on veut du vrai
+           résultat.
+[TEACHER]: Mais il faudrait que tu aies...
+[TEACHER]: Soit, comme ils ont fait tes collègues, d'avoir pas mal de monde, soit de trouver des critères jusqu'à ce que la
+           personne peut dire, ah, j'ai atteint ces critères-là.
+[STUDENT]: On pourrait faire des trucs plus sur le long terme.
+[TEACHER]: Il faut penser un peu comme ça, parce que là on a le joystick tout neuf, mais on ne l'a pas beaucoup essayé.
+[STUDENT]: Oui, je vois.
+[STUDENT]: Peut-être que tu pourrais...
+[TEACHER]: Alors ça, je ne sais pas comment faire, parce que l'installation n'est pas si simple.
+[TEACHER]: Peut-être que tu pourrais trouver un endroit où tu l'installes, et il y a des gens qui l'aiment aussi.
+[TEACHER]: trois fois, quatre fois, cinq fois, une demi-heure avec toi.
+[STUDENT]: Ouais, idéalement, c'est que... Avec ta blouse blanche, c'est une été.
+[TEACHER]: C'est où, là ?
+[STUDENT]: Idéalement, c'est que c'est sur plusieurs séances, en fait.
+[STUDENT]: Pour vraiment voir si ça marche.
+[STUDENT]: Enfin, si tu arrives, si on veut mesurer la progression musicale.
+[STUDENT]: Voilà.
+[TEACHER]: Alors après, au moins où je peux aider, c'est que, par exemple...
+[TEACHER]: Mais ça, c'est dur à faire.
+[TEACHER]: Ouais, mais t'as...
+[STUDENT]: C'est dur à rappeler, genre, les mêmes personnes six fois.
+[TEACHER]: Ouais, mais peut-être ça se discute.
+[TEACHER]: Peut-être faut...
+[TEACHER]: Je sais pas.
+[TEACHER]: Faut réfléchir.
+[TEACHER]: Ça peut être aussi, par exemple, je ne sais pas, je n'ai pas la solution pratique.
+[STUDENT]: Oui, c'est mon problème, ce n'est pas le tien.
+[TEACHER]: Non, non, mais je me dis, ce qu'il faudrait voir aussi, parce que je ne veux pas refermer la porte complètement.
+[TEACHER]: Quand le gars, il est là avec les couleurs, puis il fait ça, ça se passe.
+[TEACHER]: Il a bien joué, bien ou pas, sa phrase.
+[TEACHER]: Les notes cibles, elles sont vachement réussies.
+[TEACHER]: Je suis sur la onzième.
+[TEACHER]: Neuvième.
+[TEACHER]: Septième majeure.
+[TEACHER]: Donc, je suis dans des notes du haut de l'harmonie.
+[TEACHER]: Ça, par exemple, ça me fait penser à... Ça, c'est un critère.
+[TEACHER]: Est-ce que le gars, il arrive à avoir les notes pivots plutôt dans les upper structure ?
+[TEACHER]: Ça, c'est un critère avancé et mesurable.
+[TEACHER]: Même par un ordi.
+[TEACHER]: Ouais, oui.
+[TEACHER]: Parce que tu dis, de tous les accords, combien il y a de 7, 9, 11, 13, tu vois.
+[STUDENT]: Hum, puis ça, c'est... Bah, en jazz...
+[STUDENT]: C'est vaguement indicatif.
+[TEACHER]: Si tu fais... T'es un peu...
+[TEACHER]: Si je fais...
+[TEACHER]: Ah, il y a eu quoi là ?
+[TEACHER]: Tu vois, c'est beaucoup plus avancé ça.
+[TEACHER]: Donc peut-être déjà, un critère basique, le choix, et ça, ça peut être un exercice proposé à l'élève, ou avec la
+           couleur, comme tu avais la couleur, ça m'a fait penser à ton 4, je crois que tu as le jaune et l'orange, et puis le
+           jaune qui te dit la note suivante.
+[TEACHER]: Est-ce que l'élève, après, par exemple, est-ce que l'apprenant...
+[TEACHER]: En faisant deux, trois fois, en essayant une fois, deux fois, trois fois, est-ce que dans un cas donné très simple et
+           très basique, il arrive à reproduire, quand tu éteins la lumière déjà, qu'est-ce qui se passe ?
+[TEACHER]: Parce qu'il a le piano qui redevient normal, il sent toutes ses couleurs.
+[TEACHER]: Est-ce qu'il y a une trace dedans quelque part ?
+[TEACHER]: Est-ce qu'il arrive à faire des impros ?
+[TEACHER]: On ne sait pas si la phrase est belle ou pas, ça c'est compliqué à mesurer vraiment.
+[TEACHER]: Mais est-ce que dans le contenu de la phrase, parce que là je pense qu'on est plutôt sur des hauteurs de notes que sur
+           des notions rythmiques.
+[TEACHER]: en tout cas là j'en vois pas visuellement ni dans l'ordi et toi tu les transmets oralement mais ils sont pas vraiment
+           explicités ouais c'est plus sur le pitch voilà donc très bien déjà on referme ok que du pitch moi je pense que la
+           construction de la phrase la beauté de la construction de la phrase je me méfie un peu oui ok donc maintenant il me
+           reste les notes cibles mais les notes cibles c'est hyper bien
+[TEACHER]: Tu vois ?
+[STUDENT]: Il n'y a plus de batterie, finalement.
+[TEACHER]: Ça, c'est vachement bien, mais c'est hyper dur, enfin.
+[TEACHER]: Les gars...
+[TEACHER]: Tu connais Liam, là, qui est juste avant toi ?
+[TEACHER]: Là, je peux lui montrer, ça, il va comprendre.
+[TEACHER]: Il est en médecine et tout, il n'y a pas de problème, mais il a la peine à faire...
+[TEACHER]: Je vais jouer le même.
+[TEACHER]: Je vois.
+[TEACHER]: Il y a quand même une petite différence, tu vois.
+[STUDENT]: C'est vrai, oui.
+[STUDENT]: La façon de gamme, d'altération sur la dominante, du fait de viser les upper structures.
+[TEACHER]: Et peut-être, tu te rappelles des fois, je t'avais fait au cours, je t'avais fait ce schéma où tu as la note cible, de
+           la déco,
+[TEACHER]: la note cible, quelque chose qui relie une autre note cible, avec éventuellement un appui intermédiaire, mais en tout
+           cas une autre note cible, et puis la note cible finale.
+[TEACHER]: Donc si je suis là, ok, 9ème, B9, et là il y a des chemins aussi obligés.
+[TEACHER]: Est-ce que, par exemple, dans ces notes cibles, est-ce qu'il y a, en tout cas, une de départ ou des certaines de
+           départ, pas en quantité, mais en qualité, de upper structure ?
+[TEACHER]: Et est-ce que le chemin des notes cibles fait sens ?
+[TEACHER]: Oui.
+[TEACHER]: Ça, ça peut être aussi encore...
+[STUDENT]: Mais faire sens, c'est... False, true or false ?
+[STUDENT]: Parce qu'en fait, si je fais ça...
+[TEACHER]: Ouais.
+[TEACHER]: Ça va là.
+[TEACHER]: Ça va pas là.
+[TEACHER]: Parce que là, il faut faire autre chose.
+[TEACHER]: ça il faut un peu de la jugeauté humaine pour déterminer ouais alors j'essaie de trouver un peu des sortes de trucs
+           esthétiques vu que j'ai joué un peu avec ces pourcentages avec mon ami informaticien je suis un peu en train de
+           barboter je laisse traîner mon cerveau dans ce truc de tirage, pourcentage, esthétique mais en même temps avec des
+           points de valeur peut-être c'est un chemin d'évaluation
+[STUDENT]: Probablement.
+[TEACHER]: Parce que si tu es là, on va essayer de voir s'il arrive à améliorer l'auteur des pitches, des notes de base utilisées
+           dans la création de phrases pour avoir un maximum de phrases qui déambulent dans les upper structures.
+[TEACHER]: Quand on est là-dedans, ça s'appelle advance.
+[TEACHER]: Quand on est en tonique entre la quinte et la neuvième, on peut appeler médium.
+[TEACHER]: Et puis quand on est 1-3-5 ou 1-3-5-7, c'est basique.
+[STUDENT]: Oui.
+
+============================================================
+  Canon 03
+============================================================
+
+[STUDENT]: l'analyse de la situation je ne sais pas si ça va être une analyse informatique ou manuelle moi j'ai l'impression que
+           ce sera plutôt du manuel c'est vraiment dur de quantifier tu arrives à mettre un if et else en while sur ce que tu
+           viens de faire
+[TEACHER]: sur le fait que il faut vraiment un truc très compliqué avec non mais pas un max de 3 bien viser la note la plus proche
+           les règles de musique on peut les programmer en harde les limites en tout cas la règle elle peut être écrite en harde
+           si quinte augmentée égale tierce si B9 égale tonique
+[TEACHER]: Ça, c'est les notes pivots, tu vois.
+[TEACHER]: 1, 3, 5, 7, 9, c'est 9, 3, 5, 9, 5, 3, 13, tu vois, qui redevient 3, 5, 7, 9.
+[TEACHER]: C'est le truc des voicings.
+[TEACHER]: C'est ça qu'il y a là-dedans.
+[TEACHER]: Et puis, essayer de dire, de sentir où est la note pivot, analysable, visualisable, en tout cas projetable, et puis
+           laisser la latitude autour.
+[TEACHER]: Alors peut-être, dans un premier temps, je ne me mêlerai pas trop de ce bordel,
+[TEACHER]: ou éventuellement même mettre quelques est-ce que la note pivot qui est identifiée d'une manière ou d'une autre est-ce
+           qu'elle est approchée du coup on va négocier les couleurs est-ce qu'elle est approchée en strict diatonique parce que
+           ton système il est diatonique ou est-ce que il est approché en chromatique tu vois parce qu'en chromatique des fois
+[TEACHER]: Je t'ai déjà montré, c'est au cours, mais ça, je peux faire...
+[TEACHER]: Mais là, c'est la gamme chromatique, c'est pas du tout dans...
+[TEACHER]: C'est tout out, donc si je fais du comptage, c'est false, false, false, false, false, false, false, juste.
+[TEACHER]: Alors que c'est hyper bien, parce que c'est les notes qui visent, tu vois.
+[TEACHER]: Joli.
+[TEACHER]: Tu vois, oui.
+[TEACHER]: Ça, c'est le chemin obligé.
+[TEACHER]: Ça, c'est de l'approche.
+[TEACHER]: Et puis, il y a un moment.
+[TEACHER]: Et des cours en plus.
+[TEACHER]: Diatonique.
+[STUDENT]: Ok, ok.
+[TEACHER]: Ok, ok, ok.
+[TEACHER]: Je réfléchis, je m'arrête de parler parce que je ne peux pas trop embarquer là-dedans.
+[TEACHER]: Donc il y aurait des notes cibles, le jeu des notes cibles, avec...
+[TEACHER]: Je ne sais pas comment les mesurer, mais de ne pas les mesurer en tant que...
+[TEACHER]: Faut faire gaffe avec le quantifiable, c'est pas la quantité de notre cible qui nous intéresse, c'est la qualité de
+           notre cible.
+[TEACHER]: Ça c'est plus compliqué en informatique aussi.
+[TEACHER]: Ouais, totalement, totalement, absolument.
+[TEACHER]: Mais, par exemple, on pourrait, alors je vais plus loin à haute voix, comme ça, on pourrait se dire, ok, on pourrait
+           faire, tu sais...
+[TEACHER]: L'employé de la semaine, la meilleure note cible à utiliser, la plus complexe, c'est la treizième.
+[TEACHER]: La treizième, elle vaut tant de points.
+[TEACHER]: Et puis la neuvième, elle vaut tant de points.
+[TEACHER]: Tu vois, je ne sais pas.
+[TEACHER]: que les notes cibles de visée pourraient avoir un ranking, chacune, attribué.
+[STUDENT]: Genre, si tu joues les fondamentales, c'est pas terrible.
+[TEACHER]: Peut-être 1, 3, 5, 7, 9, chacune.
+[TEACHER]: 1, ça vaut 1 point, 3, ça vaut 3 points, 5, 5 points.
+[TEACHER]: Voilà, par exemple.
+[TEACHER]: Et puis, imaginez, ok, alors, est-ce que dans la combinaison, on arrive à avoir un truc haut, tu vois ?
+[TEACHER]: Je sais pas, je vais le découvrir au bas, là, mais peut-être ça peut marcher.
+[TEACHER]: Il faudrait explorer, c'est assez mathématique, c'est tout con.
+[TEACHER]: Si tu dis...
+[TEACHER]: Parce qu'ici, il fait au-dessus de 27.
+[TEACHER]: Non, au-dessus de 21.
+[TEACHER]: Ça veut dire qu'il a utilisé des choses plus hautes que les septièmes.
+[TEACHER]: Vu que la septième, elle vaut 7 points.
+[TEACHER]: Donc si tu es sur la neuvième, ça fait 9.
+[TEACHER]: Tu vois ?
+[TEACHER]: Attends, on a 7 plus pour se marrer.
+[TEACHER]: Après, en tenant compte que dans la dominante, on vise une certaine gamme, tu vois ?
+[TEACHER]: Ça, ça fait 9.
+[TEACHER]: B13, ça, ça vaut 13.
+[TEACHER]: 9.
+[TEACHER]: On est pas mal.
+[TEACHER]: Mais si je fais ça ?
+[TEACHER]: Ça, c'est 5.
+[TEACHER]: A, ça, c'est bien.
+[TEACHER]: C'est B9, donc c'est 9.
+[TEACHER]: Et puis, 5.
+[STUDENT]: Tu peux vraiment juste traduire littéralement.
+[STUDENT]: Faudrait faire des petits essais parce que... Bon après le truc c'est que c'est pas du midi là, c'est du vrai piano.
+[STUDENT]: Du coup je n'enregistre pas les données des notes.
+[STUDENT]: Il faudrait potentiellement que je sorte un clavier midi.
+[STUDENT]: Parce que moi j'avais prévu de faire avec un vrai piano.
+[TEACHER]: Oui mais bon ça c'est une fausse contrainte.
+[TEACHER]: Non ouais c'est clairement une fausse contrainte.
+[TEACHER]: Attends je te réponds parce qu'en fait le midi c'est une transformation digitale de ce qui a été appuyé.
+[TEACHER]: Mais n'importe quel IA, même basique, tu lui donnes un truc à jouer, il t'écrit.
+[STUDENT]: Il arrive à sortir des notes.
+[TEACHER]: Il donne la liste, tu dis ce que tu veux.
+[TEACHER]: Mets moi une liste midi dans un tableau, les basiques à gauche, à droite, par demi-tons, et tu mets bien écrit en
+           américain et à côté le numéro du midi qui correspond, tu vois, ou le numéro de guerre.
+[TEACHER]: c'est pas très dur à mettre en place si tu veux d'accord on va enregistrer le truc et parce que est ce que tu vas
+           vouloir faire une c'est le problème je pensais vous avez le problème du débriefing je ne sais pas qu'est ce que tu as
+           comme temps à disposition pour ton master pour ton bachelor si ça doit être fini dans un mois ou dans trois mois ou
+           dans deux semaines moi je peux je peux le finir ce mois là je peux le finir pour septembre s'il le faut
+[STUDENT]: Moi, j'avais prévu de finir pour en juin, mais c'est flexible, je ne suis pas bloqué.
+[TEACHER]: Il faut voir aussi ton point d'intérêt, parce que le truc, il est déjà monstre bien, c'est vraiment...
+[TEACHER]: On a vu que tu es déjà bien loin dans le bachelor, la place finit, si tu veux.
+[TEACHER]: Après, il faut voir ce que ça... Parce qu'il y a ces questions, je réponds un petit peu ?
+[STUDENT]: Ouais, ouais, non, t'es à loin, t'es à loin.
+[TEACHER]: Après, ce n'est pas évident.
+[STUDENT]: C'est rare qu'on voit ce genre de truc dans l'informatique.
+[TEACHER]: Oui, mais ça existe.
+[TEACHER]: Tu as regardé l'application e-piano ?
+[STUDENT]: Non.
+[TEACHER]: Tu pourrais te la payer 25 balles, je te conseille.
+[TEACHER]: Non, mais parce qu'il y a des trucs qui existent déjà.
+[TEACHER]: À part les vidéos avec les lignes qui descendent, il y a des trucs qui existent déjà.
+[STUDENT]: Oui, c'est vrai que j'ai vu.
+[STUDENT]: Moi, je ne suis plus pas le premier à projeter des lumières sur des touches de piano.
+[STUDENT]: Oui, bien sûr, ça me fait penser à moi.
+[TEACHER]: Les panopliques ont fait ça avant.
+[TEACHER]: Oui, et puis il y a tous ces cahiers d'enfants avec du col, les gommettes, avec des autocollants, des rouges, des bleus
+           de l'air.
+[STUDENT]: Dans la littérature, il n'y a personne qui...
+[STUDENT]: Il y a juste l'équipe qui a pris un panel d'experts pour mesurer la qualité musicale.
+[STUDENT]: Mais nous là, si on commence à mesurer la proportion de notes et d'extensions riches, qui serait du coup un indicateur
+           d'une phrase jazzy typique, plus ces trucs d'approche chromatique...
+[STUDENT]: Potentiellement, mais c'est à l'avant-garde de chez avant-garde.
+[TEACHER]: C'est bien ce dont on parle, non ?
+[TEACHER]: Alors maintenant, pour pouvoir un petit peu...
+[STUDENT]: Il faudrait que j'en discute avec mon prof.
+[TEACHER]: Il faudrait que tu voyes aussi peut-être d'analyser quelques phrases, soit des trucs qui existent, des solos, des
+           replicages et des trucs, surtout du langage bop, j'aurais dit, parce que déjà voir si toi tu le vois, tu vois.
+[STUDENT]: Justement, moi, là, je découvre un peu cette idée de quand tu vises les extensions hautes, les 9e et 11e, ça tue.
+[STUDENT]: Mais t'es d'accord, ça sonne bien.
+[STUDENT]: Ça tue, ouais, ça tue.
+[STUDENT]: On est d'accord.
+[TEACHER]: Je découvre un peu maintenant.
+[TEACHER]: Moi, là, aujourd'hui, j'ai encore fait avec des élèves.
+[TEACHER]: On était en train de faire ça.
+[TEACHER]: Là, OK.
+[TEACHER]: Ça, c'est demi-diminué.
+[TEACHER]: Donc, c'est comme si j'étais en gamme altérée de fa dièse.
+[TEACHER]: Donc, j'ai la triade de do.
+[TEACHER]: La triade de Do et la triade de Ré.
+[TEACHER]: Je peux passer de l'une à l'autre.
+[TEACHER]: Pour le 2, pour le 5, j'ai mes deux autres triades, ce qui est le Mi, le Mi, le Fa.
+[TEACHER]: Ma grille dans ma tête, c'est Ré, Do, Ré, Do, Ré, Do, Mi, Fa, Mi, Fa, Mi, Fa, Mi.
+[TEACHER]: Quand j'arrive en Ro mineur, ce que je veux, j'improvise avec ça et ça pète monstrueux, tel art.
+[TEACHER]: C'est pas mal !
+[TEACHER]: Mais ça c'est bien sophistiqué !
+[STUDENT]: Moi je suis dans le rouge quand je pense à ce genre de truc.
+[STUDENT]: Les super structures des gammes diminuées.
+[STUDENT]: Je déjarre maintenant.
+[TEACHER]: Ça va faire très bien, tu vois, je sais ouvrir les portes, mais il y a des portes, je ne sais pas, tu performes.
+[TEACHER]: Ouais, ouais, ouais.
+[STUDENT]: C'était comme, tu sais, j'ai repiqué ce truc de Rabi Hancock, de Dolphin Dance.
+[STUDENT]: Puis là, tu sais, la ligne à la fin de son solo, c'est justement ces superstructures de la gamme diminuée.
+[STUDENT]: C'est juste des triades majeures qui descendent.
+[STUDENT]: Moi je me rappelle de ça, mais c'était un truc totalement de Zanzan.
+[STUDENT]: Que lui avait joué ?
+[STUDENT]: Ouais, dans son solo, il avait fait une phrase, c'était gamme diminuée, mais en fait c'était juste les super structures
+           de triade.
+[STUDENT]: C'était les majeurs et les mineurs des gammes diminuées.
+[STUDENT]: Et puis lui plutôt les mineurs, ça te sonne hyper bien.
+[STUDENT]: Et c'est hyper sophistiqué ça.
+[TEACHER]: Voilà, mais alors...
+[TEACHER]: Je me rends donc bien de ça, tu vois.
+[TEACHER]: Mais est-ce que la discussion...
+[TEACHER]: Parce que, par exemple, là, on parlait, avant, on a parlé de la limite du système par rapport à l'humain.
+[TEACHER]: Maintenant, on a parlé de la limite de l'évaluation du système, soit par l'informatique, soit par l'humain.
+[TEACHER]: Et maintenant, on est en train de parler de la limite du concepteur du système, de par son aisance à évoluer dans des
+           trucs plus ou moins avancés.
+[TEACHER]: C'est des points qu'il faut les prendre en compte.
+[TEACHER]: Donc, tu as autant le problème machine, mais tu as le problème humain aussi.
+[TEACHER]: Et puis après, je pense qu'il faut vraiment faire un range d'apprenant.
+[STUDENT]: Ce genre de notion, il y a peut-être 1% des gens qui ont le niveau pour être évalué pour ce genre de truc.
+[STUDENT]: Moi, je n'aurais pas à sortir à ce stade.
+[TEACHER]: Oui, mais par exemple, dans ta machine, dans cette machine-là...
+[STUDENT]: public cible, le public moyen.
+[STUDENT]: Moi je vais viser Mathias par exemple, ton élève de guitare qui fait le deuxième instrument.
+[TEACHER]: Oui mais le gars il sort déjà tous les voicings et il sait ce que c'est jouer diatonique dans des morceaux.
+[TEACHER]: Il est déjà bien au point.
+[TEACHER]: J'ai eu des pianos au deuxième instrument, ils en étaient très très loin, très très loin.
+[STUDENT]: Mais moi je dis que c'est plutôt, en tout cas, vu la panoplie d'exercices que moi je propose, c'était pas pour les
+           super avancés en tout cas.
+[TEACHER]: Tes exercices ils sont déjà avancés, il faudrait juste le modifier un tout petit peu si tu veux avoir la catégorie
+           avancée, avancée.
+[TEACHER]: J'ai pas dit qu'il faut le faire, je dis juste, voilà, peut-être.
+[TEACHER]: Mais ça me fait penser à des trucs genre...
+[STUDENT]: C'est comme moi, je vais devoir mener mes tests, il faut qu'en gros que j'adapte le test au niveau de l'utilisateur en
+           réalité.
+[TEACHER]: Ouais, ou alors parce que j'étais en train de me dire, ok, je ne vais pas compter en pourcentage, mais en aisance.
+[TEACHER]: Comment...
+[STUDENT]: Le ressenti de l'utilisateur.
+[STUDENT]: Ça, ça se fait, ça se fait beaucoup.
+[STUDENT]: Il y a des sondages typiques où tu peux demander si la personne a trouvé ça agréable, si elle a trouvé que ça sonnait
+           bien, qu'elle le sentait bien.
+[TEACHER]: Le jugement, il faut s'éloigner par mon âme, mon goût le plus possible.
+[TEACHER]: Les gens ils viennent avec d'autres backgrounds et des fois ils ne répondent pas à la bonne question parce qu'ils se
+           mettent eux dans leur rang.
+[TEACHER]: Mon prof, il ne serait pas d'accord sur ce point.
+[STUDENT]: Parce qu'il y a des façons scientifiques pour mesurer ce genre de truc.
+[TEACHER]: Moi, je suis ancien doyen, j'ai tout évalué les élèves pendant 5 ans qu'avec de la subjectivité croisée.
+[TEACHER]: A mes collègues, je disais, toi, tu dis ce que tu penses, tu n'en as rien à foutre.
+[TEACHER]: Tu dis, comme tu sens, c'est un bourrin, il est nul, ce n'est pas grave, on fait ça dans le jeu.
+[TEACHER]: Et en fait, moi, mon job de doyen, c'était de sentir où la ligne se croisait, parce que ça se croise, forcément, et là,
+           c'était la zone, là, tu avais la réponse.
+[TEACHER]: Donc l'autre, il va un peu baver sur un truc, mais quand même, dans les 2-5-1, il se démerde.
+[TEACHER]: L'autre va dire, ouais, les phrases sont pourries et tout, mais quand même, les résolutions des 2-5-1, tu vas, ah, ah,
+           ah.
+[TEACHER]: Et puis l'autre, il va dire, je n'en sais rien, ouais, dès qu'il est posé, ah, résolution, il arrive à sortir des
+           superbes signes.
+[TEACHER]: OK, c'est bon, là...
+[TEACHER]: Tu vois, donc là c'était Deg, là c'est Deg, là ça vient par le bon côté, mais ces trois trucs se croisent, et là on a
+           une zone de réponse.
+[TEACHER]: Et du coup moi j'écoute, ça fait du bruit dans l'air, mais j'écoute rien, après l'autre ça croise, ça fait blablabla,
+           parce que moi tu comprends, mes élèves, tout ce que tu veux, et puis l'autre, ah mais les beaux accords, moi je suis un
+           expert des beaux accords, là il les balance les beaux accords, donc le gars il est fort, ici.
+[TEACHER]: Voilà, pour te donner un exemple basique.
+[TEACHER]: Non, je me disais que je pense autrement.
+[TEACHER]: Moi, je pense qu'il faudrait créer un système d'auto-évaluation par le système lui-même, mais pas avec de l'IA ou des
+           trucs.
+[TEACHER]: Et un des paramètres pourrait être la difficulté de l'exercice.
+[TEACHER]: Toi t'arrives à changer vite fait gamme ou pas trop là-dedans où c'est compliqué ?
+[TEACHER]: D'accord, comment ça... Mon temps il va commencer à diminuer, mon temps à disposition.
+[TEACHER]: Enfin je peux créer un nouveau morceau ou c'est... Ouais, ou c'est juste la première ligne de ce morceau, ça m'aurait
+           suffi.
+[TEACHER]: Tu vois, attends, attends, je vais le faire oralement.
+[TEACHER]: Après peut-être tu le refais en informatique, puis on se revoit une fois.
+[STUDENT]: Ouais, ouais, ouais.
+[TEACHER]: Ok.
+[TEACHER]: Ah tu veux le remettre ?
+[TEACHER]: C'était bien les anneaux tu vois.
+[STUDENT]: Alors je monte l'histoire.
+[TEACHER]: Parce que ça on fait tout le temps au cours.
+[TEACHER]: Tu sais, des fois je monte, je dis débutant, ça c'est le truc basique qu'il faut savoir faire.
+[TEACHER]: Après moyen et des trucs de plus en plus avancés.
+[TEACHER]: Alors, tu arrives à me faire jouer que la première ligne ?
+[STUDENT]: Non, si j'ai assez de batterie pour rebrancher le projecteur.
+[STUDENT]: Ah, il faut le réinitialiser et tout ?
+[STUDENT]: Non, ça va le faire.
+[TEACHER]: T'arrives à me faire jouer juste la première ligne du morceau ?
+[STUDENT]: Ouais, ouais, ouais.
+[STUDENT]: Juste le 2-5.
+[TEACHER]: Ouais.
+[TEACHER]: Attends, est-ce qu'on perd pas du temps ?
+[TEACHER]: Non, mais c'est quand même sympa que tu vois.
+[TEACHER]: Là, c'est des bons signes.
+[TEACHER]: Tout le monde est allumé.
+[STUDENT]: Ah ok, le projetteur existe mais gentiment en marche.
+[TEACHER]: Donc l'idée serait par exemple un 2-5-1.
+[TEACHER]: Tu vois parce que je me dis, on pourrait trouver la difficulté dans l'exercice.
+[TEACHER]: Et l'apprenant, quel que soit, donc tu pourras avoir deux paramètres d'évaluation.
+[TEACHER]: Un, le ressenti de l'apprenant si tu veux.
+[TEACHER]: Mais l'apprenant, c'est le ginkana et puis il doit sauter de plus en plus compliqué la barre, tu vois.
+[TEACHER]: Hum hum, hum.
+[TEACHER]: Tu pourrais te dire, il fait le 2-5-1, donc du coup ça c'est des notions qu'on peut soit voir ensemble, soit là tu dois
+           le...
+[STUDENT]: Là je le mets sur mon ordinateur.
+[TEACHER]: Tu vois, l'apprenant il pourrait avoir soit juste le truc basique, 2-5-1 majeur.
+[TEACHER]: 2-5-1 majeur, tu montres la gamme de Do.
+[TEACHER]: Tu arrives à faire tourner avec juste dos ?
+[TEACHER]: Oui, bien sûr.
+[TEACHER]: On peut faire vite fait des petits comme ça ?
+[TEACHER]: Il n'y aura pas les fondamentaux.
+[TEACHER]: Il y a la limite.
+[TEACHER]: Est-ce que cette caméra le filme ?
+[TEACHER]: Parce que sinon, je te joue des trucs, puis je te montre ce que je pense qu'on peut faire.
+[TEACHER]: Oui, oui, ça filme.
+[STUDENT]: Mais attends, mais ça va venir.
+[TEACHER]: 2, 2, 5, 1... Ah ouais, c'est 20h18, je vais devoir y aller, parce que j'ai vraiment beaucoup de boulot.
+[STUDENT]: Ok, ok, il est là, et puis maintenant...
+[TEACHER]: Voilà, est-ce qu'on peut enlever le bleu ?
+[TEACHER]: Ouais, ouais, hop, il n'y a rien là.
+[TEACHER]: Voilà, step 1.
+[TEACHER]: Step 2, les fondamentaux.
+[TEACHER]: Se trouver, se trouver dans la région des fondamentaux quand ils arrivent.
+[TEACHER]: D'accord.
+[TEACHER]: Ouais, ouais.
+[TEACHER]: J'ai anticipé parce que je sais qu'il est là.
+[TEACHER]: Step 3.
+[TEACHER]: Ça c'est un truc qu'on fait.
+[TEACHER]: Est-ce que tu peux reprogrammer ?
+[TEACHER]: Attends, ça c'est quoi ?
+[TEACHER]: Non, non, pas les accords.
+[TEACHER]: Tu peux faire ça.
+[TEACHER]: Il faut qu'il s'arrête parce que ça me stresse.
+[TEACHER]: Parce que je voudrais que tu modifies le bordel.
+[TEACHER]: Tu mets...
+[TEACHER]: C'est seulement celui d'arrivée qui m'intéresse.
+[TEACHER]: Et maintenant tu mets la tierce de celui d'arrivée.
+[TEACHER]: Ah, euh...
+[TEACHER]: Tu te rappelles cet exercice que je t'ai déjà fait faire ?
+[STUDENT]: Tu peux mettre... Oui, tu peux le mettre en rouge.
+[STUDENT]: De celui d'arriver seulement.
+[STUDENT]: Ah, que celui d'arriver.
+[STUDENT]: C'est possible sur le troisième accord seulement ?
+[STUDENT]: Non, là je ne peux pas trop... Ok, parce que tu es en data par-dessus.
+[STUDENT]: Là, ça fait pour tout...
+[STUDENT]: Il va faire la tierce de chaque accord.
+[STUDENT]: La tierce du Fa, la septième du Sol, la tierce de Do, puis après c'est l'ancien.
+[TEACHER]: Ah, tu fais 3-7-3, attends, attends, attends, ça c'est les guide tones.
+[TEACHER]: Ouais, ouais, c'est ça.
+[TEACHER]: Ok, alors vas-y, les guide tones, c'est pas grave, c'est juste...
+[TEACHER]: C'est le truc que moi j'ai fait...
+[TEACHER]: Tu peux enlever le bleu ?
+[STUDENT]: Ok, vas-y.
+[STUDENT]: Ouh, pardon, j'ai trompé.
+[STUDENT]: Il faut que je boucle.
+[TEACHER]: Voilà.
+[TEACHER]: Donc tu pouvais laisser défiler si tu voulais, mais...
+[TEACHER]: Ok ?
+[TEACHER]: Alors, tu vois que j'y arrive là.
+[TEACHER]: Comment dans ce... Attends, arrête, arrête.
+[TEACHER]: Comment dans ce même exercice on pourrait pourrir le truc de plus en plus ?
+[TEACHER]: Par exemple, les guide notes, c'est bien, mais ça bloque l'information à un endroit.
+[TEACHER]: Moi, ce que je fais beaucoup de travail avec, tu vois, parce que peut-être là, on est en mode enseignement, peut-être
+           c'est plus facile de trouver des solutions évaluables.
+[TEACHER]: Et du coup, tu as une série de 10, tu vois, mon truc comme je montre des fois, là, ça c'est basique, il faut savoir le
+           faire.
+[TEACHER]: Ça c'est Do majeur, pas d'information.
+[TEACHER]: Après, le troisième degré, savoir arriver sur une des notes importantes de l'accord.
+[TEACHER]: Peut-être que tu n'es pas encore programmé, mais il faudra peut-être s'y mettre.
+[TEACHER]: D'arriver sur Do, Mi, Sol et peut-être Si ou La.
+[TEACHER]: Tu vois ?
+[TEACHER]: Remets-le, fais-le jouer avec juste les basiques, les fondamentaux, sans les guide tones, comme tu as fait avant.
+[TEACHER]: Avec la boucle, elle n'est pas bouclée.
+[TEACHER]: Donc là, OK.
+[TEACHER]: Comment on va gérer d'arriver là ?
+[TEACHER]: Maintenant, la deuxième, un autre.
+[TEACHER]: Comment on va arriver sur le Mi ?
+[TEACHER]: Plus tard, plus compliqué.
+[STUDENT]: La quinte ?
+[TEACHER]: C'est plus compliqué.
+[TEACHER]: La septième ou la sixième.
+[TEACHER]: La neuvième.
+[TEACHER]: La diapositive.
+[TEACHER]: Je l'entends pas comme une treizième.
+[TEACHER]: Donc tu vois, peut-être...
+[TEACHER]: Voilà.
+[TEACHER]: Peut-être qu'il y aurait un batterie là où il est marqué.
+[TEACHER]: Mais peut-être que tu pourrais avoir une série, créer une série de Jinkana de plus en plus complexe et ça, ça
+           montrerait le niveau de progression.
+[TEACHER]: Et si le gars, il y a un truc, peut-être que tu peux croiser deux datas, tu vois, le ressenti et puis sur un des sujets
+           simples ou basiques, tu vois, tu réfléchis peut-être sur des enchaînements d'accords puis après sur un morceau, pas
+           plus.
+[TEACHER]: et puis des degrés de avec ces trucs de jouer le but c'est d'arriver aux extensions voilà exactement et du coup tu
+           pourrais avoir quelque chose j'ai réfléchi un peu je suis quand même descendu de niveau un peu voilà tu pourras avoir
+           des choses ou dedans dans l'exercice selon l'exercice ça c'est pure pédagogie et là je me sens concerné je peux même
+           t'aider si tu veux on peut même discuter de ça et le faire en bout ensemble c'est pas un problème
+[TEACHER]: Mais je t'ai déjà fait faire d'ailleurs au cours.
+[TEACHER]: Tu pars sur des choses importantes et ta note d'arrivée, tu la négocies au début, forcée.
+[TEACHER]: Après, tu dis non, il faut que tu arrives sur les 1, 3, 5 de la corde d'arrivée.
+[TEACHER]: Tu arrives comme tu veux.
+[TEACHER]: Tu dois l'entendre et t'arriver, faire une pause et après, ça c'est.
+[TEACHER]: Et après, tu peux arriver random, mais sur 1, 3, 5.
+[TEACHER]: Donc, une des trois.
+[TEACHER]: Après, il y a peut-être les trois couleurs qui s'allument.
+[TEACHER]: On s'en fout, il faut arriver sur une.
+[TEACHER]: Et peut-être un truc comme ça, tu vois.
+[STUDENT]: Oui, je vois.
+[TEACHER]: Tu aurais une série d'exercices que tu as créés, donc toujours avec la notion de random et tout, mais avec des trucs
+           plus avancés.
+[TEACHER]: Quand tu as la dominante, on va pourrir la gamme de la dominante, tu vois.
+[TEACHER]: Oui.
+[TEACHER]: Puis, du coup, la gamme de la dominante, là, on va peut-être...
+[TEACHER]: L'idée...
+[TEACHER]: Je suis en train de penser, tu sais, par exemple, pour le jazz, il y a un truc à penser, j'en fais comme un Cantus
+           firmus.
+[TEACHER]: Comme les chants grégoriens, si tu veux.
+[TEACHER]: Si je suis sur Fa...
+[TEACHER]: Après, je vais sur...
+[TEACHER]: Alors, là, c'est les Gaetons.
+[TEACHER]: Mais si je suis sur La...
+[TEACHER]: Alors, qu'est-ce qui se passe, là ?
+[TEACHER]: Là, j'ai le choix d'aller La.
+[TEACHER]: Et si je suis La, j'ai le choix de faire... Ou...
+[TEACHER]: Version ancienne, là, sans Simone, et version jazz, je me mets sur la septième.
+[TEACHER]: Si je suis La...
+[TEACHER]: On peut faire un peu plus avancé ?
+[TEACHER]: Si je fais ça, le chemin obligé, traditionnel, c'est lui.
+[TEACHER]: Par contre, je peux être là.
+[TEACHER]: Tu retends l'arrivée.
+[TEACHER]: C'est pas ça.
+[TEACHER]: Donc peut-être qu'il y aura aussi une gradation de solutions proposées qu'il faut que le mec joue de plus en plus
+           avancé.
+[TEACHER]: Dans les lumières.
+[TEACHER]: Puis après, l'évaluation du mec, c'est de dire, bon, j'arrive jusque là.
+[TEACHER]: Puis peut-être, dans la qualité de l'exercice ou la complexité qu'il y a dedans, ça c'est un implicite, l'apprenant
+           n'est pas obligé d'être au courant.
+[TEACHER]: tu as des notes cibles, il faut essayer de les suivre en phrasant, mais ces notes cibles, après avec le principe
+           d'improvisation du jazz, elles vont évoluer
+[TEACHER]: vers des notes un peu plus consonantes, un peu différentes, avec des couleurs un peu plus vers du jazz plus avancé, on
+           va dire.
+[TEACHER]: Voilà, ça c'est ce que tu dis à l'apprenant.
+[TEACHER]: Et après, bon, vas-y, t'as 15 trucs, vas-y, premier item, facile, en deux minutes.
+[TEACHER]: Et du coup, ça serait un truc, un morceau exercice, en fait, comme là.
+[TEACHER]: Ouais, je sais pas, je me dis un truc comme ça.
+[TEACHER]: Ça, c'est faisable.
+[TEACHER]: Peut-être sur une séquence, les deux, cinq, ça va très bien, sur une séquence déjà basique.
+[TEACHER]: Tu fais faire une série d'itérations, puis après, dans le contexte d'un morceau pas trop compliqué, Béatrice, c'est
+           quand même déjà bien avancé, si jamais.
+[TEACHER]: C'est basique, c'est Beautiful Love, How I'd Moon, enfin, tu vois, des trucs un peu moins avancés que ça, des trucs...
+[TEACHER]: Là-dedans, tu fais un crible de choses à faire, qui fait que l'exercice, il doit s'appeler, on doit savoir comment il
+           s'appelle.
+[TEACHER]: Les dominantes, maximum tension, résolution sur une bonne note cible.
+[TEACHER]: Et ça peut être fermé ou ouvert.
+[TEACHER]: Avec qu'une note d'arrivée, ou je ne sais pas, disons trois notes d'arrivée, ou deux notes d'arrivée.
+[STUDENT]: Ah putain, il y a la gamme à terre !
+[STUDENT]: Ah, trop cool !
+[TEACHER]: Je ne sais pas, rouge ?
+[TEACHER]: rouge qui va résoudre sur rouge.
+[TEACHER]: Ou orange qui va aller vers rouge et vert qui va aller sur bleu.
+[TEACHER]: Ça, t'as tes deux extensions, tu vois.
+[STUDENT]: Ouais, je vois.
+[TEACHER]: Je sais pas si je m'embarque pas dans un truc qui marche pas, mais...
+[TEACHER]: J'ai l'impression de répondre un petit bout à ta question.
+[TEACHER]: C'est une bonne idée, en réalité.
+[TEACHER]: Parce que du coup, on est moins dans des trucs universitaires, on est dans du...
+[TEACHER]: pragmatique, basique, mais en même temps, c'est ce qu'il faut.
+[TEACHER]: Si le gars arrive avec ce système-là et te couvre jusqu'à l'exercice 15, c'est aussi intéressant de se dire, ah putain,
+           soit il était déjà très à droit en arrivant, mais sinon, il arrive à s'embarquer dedans.
+[TEACHER]: Et là, tu peux avoir des sorties.
+[STUDENT]: Après, si tu lui montres tout ça et tu lui enlèves tout le système de projection, il y a tout...
+[STUDENT]: Il perd un peu ses repères, non, au final.
+[STUDENT]: Avec la projection, il arrive à, juste comme ça, jouer B9, B13.
+[TEACHER]: Oui, on est d'accord, mais moi je me suis basé sur ce que tu m'as dit au début, c'est que ce système de projection, et
+           c'était l'argument avec ton prof, fait qu'on n'est pas dans la globalité de l'exercice.
+[TEACHER]: On est dans une chose partielle qui le fait de proposer un petit gincana, un petit exercice de proprioception sportive
+           et musicale, fait que tu as ton cerveau qui ne pense pas à tout le background.
+[STUDENT]: Ça, c'est un autre exercice, un autre monde qui fait de ça.
+[TEACHER]: Toi, ce système-là permet d'ouvrir un éclairage là-dessus, qui fait que pendant un certain temps, tu vas être habitué à
+           jouer, entre guillemets, sur des notes qui sonnent.
+[TEACHER]: Donc, ton oreille, elle se forme en même temps.
+[TEACHER]: Tes doigts, ils se forment en même temps à viser des chemins.
+[TEACHER]: Ton habitude à être dans un système contraignant quand même, avec du time et tout, elle est...
+[TEACHER]: pas beaucoup expliqué, mais elle fait partie du truc, tu n'as pas d'autre choix que de faire ça.
+[TEACHER]: Tu l'entends, tu ressens que tu joues de la gamme intérée, même si tu ne sais pas ce que c'est la gamme intérée.
+[STUDENT]: Voilà.
+[TEACHER]: Et après, petit à petit, peut-être qu'il faut imaginer comment on éteint la lumière, tu vois.
+[STUDENT]: Ouais, ouais.
+[STUDENT]: Peut-être après...
+[STUDENT]: Pour nous, l'approche naïve, c'est que tu lui entraînes un moment avec les projecteurs, puis à un moment donné, tu le
+           coupes.
+[TEACHER]: Oui, ou tu le coupes partiellement, peut-être que tu lui laisses allumer...
+[TEACHER]: ta cadence, ce que je t'ai dit avant, les trois structures avec leurs trois solutions, avec des couleurs associées, tu
+           n'as que ça qui s'allume.
+[STUDENT]: Tu as le morceau qui tourne, 2, 5, 7, 8, et puis il y a des notes vraiment hyper importantes, et puis tu es là, tu
+           joues ce que tu
+
+============================================================
+  Canon 04
+============================================================
+
+[TEACHER]: Il y a un moment, seul ou accompagné, ou dans son cerveau intérieur, sans que personne ne lui ait rien dit, il va dire,
+           quand il y a la B9, ça descend sur le truc, et puis il y a à chaque fois la phrase qui peut passer par là et arriver
+           là.
+[TEACHER]: Ah ok, c'est bon, on a compris.
+[TEACHER]: Mais là, je connais les trucs, parce que j'ai déjà participé à des trucs, et il faut faire gaffe, parce qu'eux, ils
+           n'aiment pas trop ce que je viens de dire.
+[TEACHER]: Je te dis déjà, c'est une solution...
+[TEACHER]: Et les universitaires, ils aiment bien voir quel est le ressenti selon la convergence de pensées de ce genre
+           d'individus.
+[TEACHER]: Des fois, ils préfèrent ça, tu vois, c'est un peu... Moi, mon prof, je pense pas.
+[STUDENT]: Il est fan de jazz, du coup, il connaîtra...
+[TEACHER]: Mais là, on a des éléments de solution.
+[STUDENT]: Totalement.
+[STUDENT]: Là, ça me donne envie de figer un peu les choses, de faire des exercices.
+[STUDENT]: des morceaux exercices figés à l'avance.
+[STUDENT]: Parce que là, mon truc, ça marche pour tous les morceaux, mais peut-être que ce n'est pas ce qui est plus intéressant.
+[STUDENT]: Si je fais un truc, un curriculum cadré... Non, mais je pense que ce que tu peux dire... Ou bien ça peut se
+           généraliser, ce truc de jouer sur des extensions, peut-être que ça peut marcher sur... Ouais, mais après...
+[TEACHER]: C'est compliqué, mais ça peut être top.
+[TEACHER]: Non, mais tu as plusieurs étapes aussi.
+[TEACHER]: Ton cadrage ici te permet...
+[TEACHER]: avec ce langage ouvert de pouvoir aborder n'importe quel standard.
+[TEACHER]: Tu fais une grise, quoi faire ?
+[TEACHER]: Après, toi, ça c'est ton jouet et de ce jouet, tu prends un truc et tu fais une chose précise avec ce jouet.
+[TEACHER]: Dans le cadre de mon bachelor.
+[TEACHER]: Dans le cadre de mon bachelor.
+[TEACHER]: C'est bien ça.
+[TEACHER]: Tu as fermé le range à un truc bien précis qui a à voir avec la lumière et le truc.
+[TEACHER]: Et dans ce truc-là, tu retrouves des gradations.
+[TEACHER]: Et la mesure, l'unité de mesure, elle est moins... Sur la métadonnée, elle est juste... Est-ce que le rat, il saute ?
+[TEACHER]: Est-ce que quand il va dans un truc qui tourne, il arrive à sortir ?
+[TEACHER]: À partir de quand il tourne trop vite, tu sais, quand il tourne trop vite, il n'arrive plus à sortir.
+[TEACHER]: C'est pour ça qu'il passe un moment jusqu'à ce qu'il soit plus... Ouais, ouais, d'accord, d'accord.
+[STUDENT]: Je sais pas.
+[STUDENT]: Non, mais c'est très riche, ça.
+[TEACHER]: Je crois que j'ai clairement pivoté l'idée de... Ça ramène du clinique, parce que toi, t'aimais bien cette idée de
+           clinique.
+[TEACHER]: Tu voulais qu'il y ait un...
+[TEACHER]: Quand on dit des expérimentations avec des cliniciens, tu vois, où tu regardes les gars faire, et puis tu essaies de
+           savoir, je ne sais pas, ça va être dur de dire si c'est la beauté de la phrase ou pas, mais en même temps, si tu
+           analyses, parce que peut-être si tu as le temps, regarde-moi, même avec l'IA, peut-être que tu trouves déjà du data,
+           qu'elle sorte les 100 plus belles phrases de jazz, puis qu'elle les analyse selon le point, mais ça tu pourrais
+           demander à Claude et tout, je suis pressionné.
+[TEACHER]: il est chanteur, tu t'en fous, et tu les analyses sous le regard des cadences des extensions et du choix des notes
+           pivots dans les résolutions d'extension.
+[TEACHER]: C'est chaud, je ne suis pas sûr qu'il aille en une fois comme ça, mais il faut peut-être faire le bon prompt.
+[TEACHER]: Ça c'est l'après-midi de boulot et tu as un truc factuel, tu dis « les gars,
+[TEACHER]: Là, toutes ces phrases, regardez, deux dièses qui va sur truc, OK, donc si il y a ça, on va s'entraîner à faire ça, les
+           gars.
+[STUDENT]: Comment toi, tu connais ça ?
+[STUDENT]: Cette idée que la B9, elle sonne bien quand elle résout sur la quinte ?
+[STUDENT]: Par empirisme, et puis parce qu'on m'a montré.
+[STUDENT]: C'est toute ton expérience ?
+[TEACHER]: Non, mais pas du tout, on m'a montré, il y a des bouquins et tout, c'est tout marqué.
+[STUDENT]: Est-ce que je peux avoir ?
+[STUDENT]: Ce serait bien si tu me trouves un truc.
+[TEACHER]: Alors ça, il faut que je t'en trouve un, parce que je ne suis pas sûr que j'en trouve un.
+[TEACHER]: Toi, tu n'avais pas le bouquin « Les clés pour l'harmonie » ?
+[STUDENT]: Oui, oui.
+[STUDENT]: Tu as ce livre ?
+[STUDENT]: Est-ce qu'il est dans ton répertoire pédage ?
+[TEACHER]: Ça se pourrait qu'il soit, je ne suis pas sûr.
+[TEACHER]: Viens, on va voir si je l'ai là en physique.
+[TEACHER]: Il faut que je parte, je m'excuse.
+[STUDENT]: Oui, on a déjà parlé.
