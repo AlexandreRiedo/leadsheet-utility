@@ -39,7 +39,7 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
    - The HUD shows the current chord, bar number, and a progress bar.
 7. The user improvises on the piano, guided by the colored lights. While playing they can adjust overlays without restarting:
    - `M` toggles the metronome; `G` cycles the backing density (NONE → DRUMS → DRUMS_BASS → FULL). Both remix from the cached layers instantly.
-   - `R` toggles a root-pitch-class overlay (blue). `B` cycles the Free-Mode range (FULL / 2-OCT / 1-OCT) within the calibrated bands. `T` cycles the chord-tone mode (OFF / ONLY / OVERLAY).
+   - `R` toggles a root-pitch-class overlay (blue). `B` cycles the Free-Mode range (FULL / R.HAND / 2-OCT / 1-OCT) within the calibrated bands. `T` cycles the chord-tone mode (OFF / ONLY / OVERLAY).
    - `F` enters/exits frozen mode: playback halts and the projection pins to one chord, stepped with `←`/`→` for static practice. `Space` resumes from the top.
 8. When the form ends (or loops), the user presses `Space` to pause or `S` to stop.
 9. The user can switch exercises, change the tune, or adjust tempo at any time while stopped. Tempo changes invalidate the layer cache; the next play triggers a re-render.
@@ -188,7 +188,7 @@ Companion `.meta.json` with same base name:
 }
 ```
 
-Defaults if missing: 4/4, tempo 120, unknown title. 17 lead sheet pairs ship in `data/leadsheets/`.
+Defaults if missing: 4/4, tempo 120, unknown title. 19 lead sheet pairs ship in `data/leadsheets/`.
 
 ---
 
@@ -261,7 +261,7 @@ class KeyHighlight:
 
 Three orthogonal sub-toggles compose with Free Mode:
 
-- **RangeMode** (`exercises/free.py`, key `B`) — `FULL` highlights every scale tone on the keyboard; `TWO_OCTAVE` and `ONE_OCTAVE` collapse the set to a single ascending run of scale degrees starting at the lowest root inside the calibrated band. Lets the player practice the scale shape in one position.
+- **RangeMode** (`exercises/free.py`, key `B`) — `FULL` highlights every scale tone on the keyboard; `RIGHT_HAND` keeps the same "every scale note" set but only from middle C (C4) up, confining the lights to the solo register; `TWO_OCTAVE` and `ONE_OCTAVE` collapse the set to a single ascending run of scale degrees starting at the lowest root inside the calibrated band. Lets the player practice the scale shape in one position.
 - **ChordToneMode** (`exercises/chord_tones.py`, key `T`) — `OFF` (no treatment), `ONLY` (replace scale with just R, 3, 5/#11/b6, 7), `OVERLAY` (keep scale, recolour chord-tone pitch classes in cyan-blue). Honours the same `#11`/`b5`/`maj7#11` → #11 and `b9`/`b13`-without-13 → b6 substitutions as the comping voicings.
 - **Root overlay** (`exercises/root.py`, key `R`) — recolours every highlight whose pitch class matches the chord root in saturated blue. Applied last so the root keeps its colour over the chord-tone overlay.
 
@@ -477,7 +477,7 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `M` | Toggle metronome (instant remix from cache) |
 | `G` | Cycle backing density: NONE → DRUMS → DRUMS_BASS → FULL |
 | `R` | Toggle root-pitch-class overlay (blue) |
-| `B` | Cycle Free-Mode range: FULL → 2-OCT → 1-OCT |
+| `B` | Cycle Free-Mode range: FULL → R.HAND → 2-OCT → 1-OCT |
 | `T` | Cycle chord-tone mode: OFF → ONLY → OVERLAY |
 | `F` | Enter / exit frozen mode (pin projection to one chord) |
 | `←` / `→` | In frozen mode, step to previous / next chord |
@@ -547,7 +547,7 @@ ruff = ">=0.4"
 - [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, per-black-key offsets, projection-lead compensation, standalone preview script)
 - [x] Calibration: 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay) + JSON persistence, standalone preview script
 - [x] Main-app integration of projection: calibration loaded on startup, Free Mode rendered through the saved homography during playback
-- [x] Free Mode exercise with `RangeMode` (FULL / 2-OCT / 1-OCT, `B`), `ChordToneMode` (OFF / ONLY / OVERLAY, `T`), and root overlay (`R`) sub-toggles
+- [x] Free Mode exercise with `RangeMode` (FULL / R.HAND / 2-OCT / 1-OCT, `B`), `ChordToneMode` (OFF / ONLY / OVERLAY, `T`), and root overlay (`R`) sub-toggles
 - [x] Frozen mode (`F` + arrow keys) for static per-chord practice
 - [x] In-app calibration entry (`C` keybinding) — stops playback, runs the `CalibrationUI` on the projector, reloads homography/layout/bands/audio-delay on confirm
 - [x] Windows per-monitor DPI awareness opt-in (projector window opens at true physical resolution)
