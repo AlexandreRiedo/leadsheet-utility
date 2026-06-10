@@ -41,7 +41,6 @@
 - 2eme morceau
 - nasa TLX
 - questionnaire dassurance
-
 - questionnaire semi-ouvert (TODO: a faire)
     - leur avis personnel : bien/pas bien, utile dans l'apprentissage, intérêt pour l'apprentissage de la musique
 
