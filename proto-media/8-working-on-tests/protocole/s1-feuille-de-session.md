@@ -4,9 +4,9 @@ Code participant : ________  Date / heure : ________
 
 Niveau (après Q0 item 10 + familiarisation) : ☐ Débutant (paire D) ☐ Intermédiaire (paire I)
 
-Cellule de contrebalancement : ___ (1–4, compteur tenu **par groupe de niveau**)
+Cas de contrebalancement : ___ (1–4, compteur tenu **par groupe de niveau**)
 
-## Plan de la session (remplir d'après PROTOCOLE.md §2.1–2.2)
+## Plan de la session (remplir d'après `info1-PROTOCOLE.md`, section Contrebalancement)
 
 | N° | Morceau | Condition | Tempo | Joué ✓ | TLX ✓ | Assurance ✓ | Vidéo ✓ |
 |---|---|---|---|---|---|---|---|

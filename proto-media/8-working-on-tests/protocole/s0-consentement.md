@@ -7,8 +7,8 @@ Expérimentateur : Alexandre Riedo — alexandre.riedo@etu.unige.ch — 076 750 
 
 J'évalue un dispositif qui projette des repères lumineux sur les touches d'un piano pour
 accompagner l'improvisation jazz. Pendant la session (~1 h), vous improviserez sur
-4 morceaux avec un accompagnement automatique — tantôt avec, tantôt sans la projection —
-et répondrez à de courts questionnaires sur votre ressenti.
+deux morceaux avec un accompagnement automatique — une fois avec, une fois sans la
+projection — et répondrez à de courts questionnaires sur votre ressenti.
 
 **C'est le dispositif qui est évalué, pas votre niveau de jeu.**
 
@@ -18,10 +18,9 @@ et répondrez à de courts questionnaires sur votre ressenti.
 - L'entretien de fin de session est **enregistré en audio**.
 - Vos réponses sont identifiées par un **code anonyme** (ex. P03), jamais par votre nom.
   La correspondance nom↔code est conservée à part et détruite à la fin du travail.
-- Les enregistrements servent uniquement à l'analyse de ce travail de recherche
-  (y compris une éventuelle écoute par des enseignants de jazz pour une évaluation
-  qualitative). Ils sont stockés localement, ne sont jamais publiés ni mis en ligne,
-  et sont supprimés après la validation du travail.
+- Les enregistrements servent uniquement à l'analyse de ce travail de recherche.
+  Ils sont stockés localement, ne sont jamais publiés ni mis en ligne, et sont
+  supprimés après la validation du travail.
 
 ## Vos droits
 

@@ -9,8 +9,7 @@ d'assurance. À la fin : entretien semi-ouvert. Tout est filmé (mains/clavier).
 - **SANS** = backing track + grille d'accords à l'écran.
 - **AVEC** = pareil + les notes justes allumées sur les touches (Free Mode).
 - **Hypothèses** : AVEC < SANS en charge cognitive (NASA-TLX) ; AVEC > SANS en assurance.
-- En exploratoire : apprentissage, créativité, display de grille (entretien) ;
-  qualité musicale via les vidéos (panel d'experts, plus tard).
+- En exploratoire : apprentissage, créativité, display de grille (entretien).
 
 ## Morceaux
 
@@ -86,7 +85,7 @@ en local (`P##_morceau_condition.mp4`) ; incidents notés sur la feuille de sess
 ## Données
 
 Codes `P01`–`P12` ; table nom↔code à part, détruite à la fin du travail. Vidéos en
-local seulement, supprimées après validation. Saisie dans un tableur le soir même.
+local seulement.
 
 ## Fichiers du dossier
 
@@ -95,7 +94,6 @@ local seulement, supprimées après validation. Saisie dans un tableur le soir m
 | `s0-consentement.md` | accueil |
 | `q0-questionnaire-initial.md` | début |
 | `q1-nasa-tlx.md` | après chaque morceau |
-| `q2-assurance.md` ou `q2-assurance-hybride.md` (au choix) | après chaque morceau |
+| `q2-assurance-hybride.md` | après chaque morceau |
 | `q3-entretien-semi-ouvert.md` | fin |
 | `s1-feuille-de-session.md` | toute la session |
-| `info2-testing-todo.md` | avant le 12 juin |

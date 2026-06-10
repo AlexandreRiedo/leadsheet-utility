@@ -6,9 +6,8 @@
 - [ ] Vérifier que l'extinction/rallumage du projecteur ne déplace pas la fenêtre de
       projection (sinon : blank/AV-mute ou cache sur l'objectif — ne jamais relancer
       l'app ni recalibrer entre les blocs)
-- [ ] Choisir la version du Q2 : `q2-assurance.md` (ad hoc) ou `q2-assurance-hybride.md`
-      (STAI-6 avec libellé français validé + auto-efficacité)
-- [ ] Imprimer : consentement ×12, Q0 ×12, TLX ×24, assurance ×24, entretien ×12, feuilles de session ×12
+- [ ] Imprimer : consentement ×12, Q0 ×12, TLX ×24, assurance hybride (`q2-assurance-hybride.md`) ×24,
+      entretien ×12, feuilles de session ×12
 - [ ] Tester la caméra (cadrage, son)
 - [ ] **Session pilote** : valider tempi, paires D/I, durée ≤ 60 min, extinction/rallumage du projecteur
 - [ ] (Optionnel) branche `study` qui désactive les touches `2`–`5`
