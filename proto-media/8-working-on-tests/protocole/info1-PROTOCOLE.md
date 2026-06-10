@@ -85,7 +85,7 @@ seulement) ; feuille de session pré-remplie ; questionnaires imprimés.
 *« Merci de venir ! Je compare deux façons d'improviser au piano : avec et sans un
 dispositif de projection. J'évalue le dispositif, pas ton niveau. La session est
 filmée, mais seulement tes mains. Tu peux arrêter à tout moment. »*
-→ signer `consentement.md`.
+→ signer `s0-consentement.md`.
 
 **2. Questionnaire initial (5 min)** → `q0`. À la fin, fixer la paire D ou I.
 
@@ -96,20 +96,23 @@ projection et ~1 min sans. Puis : *« Pour chaque morceau : la grille à l'écra
 count-in de 2 mesures, et tu improvises main droite environ 4 minutes. Pas besoin de
 jouer tout le temps. Juste après, deux petits questionnaires. »*
 
-**4. Morceau 1 (10 min)**
+**4. Morceau 1 (6 min)**
 1. *« Prochain morceau : ___. Prends 30 secondes pour regarder la grille. »*
 2. Caméra ON ; dire à voix haute : code, morceau, condition.
-3. `Espace` → impro ~4 min. Ne pas intervenir. `S` pour arrêter.
-4. Caméra OFF. Tout de suite : TLX (`q1`) puis assurance (`q2`).
-   *« Réponds par rapport à ce morceau précis. »*
+3. `Espace` → impro ~4 min. Ne pas intervenir. `S` pour arrêter. Caméra OFF.
 
-**5. Changement (2 min)** : *« Pour le prochain morceau, on passe [avec / sans] la projection. »*
+**5. NASA-TLX (`q1`) puis questionnaire d'assurance (`q2`) (4 min)**
+*« Réponds par rapport à ce morceau précis. »*
 
-**6. Morceau 2 (10 min)** : comme le morceau 1.
+**6. Morceau 2 (6 min)** : comme le morceau 1, dans l'autre condition.
+*« Pour ce morceau, on passe [avec / sans] la projection. »*
 
-**7. Entretien (8–10 min)** → `q3`, enregistré en audio. Finir par un debriefing libre.
+**7. NASA-TLX (`q1`) puis questionnaire d'assurance (`q2`) (4 min)**
 
-**8. Clôture** : code participant sur toutes les feuilles (jamais le nom) ; vidéo
+**8. Entretien semi-ouvert (8–10 min)** → `q3`, enregistré en audio.
+Finir par un debriefing libre.
+
+**9. Clôture** : code participant sur toutes les feuilles (jamais le nom) ; vidéo
 déchargée en local (`P##_morceau_condition.mp4`) ; incidents notés.
 
 ## Données
@@ -122,10 +125,10 @@ déchargée en local (`P##_morceau_condition.mp4`) ; incidents notés.
 
 | Fichier | Quand |
 |---|---|
-| `consentement.md` | accueil |
+| `s0-consentement.md` | accueil |
 | `q0-questionnaire-initial.md` | début |
 | `q1-nasa-tlx.md` | après chaque morceau |
-| `q2-assurance.md` | après chaque morceau |
+| `q2-assurance.md` ou `q2-assurance-hybride.md` (au choix, cf. todo) | après chaque morceau |
 | `q3-entretien-semi-ouvert.md` | fin |
-| `feuille-de-session.md` | toute la session |
-| `testing-todo.md` | à faire avant le 12 juin |
+| `s1-feuille-de-session.md` | toute la session |
+| `info2-testing-todo.md` | à faire avant le 12 juin |
