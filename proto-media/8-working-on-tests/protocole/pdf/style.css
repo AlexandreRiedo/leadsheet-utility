@@ -10,3 +10,4 @@ blockquote { margin: 0.5em 0 0.5em 1em; padding-left: 0.8em; border-left: 3px so
 li { margin: 0.15em 0; }
 hr { border: none; border-top: 1px solid #999; margin: 1em 0; }
 td:empty { height: 3.5em; }
+table, tr { page-break-inside: avoid; }
