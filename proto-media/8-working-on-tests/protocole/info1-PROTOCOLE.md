@@ -15,13 +15,13 @@ d'assurance. À la fin : entretien semi-ouvert. Tout est filmé (mains/clavier).
 
 Une paire par niveau ; les deux morceaux d'une paire se valent (32 mesures, ii-V).
 Choix : niveau auto-évalué au Q0 item 10 — ≤ 3 → D, ≥ 4 → I (reclassement possible
-après la familiarisation, à noter). Tempo fixe ; si la personne est perdue au 1er
-morceau : −10 BPM pour ses deux morceaux, à noter.
+après la familiarisation, à noter). Tempo fixe, lent (déchiffrage à vue) ; si la
+personne est perdue au 1er morceau : −10 BPM pour ses deux morceaux, à noter.
 
-| Paire | Niveau | Morceaux (tempo) |
-|---|---|---|
-| **D** | Débutant | Autumn Leaves (110), Fly Me to the Moon (120) |
-| **I** | Intermédiaire | Beautiful Love (110), How High the Moon (120) |
+| Paire | Niveau | Morceaux | Tempo |
+|---|---|---|---|
+| **D** | Débutant | Autumn Leaves, Fly Me to the Moon | 90 |
+| **I** | Intermédiaire | Beautiful Love, How High the Moon | 100 |
 
 ## Contrebalancement
 
@@ -44,7 +44,7 @@ comparaison appariée AVEC vs SANS (Wilcoxon).
 - Backing **FULL** (`G`), métronome OFF (`M`).
 - Grille d'accords à l'écran **dans les deux conditions** ; SANS = projecteur éteint.
 - Calibration vérifiée avant la première session du jour.
-- `form_repeats: 4` → ~4 min par morceau ; sinon arrêter avec `S`.
+- `form_repeats: 3` → ~4 min par morceau (32 mesures à 90–100 BPM) ; sinon arrêter avec `S`.
 
 ## Déroulé (~50 min)
 

@@ -18,7 +18,8 @@
   version française : Non / Plutôt non / Plutôt oui / Oui (1–4).
 - **Cotation** : inverser les items positifs 1, 4, 5 de notre Partie A (5−x).
   Score = somme des 6 × 20/6 (étendue 20–80, comparable au STAI-S complet).
-  Score élevé = anxiété élevée (donc ici : H2 prédit STAI-6 AVEC < SANS).
+  Score élevé = anxiété élevée — l'hypothèse d'assurance du protocole prédit donc
+  STAI-6 AVEC < SANS (et auto-efficacité AVEC > SANS).
 - **Adaptations à signaler dans le rapport** : (a) l'original se remplit « à l'instant,
   juste en ce moment » ; ici la consigne vise « pendant que vous jouiez », rempli
   immédiatement après le morceau (mesure à chaud rétrospective courte) ; (b) les items
@@ -39,5 +40,3 @@
 
 Deux scores par morceau, rapportés séparément : **anxiété-état** (STAI-6, validé) et
 **auto-efficacité tâche** (ad hoc Bandura). Comparaison appariée AVEC vs SANS pour chacun.
-Remplace la v1 (`q2-assurance.md`, échelle unique ad hoc à 7 items) — v1 conservée comme
-alternative si la passation doit être raccourcie.

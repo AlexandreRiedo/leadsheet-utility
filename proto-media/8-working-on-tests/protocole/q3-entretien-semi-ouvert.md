@@ -57,6 +57,8 @@ personne veut savoir).
 
 ## Grille de prise de notes rapide (pendant l'entretien)
 
+<style>td:empty { width: 65%; }</style>
+
 | Thème | Verbatims / notes |
 |---|---|
 | Préférence avec/sans + raison | |
