@@ -3,14 +3,16 @@
 Three rendering modes (cycled by the `T` keybinding):
 
 - ``OFF``  — no chord-tone treatment.
-- ``ONLY`` — replace the chord-scale with just the chord tones (R, 3, 5/#11/b6, 7).
+- ``ONLY`` — replace the chord-scale with just the chord tones (R, 3, 5/#11, 7).
 - ``OVERLAY`` — keep the full chord-scale, recolor chord-tone pitch classes.
 
-Pitch classes use the same 5th-substitution rule as the comping voicings:
+One 5th-substitution rule applies (mirroring the comping voicings):
 
 - ``#11`` / ``b5`` extensions or ``maj7#11`` quality → 5 becomes #11 (6)
-- ``b9`` / ``b13`` without natural ``13`` (and not already taking #11) →
-  5 becomes b6 (8)
+
+Altered dominants (``b9`` / ``b13``) keep their natural 5th — the highlight
+shows the plain R-3-5-b7 chord tones; the alterations remain visible as
+scale tones in the underlying chord-scale.
 """
 
 from __future__ import annotations
@@ -56,15 +58,8 @@ def chord_tone_pitch_classes(chord: ChordEvent) -> set[int]:
     if 7 in intervals:
         exts = set(chord.extensions)
         use_sharp11 = "#11" in exts or "b5" in exts or chord.quality == "maj7#11"
-        use_flat13 = (
-            ("b9" in exts or "b13" in exts)
-            and "13" not in exts
-            and not use_sharp11
-        )
         if use_sharp11:
             intervals = {6 if i == 7 else i for i in intervals}
-        elif use_flat13:
-            intervals = {8 if i == 7 else i for i in intervals}
     return {(root_pc + i) % 12 for i in intervals}
 
 

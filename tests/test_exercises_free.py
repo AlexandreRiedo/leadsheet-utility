@@ -196,6 +196,8 @@ def _resolved_chord(symbol: str) -> ChordEvent:
         ("C:7sus4", {0, 5, 7, 10}),
         # Emaj7#11 -> E G# A# D# (5 -> #11 substitution)
         ("E:maj7(#11)", {4, 8, 10, 3}),
+        # B7b9 (hm5 dominant) -> B D# F# A: natural 5 kept, no 5 -> b6 substitution
+        ("B:7(b9)", {11, 3, 6, 9}),
     ],
 )
 def test_chord_tone_pitch_classes_matches_user_examples(symbol, expected_pcs):

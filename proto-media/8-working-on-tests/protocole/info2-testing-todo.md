@@ -1,6 +1,5 @@
 # À faire avant le 12 juin
 
-- [ ] Vérifier leurs gammes dans l'app (frozen mode `F`, accord par accord)
 - [ ] Vérifier que l'extinction/rallumage du projecteur ne déplace pas la fenêtre de
       projection (sinon : blank/AV-mute ou cache sur l'objectif — ne jamais relancer
       l'app ni recalibrer entre les blocs)
