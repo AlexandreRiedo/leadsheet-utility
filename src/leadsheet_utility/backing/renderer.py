@@ -25,12 +25,11 @@ def render_layer(
 ) -> np.ndarray:
     """Render *events* to a raw stereo float32 buffer.
 
-    Returns an interleaved L/R array shaped ``(total_samples * 2,)``. The
-    output is *not* clipped or normalized — a single dense layer (e.g.
-    drums on a downbeat) can momentarily exceed |1.0|, and clipping at
-    the layer stage would shear off peaks that the final mix can still
-    accommodate.  Always pair with :func:`mix_layers` for clipping +
-    int16 conversion.
+    Returns an interleaved L/R array shaped ``(total_samples * 2,)``.
+    FluidSynth's ``get_samples`` emits int16-scale values, so the buffer
+    holds floats in ``[-32767, 32767]``. No per-layer gain is applied —
+    always pair with :func:`mix_layers` for the master gain, clip guard,
+    and int16 conversion.
     """
     synth = fluidsynth.Synth(samplerate=float(sample_rate), gain=0.5) # type: ignore
     sfid = synth.sfload(sf_path)
@@ -71,15 +70,25 @@ def render_layer(
     return buf
 
 
+# Fixed make-up gain applied to the summed mix. Layer buffers are int16-scale
+# but FluidSynth output peaks far below full scale at our gain/CC settings, so
+# the sum needs a lift to reach a healthy playback level. Deliberately a
+# constant: a per-render peak normalization would act as a loudness maximizer,
+# pinning every mix to the ceiling and re-leveling everything whenever a layer
+# is toggled or a CC balance changes.
+MIX_MASTER_GAIN = 2.5
+_INT16_FULL_SCALE = 32767.0
+
+
 def mix_layers(
     layers: list[np.ndarray],
     total_samples: int | None = None,
 ) -> np.ndarray:
-    """Sum float32 layer buffers and convert to a normalized int16 buffer.
+    """Sum int16-scale float32 layer buffers into an int16 mix.
 
-    Peaks are only attenuated, never amplified — so a layer's loudness stays
-    consistent whether or not other layers are also playing (the original
-    full-mix renderer had the same property).
+    Applies :data:`MIX_MASTER_GAIN`, then attenuates only if the gained sum
+    would actually clip — so within- and between-render dynamics stay linear
+    and the CC7 instrument balance set in :func:`render_layer` is preserved.
     """
     if total_samples is None:
         total_samples = max((layer.size for layer in layers), default=0)
@@ -88,10 +97,12 @@ def mix_layers(
         n = min(layer.size, total_samples)
         acc[:n] += layer[:n]
 
+    acc *= MIX_MASTER_GAIN
     peak = float(np.max(np.abs(acc))) if acc.size else 0.0
-    if peak > 0.95:
-        acc = acc * (0.95 / peak)
-    return (acc * 32767).astype(np.int16)
+    ceiling = 0.95 * _INT16_FULL_SCALE
+    if peak > ceiling:
+        acc *= ceiling / peak
+    return acc.astype(np.int16)
 
 
 def render_backing_track(

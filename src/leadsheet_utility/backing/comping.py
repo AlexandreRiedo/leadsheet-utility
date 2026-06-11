@@ -22,6 +22,11 @@ COMP_VELOCITY_BASE = 75
 COMP_VELOCITY_ACCENT = 95
 COMP_HUMANIZE_VEL = 8
 COMP_HUMANIZE_SAMPLES = 180
+# Per-hit strum: voices sound low-to-high with a random per-note stagger in
+# this range (a guitarist's downstroke), instead of all landing on one sample.
+COMP_STRUM_MIN_S = 0.004
+COMP_STRUM_MAX_S = 0.010
+COMP_NOTE_VEL_JITTER = 6  # additional per-note velocity spread within a hit
 COMP_LEGATO = 0.85  # fraction of hit duration before note-off
 COMP_SKIP_PROBABILITY = 0.2  # chance a given pattern hit is dropped for sparseness
 _SWING_RATIO = 0.67
@@ -97,12 +102,23 @@ def _emit_hit(
     off_sample = max(on_sample + 1, off_sample)
 
     base_vel = COMP_VELOCITY_ACCENT if accented else COMP_VELOCITY_BASE
-    velocity = max(1, min(127, base_vel + rng.randint(-COMP_HUMANIZE_VEL, COMP_HUMANIZE_VEL)))
+    hit_vel = base_vel + rng.randint(-COMP_HUMANIZE_VEL, COMP_HUMANIZE_VEL)
+
+    strum_step = rng.randint(
+        int(COMP_STRUM_MIN_S * sample_rate),
+        int(COMP_STRUM_MAX_S * sample_rate),
+    )
 
     events: list[MidiEvent] = []
-    for note in voicing:
-        events.append(MidiEvent(on_sample, COMP_CHANNEL, note, velocity, True))
-        events.append(MidiEvent(off_sample, COMP_CHANNEL, note, 0, False))
+    for i, note in enumerate(voicing):
+        note_on = on_sample + i * strum_step
+        velocity = hit_vel + rng.randint(-COMP_NOTE_VEL_JITTER, COMP_NOTE_VEL_JITTER)
+        if i == len(voicing) - 1:
+            velocity += 4  # top voice leads — let it speak slightly louder
+        velocity = max(1, min(127, velocity))
+        note_off = max(note_on + 1, off_sample)
+        events.append(MidiEvent(note_on, COMP_CHANNEL, note, velocity, True))
+        events.append(MidiEvent(note_off, COMP_CHANNEL, note, 0, False))
     return events
 
 
