@@ -45,7 +45,7 @@ The active black key is drawn yellow. Use this phase to nudge individual black k
 - Default projected range is **F2–E6**: both edges of the band align to the left side of an F key, so you've got the same physical landmark to drag both corners onto.
 - After dragging the 4 white-corner markers, use `Q`/`W` and `A`/`S` to tune the black-key proportions to your specific piano — the "standard" 0.60 / 0.65 ratios won't match every instrument. Expect a small residual misalignment on the black keys: a single planar homography can't fully account for the fact that black keys sit on a physically higher plane than the whites. Good enough for highlighting.
 - The projector should have **keystone correction disabled** in its OSD — the app's homography is the only transform that should be active.
-- On a multi-monitor setup, set `PROJ_DISPLAY=<index>` to pick which display to fullscreen.
+- On a multi-monitor setup the main app places its windows per display: HUD on display 0, chart on display 1 (with 3+ displays, else primary), projection fullscreen on the last display. Override with `HUD_DISPLAY` / `CHART_DISPLAY` / `PROJ_DISPLAY=<index>` (the preview scripts honour `PROJ_DISPLAY` too).
 
 # Projector lag compensation
 

@@ -93,7 +93,7 @@ Sync: timeline uses wall-clock elapsed time (perf_counter) -> drives both projec
 - **`data/leadsheets/`** — 19 lead sheets as `.tsv` + `.meta.json` pairs
 - **`data/soundfonts/GeneralUser-GS.sf2`** — bundled GM SoundFont for FluidSynth rendering
 
-Multi-monitor: `PROJ_DISPLAY=<index>` env var picks which display the projector window fullscreens on. The projector should have keystone correction disabled in its OSD — the app's homography is the only transform that should be active. A single planar homography cannot fully correct black-key parallax (black-key tops sit on a physically higher plane than whites), so a small residual black-key drift is expected and accepted; the `black_width_ratio`/`black_height_ratio` knobs address the related but distinct issue of canonical proportions not matching the specific piano.
+Multi-monitor: the main app assigns one window per display — HUD on 0, chart on 1 (when 3+ displays exist, else primary), projector fullscreen on the last display — via the SDL `WINDOWPOS_CENTERED | index` placement trick; `HUD_DISPLAY` / `CHART_DISPLAY` / `PROJ_DISPLAY=<index>` env vars override (the preview scripts honour `PROJ_DISPLAY` too). The projector should have keystone correction disabled in its OSD — the app's homography is the only transform that should be active. A single planar homography cannot fully correct black-key parallax (black-key tops sit on a physically higher plane than whites), so a small residual black-key drift is expected and accepted; the `black_width_ratio`/`black_height_ratio` knobs address the related but distinct issue of canonical proportions not matching the specific piano.
 
 ### What Does NOT Exist Yet
 

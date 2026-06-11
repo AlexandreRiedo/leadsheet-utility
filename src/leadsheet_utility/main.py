@@ -8,6 +8,7 @@ the same :class:`~leadsheet_utility.timeline.Timeline` state.
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import threading
 import time
@@ -284,16 +285,39 @@ class App:
 
         # -- Query displays ---------------------------------------------------
         desktop_sizes = pygame.display.get_desktop_sizes()
-        primary_w, primary_h = desktop_sizes[0]
-        has_secondary = len(desktop_sizes) > 1
+        primary_h = desktop_sizes[0][1]
+        n_displays = len(desktop_sizes)
+        has_secondary = n_displays > 1
 
-        # -- Projection window (secondary display, fullscreen) ----------------
+        # Per-window display assignment. SDL places a window on display N when
+        # its position is WINDOWPOS_CENTERED | N (the constant is a mask);
+        # fullscreen_desktop then takes over the display containing the window.
+        # Defaults: HUD on 0, chart on 1, projector on the last display —
+        # override with the HUD_DISPLAY / CHART_DISPLAY / PROJ_DISPLAY env vars.
+        def display_env(name: str, default: int) -> int:
+            try:
+                idx = int(os.environ.get(name, default))
+            except ValueError:
+                idx = default
+            if not 0 <= idx < n_displays:
+                logging.warning("%s=%s out of range; using %d", name, os.environ.get(name), default)
+                idx = default
+            return idx
+
+        def centered_on(idx: int) -> tuple[int, int]:
+            return (pygame.WINDOWPOS_CENTERED | idx, pygame.WINDOWPOS_CENTERED | idx)
+
+        hud_display = display_env("HUD_DISPLAY", 0)
+        chart_display = display_env("CHART_DISPLAY", 1 if n_displays >= 3 else 0)
+        proj_display = display_env("PROJ_DISPLAY", n_displays - 1)
+
+        # -- Projection window (fullscreen on its own display) -----------------
         if has_secondary:
-            proj_size = desktop_sizes[1]
+            proj_size = desktop_sizes[proj_display]
             self._proj_window = pygame.Window(
                 title="Projection",
                 size=proj_size,
-                position=(primary_w, 0),
+                position=centered_on(proj_display),
                 fullscreen_desktop=True,
             )
         else:
@@ -305,21 +329,23 @@ class App:
                 position=(50, primary_h - 260),
             )
 
-        # -- HUD window (primary display, windowed) ---------------------------
+        # -- HUD window (windowed, centered on its display) --------------------
         self._hud_window = pygame.Window(
             title="leadsheet-utility",
             size=_HUD_SIZE,
-            position=pygame.WINDOWPOS_CENTERED,
+            position=centered_on(hud_display),
         )
 
-        # -- Chord chart window (primary display, fullscreen) -----------------
+        # -- Chord chart window (fullscreen on its own display) ----------------
         # iReal Pro-style grid the player reads during playback. Borderless
-        # fullscreen on the primary display (covers the HUD — Alt-Tab to the
-        # HUD when you need the controls). The grid auto-scales to the size.
+        # fullscreen on its display; with fewer than three displays it shares
+        # the primary and covers the HUD (Alt-Tab to reach the controls). The
+        # grid auto-scales to the size.
+        chart_size = desktop_sizes[chart_display]
         self._chart_window = pygame.Window(
             title="Chart",
-            size=(primary_w, primary_h),
-            position=(0, 0),
+            size=chart_size,
+            position=centered_on(chart_display),
             fullscreen_desktop=True,
         )
 

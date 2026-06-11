@@ -7,12 +7,10 @@ metadata sidecar loading, and full-file integration against real lead sheets.
 """
 
 import json
-import textwrap
 from pathlib import Path
 
 import pytest
 
-from leadsheet_utility.leadsheet.models import ChordEvent, LeadSheet
 from leadsheet_utility.leadsheet.parser import parse_chord_symbol, parse_leadsheet
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "leadsheets"
