@@ -14,6 +14,10 @@ from leadsheet_utility.backing.events import MidiEvent
 from leadsheet_utility.leadsheet.models import ChordEvent
 
 COMP_CHANNEL = 1
+# The walking bass owns the roots: voicings are voice-led as full root-bass
+# drop-2/drop-3 shapes but emitted without the root, so the guitar stays out
+# of the bass register and doesn't double the bass line.
+COMP_OMIT_ROOT = True
 COMP_VELOCITY_BASE = 75
 COMP_VELOCITY_ACCENT = 95
 COMP_HUMANIZE_VEL = 8
@@ -130,8 +134,9 @@ def generate_comping(
 
     Walks the timeline in 2-bar windows, picking rhythm patterns from the
     Phil DeGreg swing pool. Each hit is voiced as a drop-2 or drop-3 voicing
-    (root as bass) chosen to minimise voice movement from the previous hit.
-    Anticipations in 2-bar patterns use the upcoming bar's harmony.
+    chosen to minimise voice movement from the previous hit, then sounded
+    without its root (see ``COMP_OMIT_ROOT``). Anticipations in 2-bar
+    patterns use the upcoming bar's harmony.
     """
     if not chords:
         return []
@@ -173,8 +178,9 @@ def generate_comping(
             if duration <= 0:
                 continue
 
+            sounded = voicing[1:] if COMP_OMIT_ROOT and len(voicing) > 1 else voicing
             events.extend(
-                _emit_hit(voicing, abs_beat, duration, hit.accented, spb, sample_rate, rng),
+                _emit_hit(sounded, abs_beat, duration, hit.accented, spb, sample_rate, rng),
             )
             prev_voicing = voicing
 

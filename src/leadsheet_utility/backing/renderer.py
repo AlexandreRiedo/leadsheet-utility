@@ -39,8 +39,8 @@ def render_layer(
     synth.program_select(9, sfid, 128, 0)  # channel 9 → GM drums
 
     # Per-channel volume balance (MIDI CC7, 0-127).
-    synth.cc(0, 7, 110)  # bass: full
-    synth.cc(1, 7, 70)   # guitar: backed off — comping shouldn't dominate
+    synth.cc(0, 7, 60)   # bass: present but not booming
+    synth.cc(1, 7, 85)   # guitar: comping clearly audible over the bass
     synth.cc(9, 7, 115)  # drums: near full
 
     total_samples = int((total_beats * 60.0 / tempo) * sample_rate)
