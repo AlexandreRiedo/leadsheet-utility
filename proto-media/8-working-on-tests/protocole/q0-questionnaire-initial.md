@@ -58,10 +58,16 @@ répondez spontanément.*
 | Morceau | Inconnu | Déjà entendu | Déjà joué | Je le connais bien |
 |---|---|---|---|---|
 | Satin Doll | ☐ | ☐ | ☐ | ☐ |
+| So What | ☐ | ☐ | ☐ | ☐ |
+| All of Me | ☐ | ☐ | ☐ | ☐ |
 | Beautiful Love | ☐ | ☐ | ☐ | ☐ |
 | How High the Moon | ☐ | ☐ | ☐ | ☐ |
 | Autumn Leaves | ☐ | ☐ | ☐ | ☐ |
 | Fly Me to the Moon | ☐ | ☐ | ☐ | ☐ |
+| There Will Never Be Another You | ☐ | ☐ | ☐ | ☐ |
+| Beatrice | ☐ | ☐ | ☐ | ☐ |
+| 26-2 | ☐ | ☐ | ☐ | ☐ |
+| Giant Steps | ☐ | ☐ | ☐ | ☐ |
 
 ## E. Technologie
 

@@ -1,11 +1,11 @@
 {
-    "title": "ii-V-I in C & F",
+    "title": "Blues in C",
     "composer": "Study",
     "key": "C",
     "time_signature": [
         4,
         4
     ],
-    "default_tempo": 80,
-    "form_repeats": 10
+    "default_tempo": 90,
+    "form_repeats": 8
 }

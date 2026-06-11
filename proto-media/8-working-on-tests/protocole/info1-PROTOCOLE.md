@@ -13,27 +13,39 @@ d'assurance. À la fin : entretien semi-ouvert. Tout est filmé (mains/clavier).
 
 ## Morceaux
 
-Une paire par niveau ; les deux morceaux d'une paire se valent (32 mesures, ii-V).
-Choix : niveau auto-évalué au Q0 item 10 — ≤ 3 → D, ≥ 4 → I (reclassement possible
-après la familiarisation, à noter). Tempo fixe, lent (déchiffrage à vue) ; si la
-personne est perdue au 1er morceau : −10 BPM pour ses deux morceaux, à noter.
+Une paire par niveau ; les deux morceaux d'une paire sont de difficulté comparable.
+Les fichiers sont dans `data/leadsheets/testing/`, préfixés par niveau (ordre
+alphabétique = ordre de difficulté). Choix : niveau auto-évalué au Q0 item 10 —
+1 → **S**, 2–3 → **E**, 4–5 → **M**, 6–7 → **P** (reclassement possible après la
+familiarisation, à noter). Les paires S et P étendent le protocole aux profils
+non-jazz et avancés ; l'analyse appariée AVEC/SANS reste intra-sujet, donc inchangée.
+Tempo fixe, lent (déchiffrage à vue) ; si la personne est perdue au 1er morceau :
+−10 BPM pour ses deux morceaux, à noter.
 
-| Paire | Niveau | Morceaux | Tempo |
-|---|---|---|---|
-| **D** | Débutant | Autumn Leaves, Fly Me to the Moon | 90 |
-| **I** | Intermédiaire | Beautiful Love, How High the Moon | 100 |
+| Paire | Niveau (préfixe) | Morceau A | Morceau B | Morceau C (remplaçant) | Tempo |
+|---|---|---|---|---|---|
+| **S** | Super facile (`drill_`) | ii-V-I in C & F | So What | Blues in C | 80 / 100 / 90 |
+| **E** | Facile (`easy_`) | Autumn Leaves | Fly Me to the Moon | All of Me | 90 |
+| **M** | Moyen (`medium_`) | Beautiful Love | How High the Moon | There Will Never Be Another You | 100 |
+| **P** | Avancé (`pro_`) | Beatrice | 26-2 | Giant Steps | 120 |
+
+**Morceau C** : remplaçant uniquement — si le Q0 item 13 indique « Déjà joué » ou
+« Je le connais bien » pour A ou B (biais de familiarité), C prend la place du
+morceau trop connu, à noter sur la feuille de session. Sinon C n'est pas utilisé ;
+le contrebalancement à 4 cas reste inchangé.
 
 ## Contrebalancement
 
 4 cas par groupe de niveau, attribués dans l'ordre d'arrivée (compteur par groupe).
 Chaque morceau passe ainsi autant en AVEC qu'en SANS, en 1er qu'en 2e. n visé : 8–12.
+A et B désignent les morceaux de la paire du participant (cf. table ci-dessus).
 
-| Cas | Morceau 1 (paire D / paire I) | Morceau 2 |
+| Cas | Morceau 1 | Morceau 2 |
 |---|---|---|
-| 1 | SANS — Autumn Leaves / Beautiful Love | AVEC — Fly Me to the Moon / How High the Moon |
-| 2 | SANS — Fly Me to the Moon / How High the Moon | AVEC — Autumn Leaves / Beautiful Love |
-| 3 | AVEC — Autumn Leaves / Beautiful Love | SANS — Fly Me to the Moon / How High the Moon |
-| 4 | AVEC — Fly Me to the Moon / How High the Moon | SANS — Autumn Leaves / Beautiful Love |
+| 1 | SANS — A | AVEC — B |
+| 2 | SANS — B | AVEC — A |
+| 3 | AVEC — A | SANS — B |
+| 4 | AVEC — B | SANS — A |
 
 **Analyse** : un score TLX et un score d'assurance par condition et par personne →
 comparaison appariée AVEC vs SANS (Wilcoxon).
@@ -44,7 +56,8 @@ comparaison appariée AVEC vs SANS (Wilcoxon).
 - Backing **FULL** (`G`), métronome OFF (`M`).
 - Grille d'accords à l'écran **dans les deux conditions** ; SANS = projecteur éteint.
 - Calibration vérifiée avant la première session du jour.
-- `form_repeats: 3` → ~4 min par morceau (32 mesures à 90–100 BPM) ; sinon arrêter avec `S`.
+- Les `form_repeats` des fichiers `testing/` sont réglés pour ~4 min par morceau
+  (formes courtes répétées plus souvent) ; sinon arrêter avec `S`.
 
 ## Déroulé (~50 min)
 
