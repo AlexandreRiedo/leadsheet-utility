@@ -11,40 +11,38 @@ répondez spontanément.*
 
 1. Âge : ________
 
-2. Genre (facultatif) : ________
-
-3. Avez-vous un trouble de la vision des couleurs (daltonisme) ?
+2. Avez-vous un trouble de la vision des couleurs (daltonisme) ?
    ☐ Non  ☐ Oui : ____________  ☐ Je ne sais pas
 
 ## B. Pratique musicale
 
-4. Instrument principal : ____________  Années de pratique : ________
+3. Instrument principal : ____________  Années de pratique : ________
 
-5. Années de pratique du **piano** (même occasionnelle) : ________
+4. Années de pratique du **piano** (même occasionnelle) : ________
 
-6. Formation au piano :
+5. Formation au piano :
    ☐ Autodidacte  ☐ Cours particuliers  ☐ École de musique / conservatoire  ☐ Autre : ________
 
-7. Depuis combien d'années êtes-vous familier·ère avec le **jazz**
+6. Depuis combien d'années êtes-vous familier·ère avec le **jazz**
    (écoute active, pratique, théorie) ? ________
 
-8. Savez-vous lire une **grille d'accords** (ex. `Dm7 | G7 | Cmaj7`) ?
+7. Savez-vous lire une **grille d'accords** (ex. `Dm7 | G7 | Cmaj7`) ?
    ☐ Pas du tout  ☐ Avec difficulté  ☐ À l'aise  ☐ Très à l'aise
 
 ## C. Improvisation
 
-9. À quelle fréquence improvisez-vous (tous instruments confondus) ?
+8. À quelle fréquence improvisez-vous (tous instruments confondus) ?
    ☐ Jamais  ☐ Rarement  ☐ Quelques fois par mois  ☐ Chaque semaine  ☐ Presque chaque jour
 
-10. Comment évaluez-vous votre niveau en **improvisation jazz** ?
+9. Comment évaluez-vous votre niveau en **improvisation jazz** ?
 
-    Débutant·e  1 — 2 — 3 — 4 — 5 — 6 — 7  Avancé·e
+   Débutant·e  1 — 2 — 3 — 4 — 5 — 6 — 7  Avancé·e
 
-11. « Improviser sur une grille de jazz qui défile me semble difficile. »
+10. « Improviser sur une grille de jazz qui défile me semble difficile. »
 
     Pas du tout d'accord  1 — 2 — 3 — 4 — 5 — 6 — 7  Tout à fait d'accord
 
-12. Qu'est-ce qui vous semble **le plus difficile** dans l'improvisation jazz ?
+11. Qu'est-ce qui vous semble **le plus difficile** dans l'improvisation jazz ?
     (en une ou deux phrases)
 
     ________________________________________________________________
@@ -53,7 +51,7 @@ répondez spontanément.*
 
 ## D. Familiarité avec les morceaux
 
-13. Pour chaque morceau, cochez ce qui correspond le mieux :
+12. Pour chaque morceau, cochez ce qui correspond le mieux :
 
 | Morceau | Inconnu | Déjà entendu | Déjà joué | Je le connais bien |
 |---|---|---|---|---|
@@ -74,9 +72,9 @@ répondez spontanément.*
 
 ## E. Technologie
 
-14. Utilisez-vous des applications d'accompagnement type **iReal Pro** ?
+13. Utilisez-vous des applications d'accompagnement type **iReal Pro** ?
     ☐ Jamais  ☐ Occasionnellement  ☐ Régulièrement
 
-15. Avez-vous déjà essayé un dispositif de **piano augmenté** (touches lumineuses,
+14. Avez-vous déjà essayé un dispositif de **piano augmenté** (touches lumineuses,
     projection, Synthesia, etc.) ?
     ☐ Non  ☐ Oui : ____________________________

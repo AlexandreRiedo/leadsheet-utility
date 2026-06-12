@@ -19,6 +19,7 @@ Qu'est-ce qui se passait ? »**
 ## 2. Comparaison avec / sans (cœur de l'entretien)
 
 **« Quelle différence ça a fait de jouer avec la projection, par rapport à sans ? »**
+- Relance facilité : est-ce que c'était plus facile avec ou sans la projection ? En quoi ?
 - Relance charge : est-ce que tu devais réfléchir plus, ou moins ? À quoi tu pensais en jouant ?
 - Relance anticipation : tu voyais les changements d'accord arriver, ou ils te tombaient
   dessus ? Pareil dans les deux conditions ?

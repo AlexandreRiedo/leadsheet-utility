@@ -15,7 +15,7 @@ d'assurance. À la fin : entretien semi-ouvert. Tout est filmé (mains/clavier).
 
 Une paire par niveau ; les deux morceaux d'une paire sont de difficulté comparable.
 Les fichiers sont dans `data/leadsheets/testing/`, préfixés par niveau (ordre
-alphabétique = ordre de difficulté). Choix : niveau auto-évalué au Q0 item 10 —
+alphabétique = ordre de difficulté). Choix : niveau auto-évalué au Q0 item 9 —
 1 → **S**, 2–3 → **E**, 4–5 → **M**, 6–7 → **P** (reclassement possible après la
 familiarisation, à noter). Les paires S et P étendent le protocole aux profils
 non-jazz et avancés ; l'analyse appariée AVEC/SANS reste intra-sujet, donc inchangée.
@@ -29,7 +29,7 @@ Tempo fixe, lent (déchiffrage à vue) ; si la personne est perdue au 1er morcea
 | **M** | Moyen (`medium_`) | Beautiful Love | How High the Moon | There Will Never Be Another You | Have You Met Miss Jones? | 100 |
 | **P** | Avancé (`pro_`) | Beatrice | 26-2 | Giant Steps | Moment's Notice | 120 |
 
-**Morceaux C et D** : remplaçants uniquement — si le Q0 item 13 indique « Déjà joué »
+**Morceaux C et D** : remplaçants uniquement — si le Q0 item 12 indique « Déjà joué »
 ou « Je le connais bien » pour A ou B (biais de familiarité), C prend la place du
 morceau trop connu ; D sert de 2e remplaçant si les deux morceaux sont trop connus
 (ou si C l'est aussi), à noter sur la feuille de session. Sinon C et D ne sont pas
@@ -63,12 +63,15 @@ comparaison appariée AVEC vs SANS (Wilcoxon).
 ## Déroulé (~50 min)
 
 Les *phrases en italique* sont le script — même formulation pour tout le monde,
-neutre (ne jamais dire que la projection « devrait aider »).
+neutre (ne jamais dire que la projection « devrait aider » ; à l'accueil, rester
+général — ne pas annoncer la comparaison avec/sans, elle se découvre à la
+familiarisation et s'explique au debriefing).
 
 **1. Accueil + consentement (5 min)**
-*« Merci de venir ! Je compare deux façons d'improviser au piano : avec et sans un
-dispositif de projection. J'évalue le dispositif, pas ton niveau. La session est
-filmée, mais seulement tes mains. Tu peux arrêter à tout moment. »*
+*« Merci de venir ! J'évalue un dispositif d'aide à l'improvisation au piano : tu vas
+improviser sur quelques morceaux et me dire ton ressenti. C'est le dispositif qui est
+testé, pas ton niveau — tu ne peux pas « rater ». La session est filmée, mais seulement
+tes mains. Tu peux arrêter à tout moment. »*
 → signer `s0-consentement.md`.
 
 **2. Questionnaire initial (5 min)** → `q0`. À la fin, fixer la paire (S/E/M/P).
