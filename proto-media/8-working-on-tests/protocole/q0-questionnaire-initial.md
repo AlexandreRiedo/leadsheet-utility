@@ -60,13 +60,16 @@ répondez spontanément.*
 | Satin Doll | ☐ | ☐ | ☐ | ☐ |
 | So What | ☐ | ☐ | ☐ | ☐ |
 | All of Me | ☐ | ☐ | ☐ | ☐ |
+| Blue Bossa | ☐ | ☐ | ☐ | ☐ |
 | Beautiful Love | ☐ | ☐ | ☐ | ☐ |
 | How High the Moon | ☐ | ☐ | ☐ | ☐ |
 | Autumn Leaves | ☐ | ☐ | ☐ | ☐ |
 | Fly Me to the Moon | ☐ | ☐ | ☐ | ☐ |
 | There Will Never Be Another You | ☐ | ☐ | ☐ | ☐ |
+| Have You Met Miss Jones? | ☐ | ☐ | ☐ | ☐ |
 | Beatrice | ☐ | ☐ | ☐ | ☐ |
 | 26-2 | ☐ | ☐ | ☐ | ☐ |
+| Moment's Notice | ☐ | ☐ | ☐ | ☐ |
 | Giant Steps | ☐ | ☐ | ☐ | ☐ |
 
 ## E. Technologie

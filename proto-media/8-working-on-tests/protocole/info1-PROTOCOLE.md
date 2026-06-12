@@ -22,17 +22,18 @@ non-jazz et avancés ; l'analyse appariée AVEC/SANS reste intra-sujet, donc inc
 Tempo fixe, lent (déchiffrage à vue) ; si la personne est perdue au 1er morceau :
 −10 BPM pour ses deux morceaux, à noter.
 
-| Paire | Niveau (préfixe) | Morceau A | Morceau B | Morceau C (remplaçant) | Tempo |
-|---|---|---|---|---|---|
-| **S** | Super facile (`drill_`) | ii-V-I in C & F | So What | Blues in C | 80 / 100 / 90 |
-| **E** | Facile (`easy_`) | Autumn Leaves | Fly Me to the Moon | All of Me | 90 |
-| **M** | Moyen (`medium_`) | Beautiful Love | How High the Moon | There Will Never Be Another You | 100 |
-| **P** | Avancé (`pro_`) | Beatrice | 26-2 | Giant Steps | 120 |
+| Paire | Niveau (préfixe) | Morceau A | Morceau B | Morceau C (remplaçant) | Morceau D (2e remplaçant) | Tempo |
+|---|---|---|---|---|---|---|
+| **S** | Super facile (`drill_`) | ii-V-I in C & F | So What | Blues in C | Minor Blues in C | 80 / 100 / 90 / 90 |
+| **E** | Facile (`easy_`) | Autumn Leaves | Fly Me to the Moon | All of Me | Blue Bossa | 90 |
+| **M** | Moyen (`medium_`) | Beautiful Love | How High the Moon | There Will Never Be Another You | Have You Met Miss Jones? | 100 |
+| **P** | Avancé (`pro_`) | Beatrice | 26-2 | Giant Steps | Moment's Notice | 120 |
 
-**Morceau C** : remplaçant uniquement — si le Q0 item 13 indique « Déjà joué » ou
-« Je le connais bien » pour A ou B (biais de familiarité), C prend la place du
-morceau trop connu, à noter sur la feuille de session. Sinon C n'est pas utilisé ;
-le contrebalancement à 4 cas reste inchangé.
+**Morceaux C et D** : remplaçants uniquement — si le Q0 item 13 indique « Déjà joué »
+ou « Je le connais bien » pour A ou B (biais de familiarité), C prend la place du
+morceau trop connu ; D sert de 2e remplaçant si les deux morceaux sont trop connus
+(ou si C l'est aussi), à noter sur la feuille de session. Sinon C et D ne sont pas
+utilisés ; le contrebalancement à 4 cas reste inchangé.
 
 ## Contrebalancement
 
@@ -70,7 +71,7 @@ dispositif de projection. J'évalue le dispositif, pas ton niveau. La session es
 filmée, mais seulement tes mains. Tu peux arrêter à tout moment. »*
 → signer `s0-consentement.md`.
 
-**2. Questionnaire initial (5 min)** → `q0`. À la fin, fixer la paire D ou I.
+**2. Questionnaire initial (5 min)** → `q0`. À la fin, fixer la paire (S/E/M/P).
 
 **3. Démo + familiarisation (8 min)**
 *« Le dispositif allume les touches qui fonctionnent avec l'accord du moment. Je te montre. »*

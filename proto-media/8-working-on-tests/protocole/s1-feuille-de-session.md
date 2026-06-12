@@ -22,7 +22,7 @@ Consentement signé ☐  Q0 rempli ☐  Familiarisation faite (avec + sans) ☐ 
 
 - Tempo réduit pour ce participant : ☐ Non ☐ Oui (−10 BPM sur les 2 morceaux)
 - Reclassé·e par rapport au Q0 : ☐ Non ☐ Oui, raison : ____________________
-- Morceau C utilisé : ☐ Non ☐ Oui, remplace ☐ A ☐ B (familiarité Q0 item 13)
+- Morceau C / D utilisé : ☐ Non ☐ C ☐ D, remplace ☐ A ☐ B (familiarité Q0 item 13)
 - ________________________________________________________________
 - ________________________________________________________________
 

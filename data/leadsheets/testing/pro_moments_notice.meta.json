@@ -1,0 +1,11 @@
+{
+    "title": "Moment's Notice",
+    "composer": "John Coltrane",
+    "key": "Eb",
+    "time_signature": [
+        4,
+        4
+    ],
+    "default_tempo": 120,
+    "form_repeats": 3
+}
