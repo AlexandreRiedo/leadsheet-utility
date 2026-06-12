@@ -51,6 +51,9 @@ class TestKeyToAction:
         assert key_to_action(pygame.K_4) is Action.EXERCISE_4
         assert key_to_action(pygame.K_5) is Action.EXERCISE_5
 
+    def test_anticipate(self):
+        assert key_to_action(pygame.K_a) is Action.TOGGLE_ANTICIPATE
+
     def test_unmapped_key_returns_none(self):
         assert key_to_action(pygame.K_z) is Action.NONE
 

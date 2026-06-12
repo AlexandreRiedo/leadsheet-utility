@@ -169,6 +169,46 @@ def _next_backing_mode(mode: BackingMode) -> BackingMode:
     return _BACKING_CYCLE[(i + 1) % len(_BACKING_CYCLE)]
 
 
+class AnticipationMode(Enum):
+    """How far ahead of the audio the projection switches to the next chord.
+
+    Cycled with the A key. A *musical* lead measured in note values (unlike
+    the seconds-based hardware lead), so the early switch lands on the same
+    rhythmic spot at any tempo — on the last 8th or the last quarter before
+    the change.
+    """
+
+    OFF = 0
+    EIGHTH = 1
+    QUARTER = 2
+
+
+_ANTICIPATION_CYCLE: list[AnticipationMode] = [
+    AnticipationMode.OFF,
+    AnticipationMode.EIGHTH,
+    AnticipationMode.QUARTER,
+]
+
+_ANTICIPATION_LABELS: dict[AnticipationMode, str] = {
+    AnticipationMode.OFF: "OFF",
+    AnticipationMode.EIGHTH: "8TH",
+    AnticipationMode.QUARTER: "QUARTER",
+}
+
+# Note value as a fraction of a whole note; the beat unit is 1/denominator,
+# so the lead in beats is denominator x fraction (e.g. an 8th in 4/4 = 0.5
+# beats, a quarter in 4/4 = 1 beat, an 8th in 6/8 = 1 beat).
+_ANTICIPATION_WHOLE_FRACTIONS: dict[AnticipationMode, float] = {
+    AnticipationMode.EIGHTH: 1 / 8,
+    AnticipationMode.QUARTER: 1 / 4,
+}
+
+
+def _next_anticipation_mode(mode: AnticipationMode) -> AnticipationMode:
+    i = _ANTICIPATION_CYCLE.index(mode)
+    return _ANTICIPATION_CYCLE[(i + 1) % len(_ANTICIPATION_CYCLE)]
+
+
 def _range_mode_label(mode: RangeMode) -> str:
     """Short HUD label for the range cycle."""
     return {
@@ -300,7 +340,9 @@ class App:
             except ValueError:
                 idx = default
             if not 0 <= idx < n_displays:
-                logging.warning("%s=%s out of range; using %d", name, os.environ.get(name), default)
+                logging.warning(
+                    "%s=%s out of range; using %d", name, os.environ.get(name), default
+                )
                 idx = default
             return idx
 
@@ -368,6 +410,10 @@ class App:
         self._metronome_on: bool = False
         self._backing_mode: BackingMode = BackingMode.FULL
         self._highlight_root: bool = False
+        # Anticipation: resolve the projected chord an 8th or a quarter note
+        # early so the player sees each change coming before the downbeat.
+        # Cycled with `A` (OFF -> 8TH -> QUARTER).
+        self._anticipation: AnticipationMode = AnticipationMode.OFF
         self._range_mode: RangeMode = RangeMode.FULL
         self._chord_tone_mode: ChordToneMode = ChordToneMode.OFF
         # Which precomputed voice-led path the Guide Tone exercise follows.
@@ -538,6 +584,10 @@ class App:
         elif action is Action.TOGGLE_ROOT_HIGHLIGHT:
             self._highlight_root = not self._highlight_root
             logger.info("Root highlight %s", "ON" if self._highlight_root else "OFF")
+
+        elif action is Action.TOGGLE_ANTICIPATE:
+            self._anticipation = _next_anticipation_mode(self._anticipation)
+            logger.info("Anticipation: %s", _ANTICIPATION_LABELS[self._anticipation])
 
         elif action is Action.TOGGLE_RANGE_MODE:
             self._range_mode = next_range_mode(self._range_mode)
@@ -1612,6 +1662,17 @@ class App:
                     _PROJECTION_LEAD_SECONDS - self._audio_delay_ms / 1000.0
                 )
                 lead_beats = effective_lead_s * (self._tempo / 60.0)
+                if (
+                    self._anticipation is not AnticipationMode.OFF
+                    and active_ls is not None
+                ):
+                    # Musical lead on top of the hardware compensation: the
+                    # anticipation note value converted to beats via the time
+                    # signature's beat unit.
+                    lead_beats += (
+                        active_ls.time_signature[1]
+                        * _ANTICIPATION_WHOLE_FRACTIONS[self._anticipation]
+                    )
                 projected_chord = timeline.chord_at(tl_state.current_beat + lead_beats)
                 if projected_chord is not None and active_ls is not None:
                     # ChordEvent identity is stable (same list used by analyzer + timeline)
@@ -1767,6 +1828,7 @@ class App:
             self._metronome_on,
             backing_mode=_BACKING_LABELS[self._backing_mode],
             highlight_root=self._highlight_root,
+            anticipate=_ANTICIPATION_LABELS[self._anticipation],
             range_mode=_range_mode_label(self._range_mode),
             chord_tone_mode=self._chord_tone_mode.name,
             count_in_beat=self._get_count_in_beat(),

@@ -29,6 +29,7 @@ class Action(Enum):
     TOGGLE_METRONOME = auto()
     TOGGLE_COMPING = auto()
     TOGGLE_ROOT_HIGHLIGHT = auto()
+    TOGGLE_ANTICIPATE = auto()
     TOGGLE_RANGE_MODE = auto()
     TOGGLE_CHORD_TONES = auto()
     TOGGLE_FROZEN = auto()
@@ -69,6 +70,7 @@ _KEY_MAP: dict[int, Action] = {
     pygame.K_m: Action.TOGGLE_METRONOME,
     pygame.K_g: Action.TOGGLE_COMPING,
     pygame.K_r: Action.TOGGLE_ROOT_HIGHLIGHT,
+    pygame.K_a: Action.TOGGLE_ANTICIPATE,
     pygame.K_b: Action.TOGGLE_RANGE_MODE,
     pygame.K_t: Action.TOGGLE_CHORD_TONES,
     pygame.K_f: Action.TOGGLE_FROZEN,
