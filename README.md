@@ -8,7 +8,7 @@
 
 # Projector calibration
 
-`scripts/preview_calibration.py` runs the 4-point calibration UI on the projector and saves the result to `data/calibration.json` (gitignored — geometry depends on your physical setup). After confirming, it enters a static C-minor verification render so you can eyeball alignment on the real keys. Re-run anytime the projector or piano moves.
+`scripts/preview_calibration.py` runs the 4-point calibration UI on the projector and saves the result to `data/calibration.json` (gitignored — geometry depends on your physical setup). After confirming, it enters a static C-minor verification render so you can eyeball alignment on the real keys.j Re-run anytime the projector or piano moves.
 
 ## Controls
 
