@@ -1,5 +1,7 @@
 # SPEC.md — leadsheet-utility: Augmented Piano for Jazz Improvisation
 
+> **Status (2026-06):** The implementation is feature-complete — every module below is marked **Done** and the system has been used in real testing sessions. Only the §12 stretch goals remain unbuilt. Work has moved to the **written bachelor thesis** (40–60 pages); see CLAUDE.md → "Written Work" for the report structure. This document is now primarily a design reference to draw on while writing the *Solution conceptuelle* and *Solution technique* chapters.
+
 ## 1. Project Overview
 
 **leadsheet-utility** is a Python application that augments a physical piano with projected light to help users learn and practice jazz improvisation. A projector mounted above the keyboard highlights scale tones, guide tones, and exercise-specific notes in real time, synchronized with an auto-generated backing track (walking bass + drums). The system reads a lead sheet file describing chord changes and timing, analyzes the harmony to compute chord-scales, and drives both the projection and the accompaniment from a shared musical timeline.
@@ -41,6 +43,7 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
    - `M` toggles the metronome; `G` cycles the backing density (NONE → DRUMS → DRUMS_BASS → FULL). Both remix from the cached layers instantly.
    - `R` toggles a root-pitch-class overlay (blue). `B` cycles the Free-Mode range (FULL / R.HAND / 2-OCT / 1-OCT) within the calibrated bands. `T` cycles the chord-tone mode (OFF / ONLY / OVERLAY).
    - `F` enters/exits frozen mode: playback halts and the projection pins to one chord, stepped with `←`/`→` for static practice. `Space` resumes from the top.
+   - `L` enters **loop-selection** mode on the chord chart: `Alt+←/→` slides a bar window, `Shift+←/→` resizes it, `Enter` confirms. The selected bars become a temporary form with its own freshly-rendered backing that repeats for ~4 minutes, and the exercise patterns regenerate over it so the game modes progress continuously across passes. `K` clears the loop and restores the full tune.
 8. When the form ends (or loops), the user presses `Space` to pause or `S` to stop.
 9. The user can switch exercises, change the tune, or adjust tempo at any time while stopped. Tempo changes invalidate the layer cache; the next play triggers a re-render.
 10. Press `Q` to quit.
@@ -188,7 +191,7 @@ Companion `.meta.json` with same base name:
 }
 ```
 
-Defaults if missing: 4/4, tempo 120, unknown title. 19 lead sheet pairs ship in `data/leadsheets/`.
+Defaults if missing: 4/4, tempo 120, unknown title. 21 lead sheet pairs ship in `data/leadsheets/`.
 
 ---
 
@@ -255,7 +258,7 @@ class KeyHighlight:
 
 ### 6.1 Free Mode (Mode Libre) — Implemented
 
-- **Projection**: All chord-scale notes in **green** (debug colour during prototyping; will return to white once projection calibration is finalised).
+- **Projection**: All chord-scale notes in **green** (`(60, 220, 90)`, `free.HIGHLIGHT_COLOR`). Green is the final base colour — it reads clearly against the white piano keys under projection.
 - **Purpose**: Introductory mode; the player sees which notes are "safe" and improvises freely.
 - **Logic**: Implemented in `exercises/free.py` as `free_mode_highlights(chord, range_mode, band_low)`. Called once per frame by `App._render_projection` against a chord resolved with projection-lead compensation, then rendered → warped → blitted onto the projector window.
 
@@ -294,7 +297,7 @@ These overlays are pure post-processing passes over a `list[KeyHighlight]`, so f
 - **Projection**: Whatever the base exercise (Free Mode + sub-toggles) would have shown when the pattern is "open"; **blackout** when "closed".
 - **Purpose**: Train rhythmic phrasing by forcing silence and pushing the player to think in phrases that cross chord and barline boundaries.
 - **Logic** (`exercises/flow.py`):
-  - `generate_flow_pattern(total_beats, density, seed)` pre-generates a list of `(start_beat, end_beat)` "open" windows spanning every form repeat. Switches do **not** align to bars or chord boundaries — a window can start on beat 4 of one bar and end on beat 3 of the next-next chord.
+  - `generate_flow_pattern(total_beats, phrasing, seed)` pre-generates a list of `(start_beat, end_beat)` "open" windows spanning every form repeat. Switches do **not** align to bars or chord boundaries — a window can start on beat 4 of one bar and end on beat 3 of the next-next chord.
   - Three phrasings cycled with `D` (SHORT / MEDIUM / LONG) selected from `_PHRASING_PARAMS`: each band gives `(min_play, max_play, min_rest, max_rest)` in beats, tuned so playing always dominates resting on average (MEDIUM = play 6–12, rest 2–4). The total play *fraction* is similar across phrasings — what varies is phrase length: SHORT chops the form into many short runs, LONG spreads long uninterrupted phrases across long rests.
   - Pattern is regenerated on phrasing change and on lead-sheet load (length depends on the form); tempo changes do not invalidate it since the pattern is measured in beats.
   - Frozen mode and the stopped state bypass the gate entirely so the player can still study a chord with no flow noise.
@@ -314,7 +317,7 @@ These overlays are pure post-processing passes over a `list[KeyHighlight]`, so f
 
 | Element | Color | RGB |
 |---|---|---|
-| Chord-scale notes (base) | White | `(255, 255, 255)` |
+| Chord-scale notes (base) | Green | `(60, 220, 90)` |
 | Guide tone / Start & End start note | Red | `(255, 50, 50)` |
 | Start & End target note | Orange | `(255, 140, 40)` |
 | All other keys / blackout | Black | `(0, 0, 0)` — **no light** |
@@ -325,7 +328,7 @@ Black background is critical: the projector emits no light for black pixels, so 
 
 ## 7. Projection Engine — Implemented
 
-Implemented in `projection/layout.py` (88-key `KeyRect` geometry with configurable MIDI range, per-instrument `black_width_ratio`/`black_height_ratio`, and per-black-key `(dx, dy)` offsets), `projection/renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), and `projection/warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`). Default range is **F2–E6** so both edges align to the left side of an F-key — a single physical landmark for both calibration corners. Range endpoints are validated to be white keys. Wired into `main.py`: each frame, the timeline's current beat is shifted by `+_PROJECTION_LEAD_SECONDS - audio_delay_ms/1000` to mask projector input lag, the chord at that beat is resolved, Free-Mode (plus overlays) produces a `list[KeyHighlight]`, those are rendered → warped → blitted onto the projector window. `scripts/preview_projector.py` still exercises the same pipeline against a static C-minor highlight.
+Implemented in `projection/layout.py` (88-key `KeyRect` geometry with configurable MIDI range, per-instrument `black_width_ratio`/`black_height_ratio`, and per-black-key `(dx, dy)` offsets), `projection/renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), and `projection/warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`). Default range is **F2–E6** so both edges align to the left side of an F-key — a single physical landmark for both calibration corners. Range endpoints are validated to be white keys. Wired into `main.py`: each frame, the timeline's current beat is shifted by `+_PROJECTION_LEAD_SECONDS - audio_delay_ms/1000` to mask projector input lag, the chord at that beat is resolved, Free-Mode (plus overlays) produces a `list[KeyHighlight]`, those are rendered → warped → blitted onto the projector window. A separate **musical anticipation** (`AnticipationMode`, key `A`: OFF / 8TH / QUARTER) adds a further look-ahead measured in note values rather than seconds, so the projection flips to the next chord on the last 8th or quarter before the change and the lead stays rhythmically constant at any tempo. This is independent of the seconds-based hardware lead above. `scripts/preview_projector.py` still exercises the same pipeline against a static C-minor highlight.
 
 ### Reference Specification
 
@@ -476,6 +479,7 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `+` / `-` | Tempo up/down by 5 BPM (invalidates layer cache) |
 | `M` | Toggle metronome (instant remix from cache) |
 | `G` | Cycle backing density: NONE → DRUMS → DRUMS_BASS → FULL |
+| `A` | Cycle projection anticipation: OFF → 8TH → QUARTER (musical note-value lead) |
 | `R` | Toggle root-pitch-class overlay (blue) |
 | `B` | Cycle Free-Mode range: FULL → R.HAND → 2-OCT → 1-OCT |
 | `T` | Cycle chord-tone mode: OFF → ONLY → OVERLAY |
@@ -490,6 +494,11 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 | `W` | Cycle Contour window width: NARROW → MEDIUM → WIDE |
 | `X` | Cycle Contour speed: SLOW → MEDIUM → FAST |
 | `Shift+W` | Regenerate Contour curve |
+| `L` | Enter loop-selection mode (pick a bar range on the chart) |
+| `Alt+←` / `Alt+→` | Slide the loop band left / right |
+| `Shift+←` / `Shift+→` | Shrink / expand the loop band |
+| `Enter` | Confirm loop selection (start looping the bars) |
+| `K` | Clear / cancel the loop |
 | `C` | Enter calibration mode |
 | `Q` / `Esc` | Quit |
 
@@ -542,7 +551,7 @@ ruff = ">=0.4"
 - [x] Keyboard-shortcut-driven Pygame UI with HUD
 - [x] Metronome (toggleable, `M`)
 - [x] Backing density cycle (NONE / DRUMS / DRUMS_BASS / FULL, `G`)
-- [x] 17 example lead sheet files
+- [x] 21 example lead sheet files
 
 - [x] Projection engine (canonical 88-key F2–E6 layout, OpenCV homography warp, per-black-key offsets, projection-lead compensation, standalone preview script)
 - [x] Calibration: 5-phase UI (range → markers/ratios → per-black-key offsets → exercise bands → audio delay) + JSON persistence, standalone preview script
@@ -575,11 +584,14 @@ Test-driven development. Tests define expected behavior before implementation. T
 - `test_timeline.py` — musical clock, transport, chord resolution
 - `test_walking_bass.py` — voice-leading, valid MIDI range (28–48), approach notes at chord boundaries
 - `test_drums.py` — correct GM note numbers, swing timing offsets, humanization
+- `test_exercises_free.py` / `test_exercises_flow.py` / `test_exercises_contour.py` / `test_exercises_start_end.py` — highlight outputs and pattern generation per exercise
+- `test_projection_layout.py` / `test_projection_renderer.py` / `test_projection_warp.py` — canonical key geometry, flat rendering, homography warp
+- `test_calibration_persistence.py` / `test_calibration_ui.py` — JSON round-trip with default fallbacks, 5-phase state machine
 - `test_main.py` — app integration
 
 ### Planned Tests
 
-- Exercises — highlight outputs for known chord sequences
+- Guide Tone exercise — voice-led path selection and overlay outputs (not yet covered)
 - FluidSynth rendering (integration) — valid stereo int16 buffer of expected length
 
 ---
