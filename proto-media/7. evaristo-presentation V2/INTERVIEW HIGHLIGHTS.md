@@ -31,7 +31,9 @@ Le passage le plus important pour la QR — le prof formule lui-même l'hypothè
 
 - (l. 188-217) « On est **jeté dans le bain** » ; les morceaux = « l'**objet transitionnel** […] notre **jouet du moment** » (≥2-3 jouets pour aborder des problématiques différentes). Tranche d'âge 15-25. « Il y a un petit côté **impétueux** […] **il faut juste y aller** […] même si on n'a pas tous les outils. »
 - (l. 218-240) Le bon mix = « compréhension […] audition […] **proprioception** » (analogie bateau/penche). Côté psy : « **il ne faut pas qu'ils se parlent trop quand ils jouent** » — discussion intérieure liée à l'**auto-validation**, à doser.
+- (l. 242-244) Métaphore de l'**atelier / établi** : la créativité se vit « **comme si on était à l'établi** […] on a notre pièce de bois, puis on va creuser, puis on va faire des entailles dedans » — le dispositif, en mettant la part psy « **en back-up** », laisse l'apprenant à ce travail d'artisan.
 - (l. 255-272) Notion clé : parler de **notes stables / instables** plutôt que justes / fausses (« juste ou faux, il y a un jugement » ; stable/instable = proprioception, idée du surf/skate). + **représentation intérieure du futur** (« si tu ne sais pas où tu vises, tu ne vois pas ce que tu fais ») ; nécessité d'avoir **écouté des disques**.
+- (l. 272-276) **Point fort identifié de l'outil** : il « **développe cette écoute** » — « t'appuies, t'es en [mode] sensoriel, mais t'entends que ça se passe bien » → l'apprenant valide par l'**oreille** (« ça se met en phase, il y a le côté jazz ») plutôt que par le jugement (cf. §4 et §16).
 - (l. 297-311) Analogie **ski** : les très bons « se méga concentrent » dans la poudreuse — le flow demande d'être « vraiment réveillé ».
 
 ---
@@ -40,10 +42,12 @@ Le passage le plus important pour la QR — le prof formule lui-même l'hypothè
 
 Fil rouge récurrent : l'outil éclaire **une zone**, pas la globalité — et c'est OK, mais il faut savoir laquelle.
 
-- (l. 339-357) L'outil « **contourne** » un peu le côté psy (référence à la **faille de Piaget**, l. 328-338), mais : « comment je vais le **connecter avec le background complet** ? Les gammes et compagnie […] autant la théorie que la pratique […] avec d'autres personnes ? »
+- (l. 328-338) **Faille de Piaget** (cadre que le prof utilise) : un système intérieur clos et fonctionnel se **fissure** quand arrive une information nouvelle (« **B9, c'est quoi ?** ») et dysfonctionne jusqu'à ce que le cerveau « **referme la bulle** » en l'ayant intégrée. L'intérêt du dispositif = **contourner un temps** cette faille (jouer sans devoir tout intégrer d'abord).
+- (l. 339-357) L'outil « **contourne** » un peu le côté psy, mais : « comment je vais le **connecter avec le background complet** ? Les gammes et compagnie […] autant la théorie que la pratique […] avec d'autres personnes ? »
 - (l. 423-463) « ça **focus sur une des zones d'apprentissage** […] Et c'est quoi la zone ? **Je ne sais pas, je ne l'ai pas encore trouvé.** » → l'étudiant note que c'est précisément **ce qui serait testable**. Analogie **100 m haies** (athlétisme / mécanique).
 - (l. 451-457) « **une zone qui peut être grande et progresser beaucoup, mais qui n'a pas toute la globalité dedans** […] **néanmoins, l'exercice vient d'une intelligence globale de la situation.** L'exercice, il est bien, il est complet. »
 - (l. 1316-1327) Reformulation forte de l'effet de transfert : « tu vas être **habitué à jouer sur des notes qui sonnent**. Donc **ton oreille se forme** en même temps. **Tes doigts se forment** à viser des chemins. Ton habitude à être dans un **système contraignant avec du time** […] Tu ressens que tu joues de la gamme [inside], même si tu ne sais pas ce que c'est. »
+- (l. 1056-1063) **Méta-cadrage des limites** (utile pour structurer le chapitre) : le prof récapitule trois limites distinctes abordées — (1) « la **limite du système par rapport à l'humain** » ; (2) « la **limite de l'évaluation du système**, soit par l'informatique, soit par l'humain » ; (3) « la **limite du concepteur** […] de par son aisance à évoluer dans des trucs plus ou moins avancés ». « Tu as autant le **problème machine**, mais tu as le **problème humain** aussi. »
 
 ---
 
@@ -116,6 +120,7 @@ La piste d'évaluation la plus exploitable techniquement.
 
 - (l. 836-841) « **Est-ce que le gars arrive à avoir les notes pivots plutôt dans les upper structure ?** Ça c'est un **critère avancé et mesurable. Même par un ordi.** » → compter, sur tous les accords, combien de 7, 9, 11, 13.
 - (l. 897-902) Classification proposée : **upper structures = « advance »** ; entre quinte et neuvième = « **medium** » ; 1-3-5(-7) = « **basique** ».
+- (l. 1065-1066) ⚠️ **Applicabilité** : critère réservé à un haut niveau — « ce genre de notion, il y a peut-être **1 % des gens qui ont le niveau pour être évalué** pour ce genre de truc » (l'étudiant lui-même « n'aurait pas à sortir à ce stade »). À croiser avec le public cible (§2).
 - (l. 908-975) **Système de score** : les règles de musique « peuvent être écrites en **hard** » (« si quinte augmentée = tierce, si B9 = tonique » — notes pivots / voicings). Attribuer un **ranking de points** à chaque note cible : « **la treizième vaut tant de points […] 1 vaut 1, 3 vaut 3, 5 vaut 5** » → une somme > 21 = usage de notes plus hautes que la 7e. « **C'est assez mathématique, c'est tout con.** »
 - (l. 938-942) ⚠️ Limite clé : « **c'est pas la quantité de notes cibles qui nous intéresse, c'est la qualité.** Ça, c'est plus compliqué en informatique. »
 - (l. 686-695, 920-934) **Contre-exemple décisif** : les **approches chromatiques** comptent comme « false, false, false » alors qu'elles « **visent** » et sonnent excellentes — « 10 % d'infos, mais musicalement hyper haut ». → distinguer approche **strict diatonique** vs **chromatique**.
@@ -134,6 +139,7 @@ C'est l'**aboutissement** de l'interview — le prof propose, et l'étudiant ado
 - (l. 1357-1372) Étudiant : « **ça me donne envie de figer un peu les choses, de faire des morceaux-exercices figés à l'avance.** » Prof : le langage ouvert permet d'aborder n'importe quel standard, mais pour le bachelor « **tu as fermé le range à un truc bien précis** […] et dans ce truc-là tu retrouves des **gradations**. »
 - (l. 1373-1376) **Unité de mesure** image : « **Est-ce que le rat il saute ?** Quand il va dans un truc qui tourne, il arrive à sortir ? À partir de quand ça tourne trop vite, il n'arrive plus à sortir. »
 - (l. 1310-1312) « Si le gars **couvre jusqu'à l'exercice 15** […] soit il était déjà très adroit, soit il arrive à s'embarquer dedans. **Et là, tu peux avoir des sorties [data].** »
+- (l. 1289-1292) **Répertoire des morceaux-exercices** : commencer par une simple séquence **2-5** (« sur une séquence déjà basique »), puis un morceau « pas trop compliqué ». ⚠️ « **Béatrice, c'est quand même déjà bien avancé** » → préférer plus simple : **Beautiful Love**, **How High the Moon**.
 
 ---
 
@@ -151,6 +157,7 @@ C'est l'**aboutissement** de l'interview — le prof propose, et l'étudiant ado
 - (l. 805-817) Idéalement **plusieurs séances** pour mesurer la **progression musicale**.
 - (l. 1233-1239) Croiser **deux datas** : le **ressenti** + le **niveau d'exercice atteint** sur des enchaînements simples puis un morceau « pas plus ».
 - (l. 47-50) Le prof propose de **fournir d'autres testeurs** (collègue, prof classique « ultra néophyte »).
+- (l. 16-24) **Cadrage de l'entretien par l'étudiant** (consigne donnée au prof) : « **on veut du data. Que la réponse soit négative ou positive** […] Est-ce que ça marche, que ça marche pas ? **Qu'est-ce qu'on peut en extraire de cet artefact ?** » — le prof est invité à être **libre et non complaisant** (« je ne vais pas être pénalisé si c'est nul »).
 
 ---
 
@@ -161,6 +168,16 @@ C'est l'**aboutissement** de l'interview — le prof propose, et l'étudiant ado
 - (l. 1044-1054) Exemple musical : la ligne de fin de solo de **Herbie Hancock sur *Dolphin Dance*** = **upper structures de gamme diminuée** (triades majeures/mineures descendantes).
 - (l. 976-988) **MIDI vs vrai piano** : capter les notes sur un vrai piano est une « **fausse contrainte** » — n'importe quelle IA basique transcrit l'audio en notes, ou on sort un **clavier MIDI**.
 - (l. 989-998, 1379) **Timing** : finition prévue **juin**, mais flexible (septembre possible). « Le truc est déjà monstre bien […] tu es déjà bien loin dans le bachelor. »
+
+---
+
+## 16. Auto-débriefing & validation interne ⭐
+
+Thème pédagogique transversal (lié à §3 auto-validation, §10 mesure, §13 sevrage) : **comment l'apprenant sait-il qu'il a réussi**.
+
+- (l. 649-666) « Le problème qu'on a, c'est l'**auto-débriefing**. » → « le **debriefing**, c'est hyper important […] le but étant que **l'élève s'auto-débriefe** ». Étudiant : « c'est écouter soi-même, genre **s'enregistrer** ».
+- (l. 657-662) Enjeu central pour l'apprenant : « **est-ce que j'y arrive ou pas ?** » ; ⚠️ prudence sur le mot **validation** (« comment je peux évaluer ou **auto-évaluer** que la situation est réussie ? ») ; « tu mets une bécane dans les mains […] **il est où mon retour d'investissement** sur ce sujet ? ».
+- (l. 667-674) Technique du prof : « **je fais l'amibe** […] je suis exprès de **ne pas bouger** […] du moment que je te vois **tracer**, tu résous le truc, tu changes d'accord » — pousser l'autonomie, parler le moins possible. Le dispositif (validation **sonore** plutôt que jugeante, cf. §3 l. 272-276) prolonge cette logique.
 
 ---
 
