@@ -28,10 +28,11 @@ du cadrage). Le set d'instruments qui a survécu :
 | Profil (descriptif) | **Q0** | début | caractérisation de l'échantillon |
 
 **Design** : intra-sujet, 2 conditions **AVEC** (Free Mode projeté, R.HAND) vs **SANS**
-(projecteur éteint, grille + backing dans les deux cas). 2 morceaux/personne (paire de
-difficulté comparable, niveau S/E/M/P selon Q0 item 9), **contrebalancement à 4 cas** par
-groupe de niveau. **n = 8.** → un score par instrument **par condition et par personne**
-→ **comparaison appariée AVEC vs SANS (Wilcoxon)** pour chaque mesure.
+(projecteur éteint, grille + backing dans les deux cas). 2 morceaux/personne, choisis pour
+être **inconnus du participant** et de **difficulté comparable** (niveau S/E/M/P du morceau).
+Le contrebalancement formel à 4 cas prévu au cadrage **n'a pas été appliqué** (pas de rotation
+systématique morceau↔condition ni de l'ordre). **n = 8.** → un score par instrument **par
+condition et par personne** → **comparaison appariée AVEC vs SANS (Wilcoxon)** pour chaque mesure.
 
 > **À écrire dans 6.1 :** « Le protocole a été resserré par rapport au cadrage initial pour
 > tenir en une séance d'~1 h sans fatigue questionnaire ; ne subsistent que les instruments
@@ -69,7 +70,7 @@ assurance) comme référence visuelle/annexe, puis saisis dans **un seul classeu
 **Schéma recommandé — format « large » (1 ligne = 1 morceau joué), lisible à l'œil :**
 
 ```
-participant | niveau | cas | morceau | condition | ordre
+participant | niveau | morceau | condition | ordre
 | tlx_mental | tlx_physique | tlx_temporel | tlx_perf | tlx_effort | tlx_frustration
 | stai_calme | stai_tendu | stai_emu | stai_decontracte | stai_satisfait | stai_inquiet
 | se_q7 | se_q8 | se_q9 | se_q10 | conf_globale_q11
@@ -83,7 +84,7 @@ participant | niveau | cas | morceau | condition | ordre
 - **Q0** : `rapport/stats/data/q0_profil.csv` — 1 ligne par participant avec les champs du §2
   (item 11 texte libre = colonne `plus_difficile_texte`).
 - **Écarts/incidents** (feuille `s1` : tempo réduit ? reclassé ? morceau C/D ?) : les colonnes
-  de contexte de `responses.csv` (`niveau`, `cas`, `morceau`, `ordre`) les portent en partie ;
+  de contexte de `responses.csv` (`niveau`, `morceau`, `ordre`) les portent en partie ;
   le reste va dans le **tableau « écarts au protocole »** du rapport (§8).
 
 > **✅ FAIT — décision retenue : CSV + script CLI.** Le scaffolding est construit dans
@@ -175,9 +176,11 @@ Principe Carusi (et demande de Patrick) : **séparer Déroulement (protocole) et
 
 1. **Le design en un paragraphe** : intra-sujet AVEC/SANS, 2 morceaux de difficulté
    comparable, main droite ~4 min, grille + backing dans les deux conditions, ~1 h.
-2. **Le contrebalancement** : reprends la table à 4 cas (1 figure). Explique en une phrase
-   *pourquoi* (chaque morceau passe autant en AVEC qu'en SANS, en 1er qu'en 2e → neutralise
-   l'ordre et l'effet-morceau au niveau du groupe ; l'analyse appariée reste intra-sujet).
+2. **Le choix des morceaux** : explique que chaque participant a joué 2 morceaux **inconnus
+   de lui** et de **difficulté comparable**, un par condition. Précise que le contrebalancement
+   formel à 4 cas (prévu au cadrage) **n'a pas été appliqué** : l'effet d'ordre et l'effet-morceau
+   ne sont donc **pas** neutralisés au niveau du groupe — à porter en **limite** (§6.4), atténués
+   seulement par le design intra-sujet apparié et par la difficulté comparable des morceaux.
 3. **Les instruments**, chacun en 2–3 phrases avec **la source validée** :
    - NASA-TLX **brut/RTLX** (Hart & Staveland 1988 ; version non pondérée justifiée par
      Hart 2006 ; traduction FR Cegarra & Morgado 2009). Adaptation musicale = uniquement
@@ -308,8 +311,10 @@ parlante. Mais traite les tests par-dimension comme **exploratoires** (cf. §6, 
 - **Toujours : taille d'effet + figure appariée + compteur k/8.** Avec n=8, **l'effet et
   la cohérence individuelle priment sur le p.**
 - **Limites à écrire** (§6.4 / conclusion) : petit échantillon, auto-efficacité non
-  validée, morceau différent entre conditions intra-sujet (atténué par contrebalancement),
-  mesure à chaud rétrospective pour STAI, pas de mesure de transfert (mono-séance).
+  validée, **morceau différent entre conditions sans contrebalancement** (effet-morceau et
+  effet d'ordre non neutralisés ; seulement atténués par l'appariement intra-sujet et le choix
+  de morceaux inconnus de difficulté comparable), mesure à chaud rétrospective pour STAI, pas
+  de mesure de transfert (mono-séance).
 
 ---
 
@@ -376,7 +381,7 @@ L'objectif explicite de Patrick est de voir **comment tu interprètes** — une 
 
 - [ ] **Tab. profil participants** (Q0) + synthèse médiane/étendue + effectifs
 - [ ] **Tab. QR → construit → instrument → hypothèse**
-- [ ] **Fig. contrebalancement** (4 cas)
+- [ ] **Tab. assignation morceaux↔conditions** (par participant : morceau, condition, ordre)
 - [ ] **Tab. données appariées scorées** (RTLX, STAI-6, auto-eff, conf q11) × condition
 - [ ] **Fig. slope plots** ×3 (RTLX, STAI-6, auto-eff)
 - [ ] **Fig. barres 6 dimensions TLX** AVEC vs SANS (médianes)

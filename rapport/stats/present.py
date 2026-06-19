@@ -36,6 +36,14 @@ TLX_ITEMS = HERE / "data" / "tlx_items_tableur.csv"  # items bruts -> figure par
 FIGS = HERE / "figures"
 FONTS = HERE / "fonts"  # Plus Jakarta Sans embarqué (TTF) pour une typo cohérente
 GOOD, BAD = "#2e8b57", "#c0392b"  # aligné sur H1 (vert) / à contre-sens (rouge)
+GRID = "#d4d4d4"  # gris discret : guide la lecture sans masquer les données
+
+# Largeur utile d'une page A4 (210 mm = 8.27") moins 2 marges de 1 pouce : les figures
+# occupent ainsi toute la justification du rapport, insérées à 100 % (pas de redimension
+# = pas de flou). La hauteur reste libre, choisie par figure pour un aspect agréable.
+A4_WIDTH_IN, MARGIN_IN = 8.27, 1.0
+FIG_WIDTH = A4_WIDTH_IN - 2 * MARGIN_IN  # ~6.27"
+DPI = 200  # un cran au-dessus pour rester net à l'impression
 
 
 def use_jakarta():
@@ -50,7 +58,34 @@ def use_jakarta():
     plt.rcParams["axes.unicode_minus"] = False  # certains sous-ensembles n'ont pas U+2212
 
 
+def setup_style():
+    """Look commun : grille derrière les données, cadre allégé, titres en gras."""
+    plt.rcParams.update(
+        {
+            "savefig.dpi": DPI,
+            "axes.axisbelow": True,  # la grille passe DERRIÈRE lignes/barres
+            "axes.titlesize": 13,
+            "axes.titleweight": "bold",
+            "axes.titlepad": 12,
+            "axes.labelsize": 11,
+            "axes.edgecolor": "#888888",
+            "grid.color": GRID,
+        }
+    )
+
+
+def ygrid(ax):
+    """Grille horizontale (majeure + mineure discrète) pour lire les valeurs en ordonnée,
+    cadre réduit aux axes gauche/bas."""
+    ax.minorticks_on()
+    ax.grid(True, axis="y", which="major", color=GRID, linewidth=0.9)
+    ax.grid(True, axis="y", which="minor", color=GRID, linewidth=0.5, alpha=0.55)
+    ax.tick_params(which="minor", length=0)  # lignes mineures sans traits de graduation
+    ax.spines[["top", "right"]].set_visible(False)
+
+
 use_jakarta()
+setup_style()
 
 # code -> (direction H1, libellé). "less" = on prédit AVEC < SANS ; doit rester
 # IDENTIQUE aux directions du tableur et d'analyze_tests.py (sinon les couleurs mentent).
@@ -99,32 +134,47 @@ def slope_plot(pids, avec, sans, alternative, label, path):
     """Une ligne par participant (SANS -> AVEC) : VERTE si alignée sur H1, sinon ROUGE.
     PID à gauche (côté SANS) ; les ex aequo (même score SANS) sont empilés pour ne pas
     se chevaucher. Médiane en gras, étiquetée à droite."""
-    fig, ax = plt.subplots(figsize=(3.8, 5.0))
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, 4.6))
+    ygrid(ax)
+    # Repères verticaux discrets sous les deux colonnes : ancrent SANS / AVEC dans la
+    # largeur A4 (sinon les deux points flottent loin l'un de l'autre).
+    for x in (0, 1):
+        ax.axvline(x, color=GRID, lw=0.9, zorder=0)
     colors = []
     for a, s in zip(avec, sans):
         win = a < s if alternative == "less" else a > s
         colors.append(GOOD if win else BAD)
         ax.plot([0, 1], [s, a], "-o", lw=1.3, alpha=0.8, color=colors[-1])
     ax.plot([0, 1], [np.median(sans), np.median(avec)], "k-", lw=3)
-    ax.text(1.06, np.median(avec), "médiane", va="center", ha="left", fontsize=8, fontweight="bold")
+    # médiane décalée vers l'extérieur pour ne pas chevaucher la colonne PID de droite.
+    ax.text(1.18, np.median(avec), "médiane", va="center", ha="left", fontsize=8, fontweight="bold")
 
-    # Étiquettes PID : empilées verticalement autour du score quand des participants
-    # sont à égalité au SANS (sinon elles se superposeraient au même y).
+    # Étiquettes PID des DEUX côtés : au score SANS (gauche) et au score AVEC (droite),
+    # même couleur que la ligne du participant. Les ex aequo (même score dans une
+    # colonne) sont empilés verticalement pour ne pas se superposer.
     vgap = (float(np.ptp(np.concatenate([avec, sans]))) or 1.0) * 0.05
-    groups = {}
-    for pid, s, c in zip(pids, sans, colors):
-        groups.setdefault(s, []).append((pid, c))
-    for s, members in groups.items():
-        members.sort()  # ordre déterministe par PID
-        for j, (pid, c) in enumerate(members):
-            dy = (j - (len(members) - 1) / 2) * vgap
-            ax.text(-0.06, s + dy, pid, va="center", ha="right", fontsize=7, color=c)
+
+    def label_column(values, x, ha):
+        groups = {}
+        for pid, v, c in zip(pids, values, colors):
+            groups.setdefault(v, []).append((pid, c))
+        for v, members in groups.items():
+            members.sort()  # ordre déterministe par PID
+            for j, (pid, c) in enumerate(members):
+                dy = (j - (len(members) - 1) / 2) * vgap
+                ax.text(x, v + dy, pid, va="center", ha=ha, fontsize=7, color=c)
+
+    label_column(sans, -0.06, "right")
+    label_column(avec, 1.06, "left")
 
     ax.set_xticks([0, 1], ["SANS", "AVEC"])
-    ax.set(xlim=(-0.55, 1.45), ylabel="score", title=label)
+    # xlim resserré : juste de quoi loger les PID (gauche) et l'étiquette médiane
+    # (droite), sans grand vide. L'angle d'une pente est de toute façon arbitraire
+    # (axe x catégoriel) — c'est l'axe vertical qui porte l'information honnête.
+    ax.set(xlim=(-0.3, 1.45), ylabel="score", title=label)
     ax.margins(y=0.1)  # un peu d'air en haut/bas pour les étiquettes empilées
     fig.tight_layout()
-    fig.savefig(path, dpi=150)
+    fig.savefig(path, dpi=DPI)
     plt.close(fig)
 
 
@@ -138,14 +188,16 @@ def tlx_subscale_plot(rows, path):
 
     cols = list(TLX)
     x = np.arange(len(cols))
-    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, 3.9))
+    ygrid(ax)
     ax.bar(x - 0.2, [med("SANS", c) for c in cols], 0.4, label="SANS", color="#bdc3c7")
     ax.bar(x + 0.2, [med("AVEC", c) for c in cols], 0.4, label="AVEC", color=GOOD)
     ax.set_xticks(x, list(TLX.values()), rotation=20, ha="right")
+    ax.set_yticks(np.arange(0, 101, 20))  # repères majeurs lisibles (0,20,...,100)
     ax.set(ylabel="médiane (0-100)", ylim=(0, 100), title="NASA-TLX (RTLX, 0-100) par dimension (médianes)")
-    ax.legend()
+    ax.legend(frameon=False)
     fig.tight_layout()
-    fig.savefig(path, dpi=150)
+    fig.savefig(path, dpi=DPI)
     plt.close(fig)
 
 

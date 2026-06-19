@@ -38,7 +38,7 @@ lignes/mesures incomplètes — tu peux donc lancer au fur et à mesure).
 
 | Colonnes | Échelle brute à saisir |
 |---|---|
-| `niveau, cas, morceau, ordre` | contexte (S/E/M/P ; cas 1-4 ; titre ; 1 ou 2) — facultatif |
+| `niveau, morceau, ordre` | contexte (difficulté du morceau S/E/M/P ; titre ; 1 ou 2) — facultatif |
 | `tlx_*` (6) | **0–100** par pas de 5. Saisir Performance telle quelle (Réussie→Ratée), **sans inverser**. |
 | `stai_*` (6) | **1–4** (Non=1, Plutôt non=2, Plutôt oui=3, Oui=4). **Ne pas inverser** : le script s'en charge. |
 | `se_q7..se_q10` | **1–7** |
