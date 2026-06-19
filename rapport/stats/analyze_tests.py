@@ -6,6 +6,13 @@ et par condition → Wilcoxon apparié exact (scipy) dans la direction prédite 
 d'effet + figures. Justification de chaque choix : rapport/guide-interpretation-stats.md.
 
     poetry run python rapport/stats/analyze_tests.py   (deps : groupe Poetry « stats »)
+
+RÔLE : OUTIL DE RECOUPEMENT, PAS LA SOURCE DE VÉRITÉ.
+À n = 8, les calculs de référence sont faits à la main dans un tableur (Sheets/Excel) :
+c'est la version auditable et défendable au jury. Ce script ne sert qu'à *vérifier* ces
+calculs — le lancer une fois, confirmer que W, r_rb et p concordent avec le tableur, et
+investiguer tout écart avant l'export. La table de p exacte à recopier dans le tableur est
+dans guide-interpretation-stats.md §2.1 (rappel : aucune fonction Wilcoxon dans un tableur).
 """
 
 import csv
@@ -99,8 +106,8 @@ def analyse(avec, sans, alternative) -> Stats:
         t_plus=t_plus,
         t_minus=t_minus,
         W=min(t_plus, t_minus),
-        p_one=wilcoxon(avec, sans, alternative=alternative).pvalue,
-        p_two=wilcoxon(avec, sans, alternative="two-sided").pvalue,
+        p_one=wilcoxon(avec, sans, alternative=alternative).pvalue,  # type: ignore[attr-defined]  # scipy: pas de stubs
+        p_two=wilcoxon(avec, sans, alternative="two-sided").pvalue,  # type: ignore[attr-defined]  # scipy: pas de stubs
         r_rb=(t_plus - t_minus) / (t_plus + t_minus),
         dz=d.mean() / d.std(ddof=1) if d.size > 1 else np.nan,
         k=int(k),

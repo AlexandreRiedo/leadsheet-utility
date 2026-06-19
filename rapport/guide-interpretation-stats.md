@@ -67,6 +67,55 @@ Le test de Wilcoxon porte sur la **médiane des différences appariées** `d = s
 - **Différences nulles (d = 0)** : exclues → n effectif diminue ; **le
   noter** si ça arrive (ex. « un score nul, n effectif = 7 »).
 
+### 2.1 Table de p exacte (n = 8 et n = 7) — pour le calcul à la main
+
+> **Pourquoi une table.** Un tableur (Sheets/Excel) calcule nativement W (`RANK.AVG` + `SUMIF`),
+> r_rb, dₙ, médiane/IQR, mais **n'a pas de fonction Wilcoxon** : on lit donc p ici. Faire le
+> calcul à la main évite *par construction* le piège de l'approximation z (§2 ; DATAtab/MetricGate
+> y basculent par défaut) et rend chaque étape auditable → plus défendable qu'un appel `scipy` à n = 8.
+
+**Dérivation (exacte, par énumération — vérifiable à la main).** Sous H₀, chacun des rangs
+{1,…,n} reçoit un signe ± au hasard → **2ⁿ** configurations équiprobables (256 à n = 8, 128 à
+n = 7). T⁺ = somme des rangs positifs. Alors :
+
+```
+p unilatéral = (nb de sous-ensembles de {1..n} de somme ≤ W) / 2ⁿ
+p bilatéral  = 2 × p unilatéral          (distribution symétrique)
+```
+
+Aucune intégrale ni approximation normale : un simple **comptage de sommes de sous-ensembles**.
+**On rejette H₀ quand le W observé ≤ W de la ligne.** (Recoupé avec `scipy.stats.wilcoxon` ;
+l'exemple §4 « W = 1, p = .016 » est la ligne n = 7, W = 1 unilatéral.)
+
+**n = 8** (aucun nul exclu) :
+
+| W | p unilatéral | p bilatéral |
+|--:|--:|--:|
+| 0 | .004 | .008 |
+| 1 | .008 | .016 |
+| 2 | .012 | .023 |
+| 3 | .020 | .039 |
+| 4 | .027 | .055 |
+| 5 | .039 | .078 |
+| 6 | .055 | .109 |
+
+**n = 7** (un nul exclu) :
+
+| W | p unilatéral | p bilatéral |
+|--:|--:|--:|
+| 0 | .008 | .016 |
+| 1 | .016 | .031 |
+| 2 | .023 | .047 |
+| 3 | .039 | .078 |
+| 4 | .055 | .109 |
+
+> **Plancher de puissance à n = 8** : le plus petit p unilatéral atteignable est **.004** (les 8
+> différences dans le sens prédit, W = 0) ; bilatéral **.008**. Pour α = .05 unilatéral il faut
+> **W ≤ 5** → une seule paire à contre-sens peut faire basculer p au-dessus de .05 ; d'où le choix
+> (§3.3) de la **taille d'effet comme mesure principale, p en appui**.
+> **Ex æquo** : des |différences| égales modifient légèrement la distribution nulle ; cette table
+> suppose l'absence d'ex æquo → les noter (§5) et, le cas échéant, s'appuyer sur le recoupement `scipy`.
+
 ---
 
 ## 3. Comment lire chaque sortie
