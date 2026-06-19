@@ -28,22 +28,22 @@ lignes/mesures incomplètes — tu peux donc lancer au fur et à mesure).
 | `se_q7..se_q10` | **1–7** |
 | `conf_globale_q11` | **0–10** (contrôle) |
 
-## Lancer
+## Installer & lancer
 
 ```bash
+poetry install --with stats          # numpy + scipy + matplotlib
 poetry run python rapport/stats/analyze_tests.py
 ```
 
-- **numpy** suffit pour toute l'analyse (déjà installé).
-- **matplotlib** est optionnel : sans lui, tableaux OK, figures ignorées. Pour les activer :
-  `poetry run pip install matplotlib`.
+Le test, le calcul des rangs et les figures s'appuient sur **scipy** et **matplotlib**
+(groupe Poetry `stats` ; numpy est déjà dans les dépendances principales).
 
 ## Ce que fait le script (résumé)
 
 - **Scores** : RTLX = moyenne des 6 dimensions ; STAI-6 = inversion calme/décontracté/satisfait
   puis somme ×20/6 ; auto-efficacité = moyenne items 7–10.
-- **Test** : Wilcoxon des rangs signés **exact** (énumération des 2ⁿ signes), dans la bonne
-  direction par mesure (`less` pour TLX & STAI, `greater` pour l'auto-efficacité).
+- **Test** : Wilcoxon des rangs signés via `scipy.stats.wilcoxon` (p **exacte** à n ≤ 50), dans
+  la bonne direction par mesure (`less` pour TLX & STAI, `greater` pour l'auto-efficacité).
 - **Sorties par mesure** : médiane (IQR) AVEC/SANS, W, p exact (uni + bi), corrélation
   rang-bisériale (taille d'effet) + dz, et le compte k/n dans le sens prédit.
 

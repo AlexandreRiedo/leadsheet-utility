@@ -57,9 +57,10 @@ Le test de Wilcoxon porte sur la **médiane des différences appariées** `d = s
   des d négatifs (T⁻) ; `W = min(T⁺, T⁻)`. Un W très petit = quasi toutes les différences
   vont dans le même sens (signal fort).
 - **p EXACT, pas l'approximation z** : à n = 8, l'approximation normale (z = (W−μ_W)/σ_W) est
-  imprécise ; utiliser le **calcul exact**. Le script `rapport/stats/analyze_tests.py` le calcule
-  par **énumération des 2^n configurations de signes** (numpy seul, sans scipy) ; un calculateur
-  convient aussi en **mode petit-échantillon / exact**. Ne **pas** rapporter de z-score à n = 8.
+  imprécise ; utiliser le **calcul exact**. Le script `rapport/stats/analyze_tests.py` l'obtient
+  via **`scipy.stats.wilcoxon`** (méthode par défaut « auto » → p **exacte** tant que n ≤ 50, par
+  énumération des configurations de signes) ; un calculateur convient aussi en **mode
+  petit-échantillon / exact**. Ne **pas** rapporter de z-score à n = 8.
 - **Exact vs approximation — écart attendu** : un outil réglé sur l'**approximation normale**
   (DATAtab, ou MetricGate par défaut) donne un p légèrement différent (vérifié : .344 exact vs
   .312 approx sur un même jeu). À n = 8, **l'exact est le bon** ; ne pas s'inquiéter de l'écart.

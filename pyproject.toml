@@ -20,6 +20,11 @@ ruff = ">=0.15.8,<0.16.0"
 pypdf = "^6.13.2"
 
 
+
+[tool.poetry.group.stats.dependencies]
+scipy = "^1.17.1"
+matplotlib = "^3.11.0"
+
 [tool.poetry]
 package-mode = false
 

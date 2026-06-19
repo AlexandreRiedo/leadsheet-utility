@@ -1,177 +1,113 @@
 #!/usr/bin/env python3
 """Analyse des tests utilisateurs — piano augmenté (intra-sujet AVEC/SANS).
 
-Lit ``data/responses.csv`` (réponses brutes, une ligne par morceau joué), calcule
-les trois scores composites, fait un test de Wilcoxon des rangs signés **exact**
-(par énumération des 2^n configurations de signes) pour chaque mesure dans la
-**bonne direction**, et sort tableaux + figures.
+Pour chaque mesure (charge, anxiété, confiance) : un score composite par participant
+et par condition → Wilcoxon apparié exact (scipy) dans la direction prédite → taille
+d'effet + figures. Justification de chaque choix : rapport/guide-interpretation-stats.md.
 
-Voir ``rapport/guide-interpretation-stats.md`` pour la justification de chaque choix
-(scoring, direction des hypothèses, p exact, taille d'effet rang-bisériale, dz, k/n).
-
-Dépendances : numpy (requis). matplotlib (optionnel — figures ignorées si absent).
-Lancer :  poetry run python rapport/stats/analyze_tests.py
+    poetry run python rapport/stats/analyze_tests.py   (deps : groupe Poetry « stats »)
 """
-from __future__ import annotations
 
 import csv
-import itertools
 from pathlib import Path
+from typing import NamedTuple
 
+import matplotlib
 import numpy as np
+
+matplotlib.use("Agg")  # rendu hors écran : on écrit des PNG
+import matplotlib.pyplot as plt
+from scipy.stats import rankdata, wilcoxon
 
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data" / "responses.csv"
 RESULTS = HERE / "results"
 FIGS = HERE / "figures"
+GOOD, BAD = "#1f8a8a", "#c0392b"  # couleurs : va dans le sens prédit / à contre-sens
 
-# --- matplotlib optionnel -------------------------------------------------
-try:
-    import matplotlib
-
-    matplotlib.use("Agg")  # pas d'affichage interactif, on écrit des PNG
-    import matplotlib.pyplot as plt
-
-    HAVE_MPL = True
-except ImportError:  # pragma: no cover
-    HAVE_MPL = False
-
-# --- définition des items -------------------------------------------------
-TLX_COLS = [
+# Items des trois questionnaires (noms de colonnes dans responses.csv).
+TLX = [
     "tlx_mental",
     "tlx_physique",
     "tlx_temporel",
-    "tlx_perf",  # déjà orienté Réussie->Ratée : PAS d'inversion
+    "tlx_perf",
     "tlx_effort",
     "tlx_frustration",
 ]
-STAI_POS = ["stai_calme", "stai_decontracte", "stai_satisfait"]  # inverser (5 - x)
-STAI_NEG = ["stai_tendu", "stai_emu", "stai_inquiet"]  # tels quels
-SE_COLS = ["se_q7", "se_q8", "se_q9", "se_q10"]
-
-# mesure -> (alternative, libellé). alternative :
-#   "less"    => on prédit AVEC < SANS  (charge/anxiété plus basses)
-#   "greater" => on prédit AVEC > SANS  (confiance plus haute)
-MEASURES = {
-    "RTLX": ("less", "NASA-TLX (RTLX, 0-100) — charge"),
-    "STAI6": ("less", "STAI-6 (20-80) — anxiété"),
-    "SELFEFF": ("greater", "Auto-efficacité (1-7) — confiance"),
-}
+STAI_POS = ["stai_calme", "stai_decontracte", "stai_satisfait"]  # à inverser (5 - x)
+STAI_NEG = ["stai_tendu", "stai_emu", "stai_inquiet"]
+SE = ["se_q7", "se_q8", "se_q9", "se_q10"]
 
 
-# --- helpers de parsing ---------------------------------------------------
-def _f(row: dict, key: str):
-    """float tolérant : virgule décimale, vide -> None."""
-    v = row.get(key)
-    if v is None:
-        return None
-    v = str(v).strip().replace(",", ".")
-    if v == "":
-        return None
-    try:
-        return float(v)
-    except ValueError:
-        return None
+# --- scoring : un score par ligne, nan si une cellule manque (cf. guide §0) ---
+def cell(row, col):
+    """Une cellule -> float (virgule décimale tolérée) ; vide -> nan."""
+    text = (row.get(col) or "").strip().replace(",", ".")
+    return float(text) if text else np.nan
 
 
-# --- scoring (cf. guide §0) ----------------------------------------------
+def values(row, cols):
+    """Plusieurs colonnes -> array float (vide -> nan, qui se propage au score)."""
+    return np.array([cell(row, c) for c in cols])
+
+
 def score_rtlx(row):
-    vals = [_f(row, c) for c in TLX_COLS]
-    return float(np.mean(vals)) if all(v is not None for v in vals) else None
+    return values(row, TLX).mean()  # moyenne des 6 dimensions
 
 
 def score_stai6(row):
-    pos = [_f(row, c) for c in STAI_POS]
-    neg = [_f(row, c) for c in STAI_NEG]
-    if any(v is None for v in pos + neg):
-        return None
-    raw = sum(5 - v for v in pos) + sum(neg)  # inversions + items négatifs
-    return raw * 20 / 6  # ramené à l'étendue 20-80 du STAI-S complet
+    pos, neg = values(row, STAI_POS), values(row, STAI_NEG)
+    return ((5 - pos).sum() + neg.sum()) * 20 / 6  # inversions, puis échelle 20-80
 
 
 def score_selfeff(row):
-    vals = [_f(row, c) for c in SE_COLS]
-    return float(np.mean(vals)) if all(v is not None for v in vals) else None
+    return values(row, SE).mean()  # moyenne des items 7-10
 
 
-SCORERS = {"RTLX": score_rtlx, "STAI6": score_stai6, "SELFEFF": score_selfeff}
+# mesure -> (fonction de score, direction H1, libellé). "less" = on prédit AVEC < SANS.
+MEASURES = {
+    "RTLX": (score_rtlx, "less", "NASA-TLX (RTLX, 0-100) — charge"),
+    "STAI6": (score_stai6, "less", "STAI-6 (20-80) — anxiété"),
+    "SELFEFF": (score_selfeff, "greater", "Auto-efficacité (1-7) — confiance"),
+}
 
 
-# --- statistiques ---------------------------------------------------------
-def _avg_ranks(a: np.ndarray) -> np.ndarray:
-    """Rangs moyens (1-based), ex aequo -> moyenne des rangs."""
-    order = np.argsort(a, kind="mergesort")
-    sorted_a = a[order]
-    ranks = np.empty(a.size, float)
-    i = 0
-    while i < a.size:
-        j = i
-        while j + 1 < a.size and sorted_a[j + 1] == sorted_a[i]:
-            j += 1
-        avg = (i + j) / 2 + 1  # moyenne des rangs (i+1)..(j+1)
-        ranks[order[i : j + 1]] = avg
-        i = j + 1
-    return ranks
+# --- statistique : Wilcoxon apparié + tailles d'effet ---------------------
+class Stats(NamedTuple):
+    n: int  # nombre de paires (différences nulles exclues)
+    n_zero: int  # différences nulles (d = 0), écartées par le test
+    t_plus: float  # somme des rangs des différences positives
+    t_minus: float  # ... des négatives
+    W: float  # min(T+, T-)
+    p_one: float  # p exacte, unilatérale, dans la direction prédite
+    p_two: float  # p exacte, bilatérale (option conservatrice)
+    r_rb: float  # corrélation rang-bisériale, -1..+1 (Kerby 2014)
+    dz: float  # d de Cohen apparié
+    k: int  # paires allant dans le sens prédit
 
 
-def wilcoxon_exact(avec, sans, alternative):
-    """Wilcoxon apparié exact par énumération des signes. Renvoie un dict ou None."""
-    d = np.asarray(avec, float) - np.asarray(sans, float)
-    n_zero = int(np.sum(d == 0))
-    nz = d[d != 0]
-    n = nz.size
-    if n == 0:
-        return None
-    ranks = _avg_ranks(np.abs(nz))
-    t_plus = float(np.sum(ranks[nz > 0]))
-    t_minus = float(np.sum(ranks[nz < 0]))
-    total = t_plus + t_minus
-
-    # distribution nulle exacte de T+ : chaque rang a un signe +/- équiprobable
-    if n <= 22:
-        dist = np.array(
-            [
-                sum(r for r, s in zip(ranks, signs) if s)
-                for signs in itertools.product((0, 1), repeat=n)
-            ]
-        )
-        p_le = float(np.mean(dist <= t_plus + 1e-9))
-        p_ge = float(np.mean(dist >= t_plus - 1e-9))
-        method = "exact (énumération 2^n)"
-    else:  # garde-fou : approximation normale pour gros n (non utilisé ici)
-        mu = n * (n + 1) / 4
-        sigma = np.sqrt(n * (n + 1) * (2 * n + 1) / 24)
-        from math import erf
-
-        z = (t_plus - mu) / sigma
-        cdf = 0.5 * (1 + erf(z / np.sqrt(2)))
-        p_le, p_ge, method = cdf, 1 - cdf, "approximation normale"
-
-    p_one = p_le if alternative == "less" else p_ge
-    p_two = min(1.0, 2 * min(p_le, p_ge))
-    sd = np.std(d, ddof=1)
-    return {
-        "n": n,
-        "n_zero": n_zero,
-        "t_plus": t_plus,
-        "t_minus": t_minus,
-        "W": min(t_plus, t_minus),
-        "p_one": p_one,
-        "p_two": p_two,
-        "r_rb": (t_plus - t_minus) / total if total else 0.0,
-        "dz": float(np.mean(d) / sd) if sd > 0 else float("nan"),
-        "method": method,
-    }
+def analyse(avec, sans, alternative) -> Stats:
+    """Wilcoxon des rangs signés (scipy, exact à n ≤ 50) sur les paires AVEC/SANS."""
+    d = avec - sans
+    nz = d[d != 0]  # le test écarte les différences nulles
+    ranks = rankdata(np.abs(nz))  # rangs des |différences|, ex aequo moyennés
+    t_plus, t_minus = ranks[nz > 0].sum(), ranks[nz < 0].sum()
+    k = (nz < 0).sum() if alternative == "less" else (nz > 0).sum()
+    return Stats(
+        n=nz.size,
+        n_zero=int((d == 0).sum()),
+        t_plus=t_plus,
+        t_minus=t_minus,
+        W=min(t_plus, t_minus),
+        p_one=wilcoxon(avec, sans, alternative=alternative).pvalue,
+        p_two=wilcoxon(avec, sans, alternative="two-sided").pvalue,
+        r_rb=(t_plus - t_minus) / (t_plus + t_minus),
+        dz=d.mean() / d.std(ddof=1) if d.size > 1 else np.nan,
+        k=int(k),
+    )
 
 
-def count_direction(avec, sans, alternative):
-    d = np.asarray(avec, float) - np.asarray(sans, float)
-    nz = d[d != 0]
-    k = int(np.sum(nz < 0)) if alternative == "less" else int(np.sum(nz > 0))
-    return k, nz.size, int(np.sum(d == 0))
-
-
-def interpret_r(r):
+def interpret_r(r):  # barème de Cohen (repère, cf. guide §3.3)
     a = abs(r)
     if a < 0.10:
         return "négligeable"
@@ -182,173 +118,153 @@ def interpret_r(r):
     return "grand"
 
 
-def fmt_p(p):
-    return "<.001" if p < 0.001 else f"{p:.3f}".lstrip("0").replace("0.", ".", 1)
+def fmt_p(p):  # style APA : pas de 0 initial
+    return "<.001" if p < 0.001 else f"{p:.3f}".lstrip("0")
 
 
-def med_iqr(x):
-    q1, med, q3 = np.percentile(np.asarray(x, float), [25, 50, 75])
-    return med, q1, q3
+def med_iqr(x):  # "médiane (Q1-Q3)"
+    q1, med, q3 = np.percentile(x, [25, 50, 75])
+    return f"{med:.1f} ({q1:.1f}-{q3:.1f})"
 
 
-# --- chargement -----------------------------------------------------------
-def load_rows(path: Path):
+# --- chargement & appariement AVEC/SANS -----------------------------------
+def load(path):
     with path.open(encoding="utf-8-sig", newline="") as fh:
-        reader = csv.DictReader(fh)
-        return [{(k.strip() if k else k): v for k, v in r.items()} for r in reader]
+        return list(csv.DictReader(fh))
 
 
-def paired_scores(rows, measure):
-    """Renvoie (ids, avec, sans) pour les participants ayant les 2 conditions scorées."""
-    scorer = SCORERS[measure]
-    by_pid: dict[str, dict[str, float]] = {}
-    for r in rows:
-        pid = (r.get("participant") or "").strip()
-        cond = (r.get("condition") or "").strip().upper()
-        if not pid or cond not in ("AVEC", "SANS"):
-            continue
-        s = scorer(r)
-        if s is not None:
-            by_pid.setdefault(pid, {})[cond] = s
-    ids, avec, sans = [], [], []
-    for pid in sorted(by_pid):
-        d = by_pid[pid]
-        if "AVEC" in d and "SANS" in d:
-            ids.append(pid)
-            avec.append(d["AVEC"])
-            sans.append(d["SANS"])
-    return ids, avec, sans
+def paired_scores(rows, score):
+    """{participant: {"AVEC": score, "SANS": score}} ; lignes incomplètes ignorées."""
+    by_pid = {}
+    for row in rows:
+        s = score(row)
+        if not np.isnan(s):
+            by_pid.setdefault(row["participant"], {})[row["condition"]] = s
+    return by_pid
 
 
 # --- figures --------------------------------------------------------------
-def slope_plot(measure, ids, avec, sans, alternative, label, path):
+def slope_plot(avec, sans, alternative, label, path):
+    """Une ligne par participant (SANS -> AVEC), médiane en gras."""
     fig, ax = plt.subplots(figsize=(3.6, 5.0))
-    for s, a in zip(sans, avec):
-        good = (a < s) if alternative == "less" else (a > s)
-        ax.plot([0, 1], [s, a], "-o", ms=5, lw=1.3, alpha=0.75,
-                color="#1f8a8a" if good else "#c0392b")
-    ax.plot([0, 1], [np.median(sans), np.median(avec)], "-", lw=3,
-            color="black", label="médiane")
-    ax.set_xticks([0, 1])
-    ax.set_xticklabels(["SANS", "AVEC"])
-    ax.set_xlim(-0.25, 1.25)
-    ax.set_ylabel("score")
-    ax.set_title(label, fontsize=9)
-    ax.legend(fontsize=8, loc="best")
+    for a, s in zip(avec, sans):
+        win = a < s if alternative == "less" else a > s
+        ax.plot([0, 1], [s, a], "-o", lw=1.3, alpha=0.75, color=GOOD if win else BAD)
+    ax.plot([0, 1], [np.median(sans), np.median(avec)], "k-", lw=3, label="médiane")
+    ax.set_xticks([0, 1], ["SANS", "AVEC"])
+    ax.set(xlim=(-0.25, 1.25), ylabel="score", title=label)
+    ax.legend(fontsize=8)
     fig.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
 
 def tlx_subscale_plot(rows, path):
+    """Médianes des 6 sous-dimensions TLX, AVEC vs SANS (exploratoire)."""
     labels = ["Mentale", "Physique", "Temporelle", "Perf.", "Effort", "Frustration"]
-    med = {"AVEC": [], "SANS": []}
-    for cond in ("AVEC", "SANS"):
-        for col in TLX_COLS:
-            vals = [
-                _f(r, col)
-                for r in rows
-                if (r.get("condition") or "").strip().upper() == cond and _f(r, col) is not None
-            ]
-            med[cond].append(np.median(vals) if vals else 0.0)
+
+    def median(cond, col):
+        vals = [cell(r, col) for r in rows if r["condition"] == cond]
+        vals = [v for v in vals if not np.isnan(v)]
+        return np.median(vals) if vals else 0
+
     x = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=(7, 4))
-    ax.bar(x - 0.2, med["SANS"], 0.4, label="SANS", color="#bdc3c7")
-    ax.bar(x + 0.2, med["AVEC"], 0.4, label="AVEC", color="#1f8a8a")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=20, ha="right")
-    ax.set_ylabel("médiane (0-100)")
-    ax.set_title("NASA-TLX par dimension (médianes)", fontsize=10)
+    ax.bar(
+        x - 0.2, [median("SANS", c) for c in TLX], 0.4, label="SANS", color="#bdc3c7"
+    )
+    ax.bar(x + 0.2, [median("AVEC", c) for c in TLX], 0.4, label="AVEC", color=GOOD)
+    ax.set_xticks(x, labels, rotation=20, ha="right")
+    ax.set(ylabel="médiane (0-100)", title="NASA-TLX par dimension")
     ax.legend()
     fig.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
 
+# --- sorties --------------------------------------------------------------
+def write_scores(table, path):
+    cols = [f"{m}_{suf}" for m in MEASURES for suf in ("AVEC", "SANS", "d")]
+    with path.open("w", encoding="utf-8", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["participant", *cols])
+        for pid in sorted(table):
+            w.writerow([pid, *(table[pid].get(c, "") for c in cols)])
+
+
+def write_summary(summary, path):
+    lines = [
+        "# Wilcoxon apparié (scipy, exact à n ≤ 50)",
+        "",
+        "| Mesure | H1 | n | Mdn AVEC | Mdn SANS | W | p (uni) | p (bi) | r_rb | dz | sens |",
+        "|" + "---|" * 11,
+    ]
+    for code, sens, n, ma, ms, st in summary:
+        nul = f" ({st.n_zero} nul)" if st.n_zero else ""
+        lines.append(
+            f"| {code} | {sens} | {n} | {ma:.1f} | {ms:.1f} | {st.W:g} | "
+            f"{fmt_p(st.p_one)} | {fmt_p(st.p_two)} | {st.r_rb:+.2f} ({interpret_r(st.r_rb)}) | "
+            f"{st.dz:+.2f} | {st.k}/{st.n}{nul} |"
+        )
+    lines += [
+        "",
+        "*p unilatéral dans la direction prédite ; cf. guide-interpretation-stats.md.*",
+    ]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 # --- main -----------------------------------------------------------------
 def main():
-    if not DATA.exists():
-        raise SystemExit(f"Fichier introuvable : {DATA}")
-    rows = load_rows(DATA)
+    rows = load(DATA)
     RESULTS.mkdir(exist_ok=True)
     FIGS.mkdir(exist_ok=True)
 
-    summary_rows = []
-    scores_by_pid: dict[str, dict[str, float]] = {}
-    any_data = False
+    table = {}  # participant -> {RTLX_AVEC: ..., ...}  pour scores.csv
+    summary = []  # une ligne par mesure pour le tableau de résultats
 
     print("\n=== Analyse des tests utilisateurs ===\n")
-    for measure, (alt, label) in MEASURES.items():
-        ids, avec, sans = paired_scores(rows, measure)
-        if len(ids) < 1:
-            print(f"[{measure}] aucune paire complète pour l'instant — ignoré.")
+    for code, (score, alt, label) in MEASURES.items():
+        pairs = paired_scores(rows, score)
+        ids = sorted(p for p, c in pairs.items() if "AVEC" in c and "SANS" in c)
+        if not ids:
+            print(f"[{code}] aucune paire complète pour l'instant — ignoré.\n")
             continue
-        any_data = True
-        for pid, a, s in zip(ids, avec, sans):
-            d = scores_by_pid.setdefault(pid, {})
-            d[f"{measure}_AVEC"] = round(a, 2)
-            d[f"{measure}_SANS"] = round(s, 2)
-            d[f"{measure}_d"] = round(a - s, 2)
 
-        res = wilcoxon_exact(avec, sans, alt)
-        k, n_eff, n_zero = count_direction(avec, sans, alt)
-        ma, q1a, q3a = med_iqr(avec)
-        ms, q1s, q3s = med_iqr(sans)
+        avec = np.array([pairs[p]["AVEC"] for p in ids])
+        sans = np.array([pairs[p]["SANS"] for p in ids])
+        st = analyse(avec, sans, alt)
         sens = "AVEC < SANS" if alt == "less" else "AVEC > SANS"
 
-        print(f"[{measure}] {label}  (H1 : {sens})  n_paires={len(ids)}")
-        print(f"   Mdn AVEC = {ma:.1f} ({q1a:.1f}-{q3a:.1f}) | "
-              f"Mdn SANS = {ms:.1f} ({q1s:.1f}-{q3s:.1f})")
-        if res:
-            print(f"   W={res['W']:.1f}  T+={res['t_plus']:.1f}  T-={res['t_minus']:.1f}  "
-                  f"[{res['method']}]")
-            print(f"   p unilatéral = {fmt_p(res['p_one'])} | p bilatéral = {fmt_p(res['p_two'])}")
-            print(f"   r_rb = {res['r_rb']:+.2f} ({interpret_r(res['r_rb'])}) | dz = {res['dz']:+.2f}")
-            print(f"   sens prédit : {k}/{n_eff}" + (f"  ({n_zero} ex aequo exclus)" if n_zero else ""))
-            summary_rows.append((measure, label, sens, len(ids), ma, ms, res, k, n_eff, n_zero))
-        print()
+        for p in ids:
+            a, s = pairs[p]["AVEC"], pairs[p]["SANS"]
+            table.setdefault(p, {}).update(
+                {
+                    f"{code}_AVEC": round(a, 2),
+                    f"{code}_SANS": round(s, 2),
+                    f"{code}_d": round(a - s, 2),
+                }
+            )
+        summary.append((code, sens, len(ids), np.median(avec), np.median(sans), st))
+        slope_plot(avec, sans, alt, label, FIGS / f"slope_{code.lower()}.png")
 
-        if HAVE_MPL:
-            slope_plot(measure, ids, avec, sans, alt, label,
-                       FIGS / f"slope_{measure.lower()}.png")
+        nul = f" ({st.n_zero} nul)" if st.n_zero else ""
+        print(f"[{code}] {label}  (H1 : {sens}, n = {len(ids)})")
+        print(f"    Mdn AVEC = {med_iqr(avec)}   Mdn SANS = {med_iqr(sans)}")
+        print(f"    W = {st.W:g}   p = {fmt_p(st.p_one)} uni / {fmt_p(st.p_two)} bi")
+        print(
+            f"    r_rb = {st.r_rb:+.2f} ({interpret_r(st.r_rb)})   dz = {st.dz:+.2f}"
+            f"   sens prédit : {st.k}/{st.n}{nul}\n"
+        )
 
-    if not any_data:
-        print("Aucune donnée saisie pour l'instant. Remplis data/responses.csv puis relance.\n")
+    if not summary:
+        print("Aucune donnée complète. Remplis data/responses.csv puis relance.\n")
         return
 
-    # tableau scores.csv
-    measure_cols = [f"{m}_{suf}" for m in MEASURES for suf in ("AVEC", "SANS", "d")]
-    with (RESULTS / "scores.csv").open("w", encoding="utf-8", newline="") as fh:
-        w = csv.writer(fh)
-        w.writerow(["participant", *measure_cols])
-        for pid in sorted(scores_by_pid):
-            w.writerow([pid, *(scores_by_pid[pid].get(c, "") for c in measure_cols)])
-
-    # tableau wilcoxon_summary.md
-    with (RESULTS / "wilcoxon_summary.md").open("w", encoding="utf-8") as fh:
-        fh.write("# Résultats — Wilcoxon apparié (exact)\n\n")
-        fh.write("| Mesure | H1 | n | Mdn AVEC | Mdn SANS | W | p (uni) | p (bi) | "
-                 "r_rb (taille) | dz | sens prédit |\n")
-        fh.write("|---|---|---|---|---|---|---|---|---|---|---|\n")
-        for m, label, sens, n, ma, ms, res, k, n_eff, n_zero in summary_rows:
-            fh.write(
-                f"| {m} | {sens} | {n} | {ma:.1f} | {ms:.1f} | {res['W']:.1f} | "
-                f"{fmt_p(res['p_one'])} | {fmt_p(res['p_two'])} | "
-                f"{res['r_rb']:+.2f} ({interpret_r(res['r_rb'])}) | {res['dz']:+.2f} | "
-                f"{k}/{n_eff}{' (' + str(n_zero) + ' nul)' if n_zero else ''} |\n"
-            )
-        fh.write("\n*p unilatéral dans la direction prédite ; voir guide-interpretation-stats.md.*\n")
-
-    if HAVE_MPL and any((r.get("condition") or "").strip().upper() in ("AVEC", "SANS") for r in rows):
-        tlx_subscale_plot(rows, FIGS / "tlx_subscales.png")
-
-    print(f"Écrit : {RESULTS / 'scores.csv'}")
-    print(f"Écrit : {RESULTS / 'wilcoxon_summary.md'}")
-    if HAVE_MPL:
-        print(f"Figures : {FIGS}")
-    else:
-        print("(matplotlib absent — figures ignorées. `poetry run pip install matplotlib` pour les activer.)")
-    print()
+    write_scores(table, RESULTS / "scores.csv")
+    write_summary(summary, RESULTS / "wilcoxon_summary.md")
+    tlx_subscale_plot(rows, FIGS / "tlx_subscales.png")
+    print(f"Écrit : {RESULTS / 'scores.csv'} + wilcoxon_summary.md")
+    print(f"Figures : {FIGS}\n")
 
 
 if __name__ == "__main__":
