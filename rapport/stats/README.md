@@ -1,8 +1,21 @@
 # Analyse statistique des tests utilisateurs
 
-Pipeline minimal : on tape les **réponses brutes** dans un CSV, une commande sort les
-**scores composites, les tests de Wilcoxon exacts, les tailles d'effet et les figures**.
 La méthode et les sources sont dans [`../guide-interpretation-stats.md`](../guide-interpretation-stats.md).
+
+**Deux chemins, une seule source de vérité.**
+
+1. **Tableur + calculateur en ligne (source de vérité, auditable).** Saisie des valeurs brutes
+   → scores composites → Wilcoxon (W, W⁺/W⁻, p) via le calculateur en ligne → `r` rang-bisérial
+   `(W⁺−W⁻)/(W⁺+W⁻)` à la main. C'est la version défendable au jury.
+2. **`present.py` (présentation).** On exporte les **scores composites** du tableur vers
+   `data/scores_tableur.csv`, et le script en tire les figures en pente (`slope_*.png`, ×3).
+   Pour le détail NASA-TLX par dimension, on exporte en plus les **items bruts** vers
+   `data/tlx_items_tableur.csv` (format long) → `tlx_subscales.png`. Le script ne (re)calcule
+   **aucun** score et ne refait **aucun** test — il ne fait que dessiner les mêmes valeurs que
+   le tableur, donc une figure ne peut pas contredire le test fait à la main.
+3. **`analyze_tests.py` (recoupement, optionnel).** Refait tout depuis les réponses brutes
+   (`responses.csv`) pour *vérifier* le tableur — à lancer une fois, confirmer que W, p et r_rb
+   concordent, investiguer tout écart.
 
 ## Fichiers
 
@@ -10,7 +23,10 @@ La méthode et les sources sont dans [`../guide-interpretation-stats.md`](../gui
 |---|---|
 | `data/responses.csv` | **À remplir** — 1 ligne par morceau joué (16 lignes : P01–P08 × AVEC/SANS). Valeurs **brutes**. |
 | `data/q0_profil.csv` | **À remplir** — 1 ligne par participant (profil Q0, pour le tableau descriptif). |
-| `analyze_tests.py` | Le script : scoring → Wilcoxon exact → r_rb + dz + k/n → tableaux + figures. |
+| `analyze_tests.py` | **Recoupement** : scoring → Wilcoxon exact → r_rb + dz + k/n → tableaux + figures, depuis `responses.csv`. À ne lancer que pour *vérifier* le tableur. |
+| `data/scores_tableur.csv` | **À remplir / exporter du tableur** — scores composites par participant (`<MESURE>_AVEC` / `_SANS`). Source de vérité de la présentation. |
+| `data/tlx_items_tableur.csv` | *Facultatif* — items NASA-TLX bruts, **format long** (1 ligne par participant × condition) pour la figure par dimension. |
+| `present.py` | **Présentation** : lit les deux CSV ci-dessus → `slope_*.png` (×3) + `tlx_subscales.png`. Ne (re)calcule rien. |
 | `results/` | *Généré* : `scores.csv` (scores par personne) + `wilcoxon_summary.md` (tableau de résultats). |
 | `figures/` | *Généré* : `slope_*.png` (×3) + `tlx_subscales.png`. |
 
