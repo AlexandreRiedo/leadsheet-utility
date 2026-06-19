@@ -1,6 +1,8 @@
 # Analyse statistique des tests utilisateurs
 
 La méthode et les sources sont dans [`../guide-interpretation-stats.md`](../guide-interpretation-stats.md).
+Le plan du classeur Google Sheets (onglets, en-têtes, formules, saisie → export CSV) est dans
+[`SHEETS-LAYOUT.md`](SHEETS-LAYOUT.md).
 
 **Deux chemins, une seule source de vérité.**
 
