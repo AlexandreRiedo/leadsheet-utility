@@ -67,6 +67,10 @@ Carusi organise son état de l'art en 3 thèmes avec sous-titres → faire parei
 - Cognitive Load Theory (Sweller) appliquée à une tâche temps-réel comme l'impro.
 - Anxiété de performance / blocage de l'improvisateur (lien avec QR2 "n'ose pas se lancer").
 - Comment la visualisation peut décharger la mémoire de travail → justifie la projection.
+- **Effet d'inversion d'expertise (Kalyuga & Sweller) + effet de redondance** : un
+  échafaudage utile au débutant devient surcharge chez l'expert (info redondante = charge
+  extrinsèque). ← **à poser ICI pour cadrer d'avance l'anomalie experts du ch. Évaluations**
+  (§6.4) : les improvisateurs les plus chevronnés ont vécu la projection comme un fardeau.
 - *Besoin de chercher 3-5 références académiques ici (à ajouter à la biblio).*
 
 ### Thème C — Pianos augmentés & Réalité Augmentée  ← reframer en "RA" (annotation p.5)
@@ -174,28 +178,115 @@ augmentée/diminuée. Déjà bien décrits dans le DS p.10-11, à reprendre + ph
 > Note de réunion la plus stricte : "QUE par rapport à la QR ! répondre à la QR".
 > Modèle Carusi : **séparer Déroulement (protocole) et Résultats (analyse)**.
 > Reprendre les méthodes d'ImproVisAR [13] (déjà prévu dans le DS).
+>
+> **Sources des résultats (sous-projet stats, déjà produit et vérifié) :**
+> - Plan d'analyse détaillé + intendance des entretiens : `rapport/plan-analyse-tests.md`.
+> - Méthodo statistique (scoring, Wilcoxon exact, tailles d'effet, limites n=8) : `rapport/guide-interpretation-stats.md`.
+> - Données + scripts + figures : `rapport/stats/` (`README.md`, `SHEETS-LAYOUT.md`,
+>   `data/*.csv`, `results/wilcoxon_summary.md`, `figures/*.png`).
+>
+> ⚠️ **Deux corrections vs DS** (le dispositif réellement administré a changé) :
+> 1. **Pas de CSI.** Le protocole a été resserré (anti-fatigue, ~1 h) à **3 mesures
+>    directement reliées aux QR** : charge (RTLX), anxiété (STAI-6), confiance (auto-eff.).
+>    C'est mieux cadré pour Patrick ("que par rapport à la QR") — STAI-6 opérationnalise
+>    en plus le **thème anxiété** du Thème B (état de l'art).
+> 2. **n = 8** (corriger partout le "9 participants" du planning).
 
 ### 6.1 Déroulement de l'évaluation (protocole)
-- Design A/B (jeux d'impro avec aide vs impro libre sans projection), ordre randomisé,
-  backing track dans les 2 phases. (DS p.13-14.)
-- Profil des participants ciblés (1-2 ans de piano min, plutôt expérience jazz).
-- Instruments de mesure : **Creativity Support Index** (créativité), **NASA-TLX**
-  (charge mentale ← relie au thème B de l'état de l'art !), **interview semi-structuré**.
-- **Mapper chaque instrument à une QR** (Patrick : "arrivez-vous à répondre à vos QR ?").
+- **Design intra-sujet AVEC/SANS**, n = 8. **AVEC** = Free Mode projeté (R.HAND) ;
+  **SANS** = projecteur éteint. **Grille (fenêtre chart iReal) + backing track dans les
+  DEUX conditions.** 2 morceaux/personne, **inconnus** et de **difficulté comparable**
+  (1 par condition), ~4 min main droite, séance ~1 h.
+- **Protocole resserré vs cadrage initial** (anti-fatigue questionnaire) : ne subsistent
+  que les instruments reliés aux QR — à **dire et justifier** (répond à "que par rapport à la QR").
+- **Le tableau QR → construit → instrument → hypothèse** (= LA figure que Patrick veut) :
+
+  | Construit | Instrument | Échelle | H1 | QR |
+  |---|---|---|---|---|
+  | Charge cognitive perçue | **NASA-TLX brut (RTLX)**, 6 dim. | 0–100 | AVEC < SANS | QR1 (charge) |
+  | Anxiété-état | **STAI-6** | 20–80 | AVEC < SANS | QR2 (oser / blocage) |
+  | Auto-efficacité tâche | **Bandura ad hoc** (items 7–10) | 1–7 | AVEC > SANS | QR2 (confiance) |
+  | Vécu / apprentissage / créativité | **entretien semi-structuré** | — | analyse thématique | QR1 + QR2 |
+  | Profil (descriptif) | **Q0** | — | caractérisation échantillon | — |
+
+- **Méthodologie statistique** : Wilcoxon des rangs signés apparié, **p EXACT** (n ≤ 50),
+  **unilatéral** dans la direction prédite, **taille d'effet r_rb (Kerby) + dz**, compteur
+  **k/n**. **Deux chemins, une seule source de vérité** : (1) **tableur Google Sheets +
+  calculateur en ligne = source auditable défendable au jury** (saisie brute → composites →
+  W/p/r_rb à la main, cf. `SHEETS-LAYOUT.md`) ; (2) `present.py` = **figures uniquement**
+  (ne recalcule rien) ; (3) `analyze_tests.py` = **recoupement** (concorde, à lancer une fois).
 
 ### 6.2 Partie 1 — Évaluation experte (interview Patrick Roth)  ← "les highlights"
 - Patrick a testé l'artefact ; restituer son point de vue **pédagogique et cognitif**.
 - Cadrer ses retours autour de la QR (note réunion : "tourner autour de la QR").
 
-### 6.3 Partie 2 — Tests utilisateurs
-- **Analyse par tendances thématiques** des interviews (note réunion : "tendance
-  thématiques des interviews"). → faire une analyse initiale et l'envoyer à Patrick.
-- Résultats CSI / NASA-TLX (profil participants, tableaux comme Carusi "Résultats").
-- **Vidéos** : mentionner comme support, "pas si important" (note réunion) — seulement
-  si ça aide à répondre à la QR. Montage 2-3 testeurs / enregistrement.
+### 6.3 Partie 2 — Tests utilisateurs (résultats)
 
-### 6.4 Discussion : réponse aux QR
-- Section explicite qui reprend QR1 et QR2 et répond avec les données.
+**Ce qu'on présente, et où (ne PAS tout mettre dans le corps) :**
+- **Profil des participants** (Q0, tableau P01–P08 anonymisé) + synthèse **médiane/étendue**
+  (n=8 → **pas** de moyenne±ET) + effectifs catégoriels + **2-3 verbatim de l'item 11**
+  ("le plus difficile dans l'impro") — c'est de l'or pour relier au problème de charge / oser.
+  Source : `data/q0_profil.csv`.
+- **Pas le brut item-level dans le corps.** On présente les **scores composites appariés**
+  (8 lignes × 3 mesures, AVEC/SANS/d) — `data/scores_tableur.csv`. Les feuilles de saisie
+  brutes (16 lignes × ~22 items) **et** les onglets Wilcoxon du tableur → **annexe** (auditable).
+- **Tableau de résultats Wilcoxon** (= `results/wilcoxon_summary.md`, condensé des onglets
+  `wilcoxon_*`) — **chiffres réels, vérifiés et reproductibles** :
+
+  | Mesure | H1 | Mdn AVEC | Mdn SANS | W | p (uni) | r_rb | dz | k/n |
+  |---|---|---|---|---|---|---|---|---|
+  | **RTLX** (charge) | AVEC < SANS | 33.3 | 54.2 | 9 | .125 | **−0.50** (grand) | −0.44 | 6/8 |
+  | **STAI-6** (anxiété) | AVEC < SANS | 33.3 | 46.7 | 10 | .156 | **−0.44** (moyen) | −0.47 | 5/8 |
+  | **Auto-eff.** (confiance) | AVEC > SANS | 4.2 | 4.4 | 9 | .234 | **+0.36** (moyen) | +0.23 | 4/7 (1 nul) |
+
+  > ⚠️ **Cadrer en TENDANCES de taille d'effet dans le sens prédit — PAS en "significatif".**
+  > p > .05 partout : étude **sous-puissante à n=8**. Message honnête (cf. CLAUDE.md) :
+  > effets **moyens-à-grands, cohérents, tous dans le sens prédit**. La taille d'effet et la
+  > cohérence individuelle portent le résultat, pas le p. **La confiance (auto-eff.) bouge
+  > le moins** (+.36, 4/7, 1 nul) → résultat nuancé à assumer.
+- **4 figures** (générées par `present.py` → `rapport/stats/figures/`) :
+  - `slope_rtlx.png` · `slope_stai6.png` · `slope_selfeff.png` — **un trait par participant
+    (SANS→AVEC)**, **vert** si dans le sens H1, **rouge** à contre-sens, médiane en gras.
+    Avec n=8 **plus honnête qu'un barplot moyen** : on voit **qui** bouge et **dans quel
+    sens** — on peut **pointer les 2-3 traits rouges** (cf. §6.4).
+  - `tlx_subscales.png` — **médianes des 6 dimensions NASA-TLX** (AVEC vs SANS) : montre
+    **quelle** charge baisse (mentale / effort / frustration) → triangulation avec STAI-6.
+- **Analyse thématique des entretiens** : matrice **thème × participant** (framework
+  analysis) — les "tendances thématiques" demandées. Grille de codage + procédure :
+  `plan-analyse-tests.md` §7. Pour chaque thème : **combien de participants, direction,
+  1-2 verbatim**.
+- **Vidéos** : support, "pas si important" — seulement si ça sert la QR (montage 2-3 testeurs).
+
+### 6.4 Discussion — réponse aux QR (+ l'anomalie experts = effet d'inversion d'expertise)
+
+- **QR1 (charge)** : RTLX baisse AVEC (r_rb **−.50**, 6/8), porté par les dimensions
+  **mentale / effort / frustration** (`tlx_subscales`). **QR2 (oser)** : anxiété STAI-6
+  baisse (**−.44**, 5/8) ; auto-efficacité monte mais **faiblement** (+.36, 4/7).
+- **L'anomalie EST le résultat le plus intéressant (et il confirme l'intuition terrain) :**
+  les participants **à contre-sens sont systématiquement les improvisateurs jazz les plus
+  expérimentés** — **P04** (impro quasi quotidienne, niveau auto-éval 6/7, "défilement
+  difficile" **1/7**), **P07** (20 ans de jazz, iReal régulier), **P08** (iReal régulier).
+  À l'inverse, les **plus gros bénéficiaires** sont les **moins expérimentés** / ceux qui
+  trouvent la grille la plus dure — **P01, P05, P06** (niveau impro 1-2/7, défilement 6-7/7).
+- **Explication théorique (← renvoie au Thème B de l'état de l'art) :**
+  - **Effet d'inversion d'expertise** (*expertise reversal effect*, Kalyuga & Sweller) : un
+    échafaudage qui décharge le débutant devient **redondant** chez l'expert — traiter
+    l'info redondante **ajoute** de la charge extrinsèque. P04 note que la grille ne lui est
+    **pas** difficile (1/7) : rien à décharger → les lumières = surcharge pure.
+  - **Effet de redondance / partage d'attention** : la fenêtre **chart iReal** est présente
+    dans les **deux** conditions ; les experts (P07/P08 = lecteurs iReal réguliers) **lisent
+    les chiffrages** qu'ils maîtrisent → le balisage clavier devient un **canal visuel
+    concurrent**. La projection est alors un **fardeau**, pas une aide. ← exactement le constat.
+  - **Triangulation quanti ↔ quali** (ce que Patrick demande) : taguer dans les entretiens
+    "lumières trop rapides / je lisais la grille / je connais déjà les accords" et
+    **superposer ces verbatim aux traits rouges** des slope plots.
+- **Lecture "modérateur" (descriptive, n=8 → on DÉCRIT, on ne TESTE pas)** : trier P01–P08
+  par années de jazz / niveau d'impro rend l'inversion **visible à l'œil** (bénéfice ↘ quand
+  expertise ↗). **Motif descriptif**, pas corrélation testée (pas de p sur n=8).
+- **Limites** : n=8 sous-puissant ; **morceau différent entre conditions sans
+  contrebalancement** (effet-morceau / ordre non neutralisés, seulement atténués par
+  l'appariement intra-sujet + difficulté comparable) ; auto-efficacité ad hoc non validée ;
+  STAI-6 à chaud rétrospectif ; mono-séance (pas de mesure de transfert).
 
 ---
 
@@ -215,7 +306,9 @@ augmentée/diminuée. Déjà bien décrits dans le DS p.10-11, à reprendre + ph
 - Biblio : 15 réfs déjà présentes [1]-[15]. **À enrichir** : refs charge cognitive /
   anxiété (thème B), réf DSR (comme Carusi [22]).
 - Annexes (modèle Carusi) : "Revue de quelques livres de jazz", guides d'interview,
-  questionnaires CSI/NASA-TLX, transcriptions/tendances, captures du système.
+  questionnaires (Q0, NASA-TLX, STAI-6 + auto-efficacité Q2, guide d'entretien),
+  **feuilles de saisie brutes + onglets Wilcoxon du tableur** (source auditable),
+  transcriptions/tendances, captures du système.
 - Ajouter **Table des figures** et **Table des tableaux** (Carusi les a).
 
 ---
@@ -290,7 +383,7 @@ lun/mar soir = blocs plus courts ; mer = finalisation. Cible quotidienne pour su
 | Jour | Date | Bloc | Focus | Livrable | ~p cumul. |
 |---|---|---|---|---|---|
 | **Jeu** | 18/06 | soir | **Setup + Évaluations (1/2)** : créer le Google Doc (toutes sections) ; rédiger l'**interview enseignant** (highlights pédago/cognitif de Patrick, cadrés sur la QR) | Squelette + section interview prof | ~3 |
-| **Ven** | 19/06 | soir (données 16h) | **Évaluations (2/2)** : protocole A/B mappé aux QR, **résultats questionnaires** (CSI/NASA-TLX), **analyse thématique des sessions** (9 participants), interprétation + discussion QR → **envoyer à Patrick** | Chapitre éval fini (~11 p) + envoi | ~11 |
+| **Ven** | 19/06 | soir (données 16h) | **Évaluations (2/2)** : protocole AVEC/SANS mappé aux QR, **résultats questionnaires** (RTLX / STAI-6 / auto-efficacité — pas CSI), **analyse thématique des sessions** (8 participants), interprétation + discussion QR (anomalie experts) → **envoyer à Patrick** | Chapitre éval fini (~11 p) + envoi | ~11 |
 | **Sam** | 20/06 | journée | **Solution technique** : archi + structure fichiers + tableau stack justifié + diagrammes phase/séquence + 5 sous-systèmes | Chapitre technique fini (~10 p) | ~21 |
 | **Dim** | 21/06 | journée | **Solution conceptuelle** : objectifs+principe, diagramme d'ensemble, RA/réalité diminuée, contexte musical, OMR+tests, 5 exercices (DS p.10-11 + photos) | Chapitre conceptuel fini (~9 p) | ~30 |
 | **Lun** | 22/06 | soir | **État de l'art — thèmes A & C** (condenser DS p.2-6) + **recherche thème B** (3-5 réfs charge cognitive/anxiété) | Thèmes A+C + biblio thème B repérée | ~37 |
