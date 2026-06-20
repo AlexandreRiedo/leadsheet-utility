@@ -14,7 +14,7 @@ SORTIES (une figure par idée, comme present.py) :
   figures/profil_aisance.png      heatmap aisance/pratique + bande « difficulté à improviser »
   figures/profil_formation.png    formation au piano (conservatoire / cours particuliers)
   figures/profil_constantes.png   constantes en badges (daltonisme, piano augmenté)
-  figures/profil_difficultes.png  verbatims « ce qui est le plus difficile », par thème
+  figures/profil_difficultes.png  verbatims « ce qui est le plus difficile », en tableau
 
 Choix de design : pas de camembert par participant (à n = 8, une part = 12,5 %, et l'angle
 se lit mal) ; on garde un seul donut pour l'instrument (lecture part-du-tout naturelle) et on
@@ -124,17 +124,6 @@ IREAL_SHORT = {
     "Régulièrement": "Régul.",
     "Très régulièrement": "Très\nrégul.",
 }
-
-# Codage thématique de la question ouverte « ce qui est le plus difficile ». PREMIÈRE PASSE,
-# à ajuster selon ta propre analyse thématique : thème -> (couleur, [participants]).
-# L'ordre des entrées fixe l'ordre d'affichage des groupes.
-DIFF_THEMES = {
-    "Conscience harmonique": ("#5b9bd5", ["P01", "P06"]),
-    "Anticipation & fil conducteur": ("#e0a458", ["P02", "P04"]),
-    "Cohérence, phrasé & choix des notes": ("#2e8b57", ["P05", "P07", "P08"]),
-    "Maîtrise de l'idiome jazz": ("#9b6bbd", ["P03"]),
-}
-
 
 def load(path):
     with path.open(encoding="utf-8-sig", newline="") as fh:
@@ -511,59 +500,69 @@ def fig_constantes(rows, path):
 
 
 # =========================================================================================
-# Figure 4 — « ce qui est le plus difficile » : verbatims regroupés par thème (qualitatif)
+# Figure 4 — « ce qui est le plus difficile » : verbatims en tableau (qualitatif, à plat)
 # =========================================================================================
 def fig_difficultes(rows, path):
-    quotes = {r["participant"]: (r["plus_difficile_texte"] or "").strip() for r in rows}
-    # On construit la liste des éléments à empiler, avec leur hauteur en « lignes ».
-    items = []  # (kind, *payload, units)
-    for theme, (color, pids) in DIFF_THEMES.items():
-        items.append(("header", theme, color, len(pids), 1.1))
-        for p in pids:
-            wrapped = textwrap.fill(quotes.get(p, ""), width=70)
-            items.append(("quote", p, wrapped, color, wrapped.count("\n") + 1))
-        items.append(("gap", 0.6))
-    total = sum(it[-1] for it in items)
+    # Tableau simple, une ligne par participant dans l'ordre P01..P08. Pas de regroupement
+    # thématique : les catégories forçaient une lecture discutable, on laisse le verbatim
+    # parler et l'analyse thématique vit dans le texte du rapport, pas dans la figure.
+    pid = [r["participant"] for r in rows]
+    wrapped = [
+        textwrap.fill((r["plus_difficile_texte"] or "").strip(), width=58) for r in rows
+    ]
+    lines = [w.count("\n") + 1 for w in wrapped]  # hauteur de texte, en « lignes »
 
-    fig, ax = plt.subplots(figsize=(FIG_WIDTH, 0.9 + total * 0.34))
+    PAD = 0.5  # marge haut+bas d'une cellule, en demi-lignes
+    HEADER_H = 1.3
+    row_h = [n + 2 * PAD for n in lines]
+    total = HEADER_H + sum(row_h)
+
+    X_PID = 0.02  # colonne « participant »
+    X_TXT = 0.18  # colonne « réponse » (assez large pour l'en-tête « Participant »)
+    X_DIV = 0.155  # filet vertical séparant les deux colonnes
+
+    fig, ax = plt.subplots(figsize=(FIG_WIDTH, 0.7 + total * 0.30))
     ax.set_xlim(0, 1)
     ax.set_ylim(total, 0)  # y croît vers le bas
     ax.axis("off")
     ax.set_title(
-        "« Ce qui est le plus difficile » : réponses libres, regroupées par thème",
-        fontsize=11.5,
+        "« Ce qui est le plus difficile » : réponses libres",
+        fontsize=12,
         loc="left",
         pad=12,
     )
-    y = 0.3
-    for kind, *rest in items:
-        if kind == "header":
-            theme, color, k, u = rest
-            ax.text(
-                0.0,
-                y,
-                f"{theme}  ({k})",
-                color=color,
-                fontsize=10.5,
-                fontweight="bold",
-                va="top",
-            )
-            y += u
-        elif kind == "quote":
-            pid, wrapped, color, u = rest
-            ax.text(0.03, y, pid, color=color, fontsize=9, fontweight="bold", va="top")
-            ax.text(
-                0.13,
-                y,
-                f"« {wrapped} »",
-                color=INK,
-                fontsize=9,
-                style="italic",
-                va="top",
-            )
-            y += u
-        else:  # gap
-            y += rest[-1]
+
+    # En-tête bleu.
+    ax.add_patch(Rectangle((0, 0), 1, HEADER_H, facecolor=PIANO_BLUE, edgecolor="none"))
+    ax.text(
+        X_PID, HEADER_H / 2, "Participant", color="white", fontsize=9.5,
+        fontweight="bold", va="center",
+    )
+    ax.text(
+        X_TXT, HEADER_H / 2, "Réponse", color="white", fontsize=9.5,
+        fontweight="bold", va="center",
+    )
+
+    # Lignes : fond alterné pour suivre la ligne sur toute la largeur.
+    y = HEADER_H
+    for i, (p, w, h) in enumerate(zip(pid, wrapped, row_h)):
+        if i % 2 == 1:
+            ax.add_patch(Rectangle((0, y), 1, h, facecolor="#f4f6f8", edgecolor="none"))
+        cy = y + h / 2
+        ax.text(X_PID, cy, p, color=PIANO_BLUE, fontsize=9, fontweight="bold", va="center")
+        ax.text(
+            X_TXT, cy, f"« {w} »", color=INK, fontsize=9, style="italic",
+            va="center", linespacing=1.05,
+        )
+        y += h
+
+    # Filets horizontaux discrets + filet vertical entre les deux colonnes (corps seul).
+    ax.hlines(HEADER_H, 0, 1, color="#cfd6dc", lw=0.9)
+    yy = HEADER_H
+    for h in row_h:
+        yy += h
+        ax.hlines(yy, 0, 1, color="#e6eaed", lw=0.7)
+    ax.vlines(X_DIV, HEADER_H, total, color="#e6eaed", lw=0.7)
 
     fig.savefig(path, dpi=DPI, bbox_inches="tight")
     plt.close(fig)
@@ -591,7 +590,7 @@ def main():
     fig_constantes(rows, FIGS / "profil_constantes.png")
     print("[constantes] badges daltonisme + piano augmenté -> profil_constantes.png")
     fig_difficultes(rows, FIGS / "profil_difficultes.png")
-    print("[difficultés] verbatims regroupés par thème     -> profil_difficultes.png")
+    print("[difficultés] verbatims en tableau (P01..P08)    -> profil_difficultes.png")
     print(f"\nFigures dans {FIGS}\n")
 
 
