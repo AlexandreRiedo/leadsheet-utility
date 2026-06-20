@@ -1,9 +1,9 @@
-# Résultats — Wilcoxon apparié (exact)
+# Wilcoxon apparié (scipy, exact à n ≤ 50)
 
-| Mesure | H1 | n | Mdn AVEC | Mdn SANS | W | p (uni) | p (bi) | r_rb (taille) | dz | sens prédit |
+| Mesure | H1 | n | Mdn AVEC | Mdn SANS | W | p (uni) | p (bi) | r_rb | dz | sens |
 |---|---|---|---|---|---|---|---|---|---|---|
-| RTLX | AVEC < SANS | 3 | 35.8 | 53.3 | 1.0 | .250 | .500 | -0.67 (grand) | -0.79 | 2/3 |
-| STAI6 | AVEC < SANS | 3 | 36.7 | 53.3 | 1.0 | .250 | .500 | -0.67 (grand) | -0.45 | 2/3 |
-| SELFEFF | AVEC > SANS | 3 | 4.8 | 3.8 | 1.0 | .250 | .500 | +0.67 (grand) | +0.57 | 2/3 |
+| RTLX | AVEC < SANS | 8 | 33.3 | 54.2 | 9 | .125 | .250 | -0.50 (grand) | -0.44 | 6/8 |
+| STAI6 | AVEC < SANS | 8 | 33.3 | 46.7 | 10 | .156 | .312 | -0.44 (moyen) | -0.47 | 5/8 |
+| SELFEFF | AVEC > SANS | 8 | 4.2 | 4.4 | 9 | .234 | .469 | +0.36 (moyen) | +0.23 | 4/7 (1 nul) |
 
-*p unilatéral dans la direction prédite ; voir guide-interpretation-stats.md.*
+*p unilatéral dans la direction prédite ; cf. guide-interpretation-stats.md.*

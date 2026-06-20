@@ -171,10 +171,23 @@ En-tête en **A4** : `participant · AVEC · SANS · d=AVEC−SANS · |d| · ran
 A5:  =scores_tableur!A2
 B5:  =scores_tableur!B2
 C5:  =scores_tableur!C2
-D5:  =IF(OR(B5="",C5=""),"",B5-C5)
+D5:  =IF(OR(B5="",C5=""),"",ROUND(B5-C5,4))
 E5:  =IF(D5="","",ABS(D5))
-F5:  =IF(OR(D5="",D5=0),"",RANK.AVG(E5,$E$5:$E$12))
+F5:  =IF(OR(D5="",D5=0),"",RANK.AVG(E5,$E$5:$E$12,1)-COUNTIF($D$5:$D$12,0))
 ```
+
+> **⚠️ Deux détails non négociables dans `D5` et `F5` — sinon r_rb (et le sens de l'effet) sont faux.**
+> - **`D5` : `ROUND(…,4)`.** Dans le classeur, `B5/C5` sont des formules pleine précision : `B5−C5`
+>   pour des d *mathématiquement* égaux (ex. les trois d = 30 au STAI-6, fractions de 20/6) sort à un
+>   epsilon flottant près. Sans arrondi, `RANK.AVG` ne reconnaît pas l'ex aequo et moyenne mal les rangs.
+>   L'arrondi à 4 décimales rétablit les vrais ex aequo (les scores composites distincts diffèrent d'au
+>   moins 1/6 ≈ 0,17, très au-dessus de 0,0001 — aucun risque de fusionner deux vraies valeurs).
+> - **`F5` : `RANK.AVG(…,1)` ascendant + `−COUNTIF($D$5:$D$12,0)`.** Le 3ᵉ argument de `RANK.AVG` vaut
+>   **FAUX par défaut → ordre décroissant** (plus grand |d| = rang 1), ce qui **inverse** le test de
+>   Wilcoxon. Il faut **`,1`** (le plus petit |d| = rang 1). En ascendant, un |d| nul deviendrait le plus
+>   petit et volerait le rang 1 (décale tous les rangs de +1 — ne mord que sur SELFEFF, qui a un d = 0) :
+>   `−COUNTIF(…,0)` annule ce décalage. Les deux corrections reproduisent à l'identique le script
+>   `analyze_tests.py` (exact + différences arrondies). Contrôle : `B16` (W) doit valoir 9 / 10 / 9.
 
 **Synthèse (se calcule seule)** — libellé en colonne A, formule en colonne B :
 ```
@@ -193,10 +206,26 @@ A21 p bilatéral      B21: =B20*2
 
 ### Procédure (mêmes 3 étapes pour les 3 onglets)
 1. Les colonnes AVEC/SANS se remplissent seules depuis `scores_tableur`.
-2. Copier **AVEC (B5:B12)** et **SANS (C5:C12)** dans le calculateur en ligne (échantillons
-   appariés, **mode exact**, `alternative` indiquée en A2). Contrôle : le **W du calculateur
-   doit = B16** ; sinon une paire est inversée (cf. règle d'ordre §1).
-3. Lire **p**, le saisir en **B20**.
+2. Saisir **`B20` = le p EXACT de `analyze_tests.py`** (tableau ci-dessous), pas celui d'un
+   calculateur en ligne pour les mesures avec ex aequo. ⚠️ **Statistics Kingdom (et la plupart des
+   calculateurs) basculent silencieusement sur l'approximation normale dès qu'il y a des ex aequo**
+   (« Because the data contains ties… we use the normal approximation ») — leur propre validation
+   avertit qu'il faut n ≥ 16 pour cette approximation, or n = 8. Les TROIS mesures ont des ex aequo,
+   donc aucune ne sort en exact sur ces sites. Exemple STAI-6 : le site renvoie **p = .163** (normale
+   + correction de continuité, W = 10.5 car d non arrondis → trois « 30 » mal départagés en 5,5/5,5/4)
+   alors que l'exact tie-honest vaut **.156** (W = 10). Le site donne aussi un **r = Z/√n = 0,35**
+   (Rosenthal), *différent* du r_rb de Kerby `(T+−T−)/(T+−T−)` du tableur — ne pas mélanger les deux.
+3. Contrôle de cohérence : le **W du tableur (`B16`) doit = 9 / 10 / 9**. Si un calculateur sert de
+   garde-fou grossier, attendre ~.16 sur STAI-6 (même conclusion : non significatif, effet moyen,
+   sens prédit) — pas une concordance au millième.
+
+   | Onglet | W (`B16`) | p uni (`B20`) | p bi (`B21`) | r_rb (`B18`) |
+   |---|---|---|---|---|
+   | `wilcoxon_nasaTLX` | 9 | **.125** | .250 | −0.50 |
+   | `wilcoxon_STAI` | 10 | **.156** | .312 | −0.44 |
+   | `wilcoxon_SELFEFF` | 9 | **.234** | .469 | +0.36 |
+
+   *(p uni = exact unilatéral dans le sens prédit ; p bi = ×2 ; r_rb = Kerby, signé selon d = AVEC−SANS.)*
 
 ### Ce qui change d'un onglet à l'autre (seulement 3 choses)
 

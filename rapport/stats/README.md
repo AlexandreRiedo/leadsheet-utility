@@ -30,7 +30,8 @@ Le plan du classeur Google Sheets (onglets, en-têtes, formules, saisie → expo
 | `data/tlx_items_tableur.csv` | *Facultatif* — items NASA-TLX bruts, **format long** (1 ligne par participant × condition) pour la figure par dimension. |
 | `present.py` | **Présentation** : lit les deux CSV ci-dessus → `slope_*.png` (×3) + `tlx_subscales.png`. Ne (re)calcule rien. |
 | `results/` | *Généré* : `scores.csv` (scores par personne) + `wilcoxon_summary.md` (tableau de résultats). |
-| `figures/` | *Généré* : `slope_*.png` (×3) + `tlx_subscales.png`. |
+| `figures/` | *Généré par `present.py`* : `slope_*.png` (×3) + `tlx_subscales.png` — **les figures insérées dans le rapport**. |
+| `figures/_verify/` | *Généré par `analyze_tests.py`* : mêmes figures, **version recoupement jetable** (sous-dossier dédié + gitignoré, pour ne jamais écraser celles du rapport). |
 
 ## Remplir `data/responses.csv`
 

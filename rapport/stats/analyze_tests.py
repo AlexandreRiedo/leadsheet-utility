@@ -29,7 +29,11 @@ from scipy.stats import rankdata, wilcoxon
 HERE = Path(__file__).resolve().parent
 DATA = HERE / "data" / "responses.csv"
 RESULTS = HERE / "results"
-FIGS = HERE / "figures"
+# Sous-dossier DÉDIÉ au recoupement : ce script et present.py traceraient sinon les
+# MÊMES fichiers (slope_*.png, tlx_subscales.png) — le dernier lancé écraserait l'autre.
+# present.py possède figures/ (figures de présentation du rapport) ; ce script écrit ici,
+# pour ne JAMAIS clobber les figures insérées dans la thèse. Voir README §3.
+FIGS = HERE / "figures" / "_verify"
 GOOD, BAD = "#1f8a8a", "#c0392b"  # couleurs : va dans le sens prédit / à contre-sens
 
 # Items des trois questionnaires (noms de colonnes dans responses.csv).
@@ -94,8 +98,19 @@ class Stats(NamedTuple):
 
 
 def analyse(avec, sans, alternative) -> Stats:
-    """Wilcoxon des rangs signés (scipy, exact à n ≤ 50) sur les paires AVEC/SANS."""
-    d = avec - sans
+    """Wilcoxon des rangs signés exact (n ≤ 50) sur les paires AVEC/SANS.
+
+    On ARRONDIT les différences avant de classer : les scores composites tombent sur
+    des fractions de 1/6 (TLX/STAI) ou 1/4 (auto-eff.), donc des d *mathématiquement*
+    égaux (ex. trois d = 30 au STAI-6) sortent à un epsilon près de l'arithmétique
+    flottante. Sans arrondi, `rankdata` les voit distincts et `method="exact"` —
+    qui suppose des rangs distincts et NE corrige PAS les ex aequo — renvoie une p
+    qui dépend de ce bruit (STAI-6 : .156 ex aequo réels → .191 si l'epsilon les
+    sépare). L'arrondi rétablit les vrais ex aequo (rangs moyennés) et rend la p
+    reproductible et alignée sur le tableur fait à la main. NB : à n ≤ 8 avec ex aequo
+    aucune méthode n'est parfaite ; l'exact reste préférable à la normale approchée.
+    """
+    d = np.round(avec - sans, 4)  # collapse l'epsilon flottant → vrais ex aequo
     nz = d[d != 0]  # le test écarte les différences nulles
     ranks = rankdata(np.abs(nz))  # rangs des |différences|, ex aequo moyennés
     t_plus, t_minus = ranks[nz > 0].sum(), ranks[nz < 0].sum()
@@ -106,8 +121,9 @@ def analyse(avec, sans, alternative) -> Stats:
         t_plus=t_plus,
         t_minus=t_minus,
         W=min(t_plus, t_minus),
-        p_one=wilcoxon(avec, sans, alternative=alternative).pvalue,  # type: ignore[attr-defined]  # scipy: pas de stubs
-        p_two=wilcoxon(avec, sans, alternative="two-sided").pvalue,  # type: ignore[attr-defined]  # scipy: pas de stubs
+        # scipy classe les mêmes nz arrondis → p cohérente avec T+/T-/r_rb ci-dessus
+        p_one=wilcoxon(nz, alternative=alternative, method="exact").pvalue,  # type: ignore[attr-defined]  # scipy: pas de stubs
+        p_two=wilcoxon(nz, alternative="two-sided", method="exact").pvalue,  # type: ignore[attr-defined]  # scipy: pas de stubs
         r_rb=(t_plus - t_minus) / (t_plus + t_minus),
         dz=d.mean() / d.std(ddof=1) if d.size > 1 else np.nan,
         k=int(k),
@@ -224,7 +240,7 @@ def write_summary(summary, path):
 def main():
     rows = load(DATA)
     RESULTS.mkdir(exist_ok=True)
-    FIGS.mkdir(exist_ok=True)
+    FIGS.mkdir(parents=True, exist_ok=True)  # crée figures/ + _verify/ au besoin
 
     table = {}  # participant -> {RTLX_AVEC: ..., ...}  pour scores.csv
     summary = []  # une ligne par mesure pour le tableau de résultats
@@ -271,7 +287,8 @@ def main():
     write_summary(summary, RESULTS / "wilcoxon_summary.md")
     tlx_subscale_plot(rows, FIGS / "tlx_subscales.png")
     print(f"Écrit : {RESULTS / 'scores.csv'} + wilcoxon_summary.md")
-    print(f"Figures : {FIGS}\n")
+    print(f"Figures de recoupement (jetables) : {FIGS}")
+    print("  -> les figures du rapport restent dans figures/ (present.py).\n")
 
 
 if __name__ == "__main__":

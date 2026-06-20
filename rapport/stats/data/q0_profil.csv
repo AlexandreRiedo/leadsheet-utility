@@ -1,9 +1,9 @@
-participant,age,daltonisme,instrument_principal,annees_instrument,annees_piano,formation_piano,annees_jazz,lecture_grille,freq_impro,niveau_impro_1_7,defilement_difficile_1_7,usage_ireal,deja_piano_augmente,plus_difficile_texte
-P01,,,,,,,,,,,,,,
-P02,,,,,,,,,,,,,,
-P03,,,,,,,,,,,,,,
-P04,,,,,,,,,,,,,,
-P05,,,,,,,,,,,,,,
-P06,,,,,,,,,,,,,,
-P07,,,,,,,,,,,,,,
-P08,,,,,,,,,,,,,,
+participant,age,daltonisme,instrument_principal,annees_instrument,annees_piano,formation_piano,annees_jazz,lecture_grille,freq_impro,niveau_impro_1_7,defilement_difficile_1_7,plus_difficile_texte,usage_ireal,deja_piano_augmente
+P01,19,Non,Batterie,6,1,École de musique / conservatoire,1,Avec difficulté,Chaque semaine,2,6,Comprendre l'harmonie tout en jouant des accords en même temps.,Jamais,Non
+P02,19,Non,Chant,3,4,École de musique / conservatoire,2,Très à l'aise,Quelques fois par mois,3,4,Anticiper à l'oreille les notes que je vais jouer.,Occasionnellement,Non
+P03,22,Non,Piano,11,11,École de musique / conservatoire,0,Pas du tout,Jamais,1,4,"Idée de jazz, pas un style que je maîtrise.",Jamais,Non
+P04,58,Non,Piano,13,13,École de musique / conservatoire,7,Très à l'aise,Presque chaque jour,6,1,"Anticiper, garder un fil conducteur, gérer certains accords.",Occasionnellement,Non
+P05,23,Non,Piano,10,10,École de musique / conservatoire,1,À l'aise,Chaque semaine,2,3,La cohérence globale de la phrase musicale.,Jamais,Non
+P06,26,Non,Saxophone Ténor,15,3,École de musique / conservatoire,12,À l'aise,Quelques fois par mois,1,7,"La conscience de l'accord actuel, les notes correspondantes",Occasionnellement,Non
+P07,35,Non,Piano,15,15,École de musique / conservatoire,20,À l'aise,,5,4,"Créer des bonnes mélodies, choisir les bonnes notes.",Régulièrement,Non
+P08,64,Non,Piano,10,10,Cours particulieres,8,À l'aise,Chaque semaine,4,4,Le phrasé.,Régulièrement,Non

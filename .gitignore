@@ -212,3 +212,6 @@ proto-media/**/*.flv
 
 # Videos and PDFs from the testing sessions
 testing-sessions/
+
+# Throwaway recoupement figures from analyze_tests.py (report figures live in figures/)
+rapport/stats/figures/_verify/
