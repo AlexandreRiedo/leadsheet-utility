@@ -339,20 +339,35 @@ Deux choix de conception **à mettre en valeur** (ils crédibilisent la méthodo
 Patrick demande des **« tendances thématiques »**. Procédure légère type Braun & Clarke /
 framework analysis :
 
-1. **Grille de codage a priori** (déductive, dérivée du guide + des QR) — à figer **avant**
-   de te noyer dans les transcriptions. Thèmes candidats :
-   - *Charge réduite / « je pensais à moins de choses »* (← QR1, TLX)
-   - *Anticipation des changements d'accord* (vu venir vs subi)
-   - *Confiance / oser, prise de risque* (← QR2, auto-efficacité)
-   - *Anxiété / blocage / sécurité*
-   - *Agentivité : suggestion vs règle, transgression* (jouer une touche éteinte)
-   - *Partage de l'attention : yeux (grille/touches/mains) & oreilles*
-   - *Gêne / lisibilité : « trop vite », « trop de touches », couleurs, latence* (← plafond Evaristo)
-   - *Trace / rétention / formes sur le clavier* (← question du transfert)
-   - *Découverte créative / exploration*
-   - *Image du dispositif (partition / jeu vidéo / petites roues / GPS) & envie de pratiquer*
-   - *Préférence avec/sans*
-   + laisser de la place aux **thèmes émergents** (inductifs).
+1. **Grille de codage a priori** (déductive, dérivée du guide + des QR), à figer **avant**
+   de te noyer dans les transcriptions. **13 thèmes, chacun ancré sur une question du guide
+   Q3** : le recoupement thèmes ↔ questions a été fait (tout thème a une question source,
+   toute question a une destination). Codes repris tels quels dans
+   `templates/matrice-thematique.md` :
+   - **T1** *Charge réduite / « je pensais à moins de choses »* : Q2 relance *charge* (QR1, TLX)
+   - **T2** *Anticipation des changements d'accord* (vu venir vs subi) : Q2 relance *anticipation*
+   - **T3** *Confiance / oser / prise de risque* : Q2 relance *assurance* + Q3 (QR2, auto-eff)
+   - **T4** *Anxiété / blocage / sécurité* : Q2 relance *assurance* + Q1 incident (STAI-6)
+   - **T5** *Agentivité : suggestion vs règle, transgression* (touche éteinte) : Q3 (dédiée)
+   - **T6** *Partage de l'attention : yeux & oreilles, conflit lumière/oreille* : Q4 (dédiée)
+   - **T7** *Gêne / lisibilité : trop vite, trop de touches, couleurs, latence* : Q5 (plafond Evaristo)
+   - **T8** *Trace / rétention / formes sur le clavier* : Q6 (dédiée, transfert)
+   - **T9** *Image / métaphore du dispositif* (partition / jeu vidéo / petites roues / GPS, prof) : Q7 + relance *prof*
+   - **T10** *Désétayage / autonomie / s'en passer* (l'aide qui s'efface) : Q7 relance *détachement* **[ajout]**
+   - **T11** *Motivation / envie de pratiquer* : Q7 relance *usage* **[scindé de l'ancien « image »]**
+   - **T12** *Préférence avec / sans* : Q2 relance *préférence*
+   - **T13** *Améliorations souhaitées / wishlist* : Q9 clôture (baguette magique) **[ajout]**
+   + zone **émergente** (inductive). **À surveiller** : *Découverte créative / exploration*
+   (l'ancien thème) **n'a pas de question dédiée** dans Q3, alors que la créativité est un
+   construit déclaré au §0 : il restera **mince**, codé seulement depuis Q1 / Q3. Le rapporter
+   en émergent, pas en colonne pleine, et l'assumer en limite si la matière manque.
+
+   > **Recoupement guide Q3 ↔ thèmes (fait)** : les questions à colonne dédiée (Q3→T5, Q4→T6,
+   > Q5→T7, Q6→T8, Q7→T9/T10/T11) sont bien couvertes. **T1-T4 + T12 dépendent des relances de
+   > Q2** (posées « seulement si nécessaire ») : leur remplissage peut être **inégal** selon les
+   > participants, à noter. **Q1 (incident critique)** n'a pas de colonne : son contenu se code
+   > dans les thèmes (souvent T1/T3/T4) ou en émergent. **Q8 (pari)** n'est pas un thème : il va
+   > dans le *tableau des paris* de la matrice (triangulation, cf. pt 4).
 2. **Matrice** : **lignes = P01…P08, colonnes = thèmes**. Cellule = **verbatim codés**
    (citation courte + code participant). C'est ça qui remplace ton tableau unique : on lit
    **une colonne en travers des 8** = la tendance.
@@ -361,7 +376,8 @@ framework analysis :
 4. **Triangulation quantitatif ↔ qualitatif** : superpose les thèmes aux scores. Ex. :
    « la charge temporelle ne baisse pas AVEC sur les morceaux rapides (TLX) **et** 5/8
    participants disent les lumières “trop rapides” (entretien) » → les deux se confirment.
-   Confronte aussi le **pari Q8** au RTLX/perf mesuré.
+   Confronte aussi le **pari Q8** au RTLX/perf mesuré (colonne *Concordance* du **tableau des
+   paris** de la matrice).
 
 > **Garde quand même une couche capture par question** (ton Google Doc, rangé par
 > question) comme matériau brut horodaté — mais **l'analyse vit dans la matrice
@@ -387,7 +403,8 @@ L'objectif explicite de Patrick est de voir **comment tu interprètes** — une 
 - [ ] **Fig. barres 6 dimensions TLX** AVEC vs SANS (médianes)
 - [ ] **Tab. résultats Wilcoxon** (mesure, médiane AVEC, médiane SANS, W, p exact, taille
       d'effet, k/8)
-- [ ] **Matrice thème × participant** + tableau de synthèse (thème, n, direction, verbatim)
+- [ ] **Matrice thème × participant** (13 thèmes T1-T13 + Tcr, `templates/matrice-thematique.md`)
+      + tableau de synthèse (thème, n, direction, verbatim) + **tableau des paris Q8**
 - [ ] **Tab. écarts au protocole** (tempos, reclassements, substitutions, daltonisme)
 - [ ] (support) **montage vidéo 2–3 testeurs** — « pas si important », seulement si ça sert la QR
 
@@ -438,6 +455,10 @@ rapport/stats/
 ├── README.md             # ✅ comment remplir + lancer
 ├── results/              # généré : scores.csv, wilcoxon_summary.md
 └── figures/              # généré : slope_*.png ×3, tlx_subscales.png
+
+rapport/templates/
+└── matrice-thematique.md # ✅ matrice thème × participant (T1-T13 + Tcr), tableau des paris
+                          #    Q8, synthèse par thème ; ancrée sur le guide Q3 (cf. §7.2)
 ```
 
 - **Lancer** : `poetry run python rapport/stats/analyze_tests.py`.
@@ -452,7 +473,10 @@ rapport/stats/
 - **Note git** : `rapport/stats/` n'est **pas** gitignoré → script et CSV sont suivis ; à toi
   de décider si tu committes les `data/*.csv` remplis (données anonymisées P01–P08).
 
+**Fait** :
+- ✅ `templates/matrice-thematique.md` : matrice thème × participant (13 thèmes T1-T13 + Tcr
+  émergent, ancrés sur le guide Q3), tableau des paris Q8, synthèse par thème, prête pour
+  Google Docs. Recoupement guide ↔ thèmes intégré (cf. §7.2).
+
 **Reste optionnel (dis « oui »)** :
-- `templates/matrice-thematique.md` — matrice thème × participant pré-remplie des thèmes du
-  §7.2, prête pour Google Docs (pas encore créée).
 - générateur du **tableau de profil Q0** (lit `q0_profil.csv` → tableau + médianes/effectifs du §2).
