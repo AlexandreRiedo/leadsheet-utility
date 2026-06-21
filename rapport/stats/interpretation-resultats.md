@@ -125,6 +125,45 @@ Contre-sens : **P04, P07, P08**.
 
 ---
 
+## 4b. Entretien superviseur (expert) : évaluation pédagogique (§5a, descriptif)
+
+> Source : `matrice-entretien-superviseur.md`. Rester descriptif ; la triangulation avec le
+> quanti et les participants va en §5. Dans le rapport, cet entretien expert est la sous-section
+> **§5a** (avant les tendances participants §5b). **Statut : avis d'un seul expert** (le
+> professeur de jazz) → validation de cadrage, pas une donnée mesurée ; risque de désirabilité
+> (il assiste à la démo et dialogue avec le concepteur).
+
+- **Valide le cadrage « charge cognitive » (3 extraits, accord explicite).** Le professeur
+  formule de lui-même le mécanisme visé : « suivre la couleur » dispense du monologue intérieur
+  (« il ne faut pas qu'ils se parlent trop quand ils jouent », « on peut juste jouer, puis se
+  taire ») ; il confirme en séance que « se trop parler / trop réfléchir » = charge cognitive.
+  → l'orientation QR1 (réduire la charge mentale) est **endossée par l'expert**. **Convergence
+  de construit**, pas preuve de l'effet mesuré.
+- **Public cible « réglable » (Public Cible).** Débutant→intermédiaire est le bon point
+  d'entrée ; le système est extensible vers le haut (gammes de substitution sur les dominantes).
+  → cadre le périmètre de l'étude **et** anticipe l'axe niveau (cf. §5, modérateur post-hoc).
+- **Légitimité pédagogique (Pédagogie Alternative, 2 extraits).** Il inscrit l'artefact dans les
+  pédagogies alternatives (Suzuki, « mettre le focus sur un paramètre et le faire faire
+  beaucoup »), le qualifie de « pédagogie avant-garde », et fait l'hypothèse que l'oreille et la
+  mémoire musculaire se forment même sans calcul de gamme. Bon pour la conclusion (vision
+  pédagogique, pas gadget). **Mais** c'est une hypothèse d'expert, **pas un transfert mesuré**
+  (relie la limite T8, rétention faible).
+- **Contre-risque assumé : surcharge, pas seulement décharge (Feedback, extrait 1).** « Les
+  lumières, quand il y a de la grille, elles vont beaucoup trop vite », d'où sa proposition de
+  « gammes passe-partout ». → l'expert pointe **lui-même** le risque que la densité d'affichage
+  *ajoute* de la charge, à l'opposé de l'effet visé. **Converge** avec T7 (participants, « trop
+  vite / turnarounds ») et le plafond Temporelle individuel (P04). Indice fort à porter en §5.
+- **« Très serré » / temps humain (Feedback, extrait 2).** Inquiétude que les apprenants n'aient
+  « pas le temps de capter » ; le système devrait suivre le rythme de l'utilisateur, pas
+  l'inverse. → caveat d'interprétation : un **temps d'adaptation** propre à chacun existe et pèse
+  sur la lecture des résultats (relie le confond + la mono-séance, §6).
+- **Désétayage endossé (Feedback, extrait 3).** Il propose d'« éteindre la lumière » petit à
+  petit, ou partiellement (n'éclairer que les cadences). → **converge** avec le consensus
+  participant T10 (« petites roues à enlever »). L'outil est cadré, **des deux côtés**, comme une
+  béquille à dépasser.
+
+---
+
 ## 5. Triangulation et réponse aux QR (Discussion : ne PAS mettre en Résultats)
 
 **Ce que la triangulation autorise (et ce qu'elle n'autorise pas).** Les trois mesures vont dans le
@@ -147,14 +186,21 @@ comme **faisceau d'indices cohérent**, pas comme preuve.
   des débutants ne tiennent pas, elles aussi, à *quel morceau* est tombé en AVEC. Le confond
   **fragilise tout le monde**, pas seulement les contre-sens. (Cas le moins confondu : **P05**, qui
   va dans le sens prédit *malgré* AVEC = 1er tour.)
-- **Plafond d'utilisabilité** : Temporelle ↓ au groupe, mais ↑ sur morceau rapide (P04) + T7
-  « trop vite / turnarounds » → indice **convergent** que la lisibilité peut saturer sur grilles
-  rapides. Indice, pas démonstration (1 cas quanti).
+- **Plafond d'utilisabilité — convergence à trois sources** : Temporelle ↓ au groupe, mais ↑ sur
+  morceau rapide (P04) ; T7 participants « trop vite / turnarounds » ; **et l'expert** (« les
+  lumières vont beaucoup trop vite », d'où sa piste « gammes passe-partout », cf. §4b). Trois
+  angles indépendants pointent la même saturation de lisibilité sur grilles rapides. **Indice
+  convergent fort**, pas démonstration (1 cas quanti).
+- **L'expert valide le mécanisme QR1 mais nomme aussi le contre-risque** : il endosse la décharge
+  (« suivre la couleur » → « se taire ») **et** la surcharge possible (densité d'affichage). La
+  charge nette dépend donc du dosage (vitesse, densité, choix du morceau, temps d'adaptation,
+  cf. §4b) → cohérent avec un effet RTLX réel mais **fragile et conditionnel**, pas garanti.
 - **Liens inter-mesures** : STAI ↔ Frustration TLX (les deux ↓) et auto-efficacité ↔ T3 « j'ai osé »
   vont dans le sens prédit ; cohérent, non confirmatoire.
 - **Réponses aux QR (à formuler prudemment)** :
   - **QR1 (charge)** : **indices convergents** d'une charge perçue plus basse AVEC (RTLX, Mentale
-    75 → 35, T1), **non significatifs** et **nuancés** par l'écoute (T6) et la vitesse (T7).
+    75 → 35, T1, **+ cadrage validé par l'expert**, §4b), **non significatifs** et **nuancés** par
+    l'écoute (T6), la vitesse (T7) et le contre-risque de surcharge que l'expert pointe lui-même.
   - **QR2 (oser / anxiété)** : **indices convergents** allant dans le sens d'une moindre anxiété et
     d'une confiance accrue (STAI, SELFEFF, T3/T4), **non significatifs**, **avec une hétérogénéité
     marquée selon le profil**. Conclure « rassure le public cible » serait prématuré : à poser comme

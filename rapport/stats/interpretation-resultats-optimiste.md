@@ -101,6 +101,38 @@ dz = +.23 ; **4/7** (P03 nul, exclu). Contre-sens : P04, P07, P08.
 
 ---
 
+## 4b. Entretien superviseur (expert) : validation pédagogique (§5a, cadrage favorable)
+
+> Source : `matrice-entretien-superviseur.md`. Cadrage favorable assumé ; la réserve « un seul
+> expert, risque de désirabilité » est portée par le garde-fou §6.
+
+- **L'expert endosse explicitement le mécanisme QR1.** Le professeur formule de lui-même la
+  décharge visée : « suivre la couleur » dispense du monologue intérieur (« il ne faut pas qu'ils
+  se parlent trop quand ils jouent », « on peut juste jouer, puis se taire »), et confirme en
+  séance que « trop réfléchir » = charge cognitive. → **validation de construit par un expert
+  externe** : le quanti (RTLX, Mentale 75 → 35) et le quali participant ne sont plus seuls, le
+  cadre théorique est ratifié par le terrain pédagogique. **Triangulation à trois voix.**
+- **Légitimité pédagogique affirmée (Pédagogie Alternative).** Il inscrit l'artefact dans les
+  pédagogies alternatives (Suzuki, « mettre le focus sur un paramètre et le faire faire
+  beaucoup »), le qualifie de **« pédagogie avant-garde »**, et fait l'hypothèse que **l'oreille
+  et la mémoire musculaire se forment même sans calcul de gamme**. → l'outil n'est pas un
+  raccourci appauvrissant : un expert lui prête une valeur formatrice. Excellent pour l'intro /
+  la conclusion.
+- **Désétayage co-signé par l'expert (Feedback).** Il propose lui-même d'« éteindre la lumière »
+  petit à petit, ou partiellement (n'éclairer que les cadences). → **converge avec le consensus
+  participant T10** (« petites roues à enlever ») : la vision « béquille à dépasser » est portée
+  des deux côtés. Renforce le récit pédagogique sain, pas gadget.
+- **Public cible confirmé et extensible (Public Cible).** Débutant→intermédiaire est le bon point
+  d'entrée, et l'expert voit le système s'étendre vers le haut (gammes de substitution). → cadre
+  exactement le public où l'effet quanti est le plus net (§3, §5).
+- **Les retours critiques = demandes d'amélioration, pas des rejets (Feedback).** « Lumières trop
+  vite », « très serré », « temps humain » → l'expert propose aussitôt des solutions (gammes
+  passe-partout, relâcher le time, faire suivre à la machine le rythme de l'utilisateur),
+  exactement comme la wishlist participant T13. → critiques **constructives** d'un outil adopté
+  et perfectible.
+
+---
+
 ## 5. Triangulation et réponse aux QR (cadrage favorable)
 
 **Le récit qui tient le chapitre.** Les trois mesures pointent dans le même sens **et** l'entretien
@@ -122,8 +154,8 @@ le niveau**.
   cohérence quanti/quali ; plafond **individuel et lié à la difficulté**, pas général.
 - **Liens inter-mesures** : STAI ↔ Frustration TLX (↓↓) et auto-efficacité ↔ T3 « j'ai osé » tiennent.
 - **Réponses aux QR** :
-  - **QR1 (charge)** : **appuyée** pour le public cible (RTLX r_rb = -.50, Mentale 75 → 35),
-    nuancée par l'écoute (T6) et la vitesse (T7).
+  - **QR1 (charge)** : **appuyée** pour le public cible (RTLX r_rb = -.50, Mentale 75 → 35,
+    **+ cadrage ratifié par l'expert §4b**), nuancée par l'écoute (T6) et la vitesse (T7).
   - **QR2 (oser / anxiété)** : **appuyée** pour le public cible (STAI -.44, SELFEFF +.36, T3/T4 (+)),
     inversée chez l'expert (sécurité = grille connue). → l'artefact **rassure et enhardit le public cible**.
 

@@ -33,6 +33,16 @@ Le plan du classeur Google Sheets (onglets, en-têtes, formules, saisie → expo
 | `figures/` | *Généré par `present.py`* : `slope_*.png` (×3) + `tlx_subscales.png` — **les figures insérées dans le rapport**. |
 | `figures/_verify/` | *Généré par `analyze_tests.py`* : mêmes figures, **version recoupement jetable** (sous-dossier dédié + gitignoré, pour ne jamais écraser celles du rapport). |
 
+## Volet qualitatif (entretiens)
+
+Le pendant qualitatif des Évaluations : aucun calcul, que de la lecture par thème.
+
+| Fichier | Rôle |
+|---|---|
+| `matrice-entretien-superviseur.md` | **Entretien expert (§5a)** : analyse par thème de l'interview du professeur de jazz (charge cognitive, public cible, pédagogie alternative, feedback). Verbatim recopié du Google Doc maître. |
+| `matrice-synthese-portable.md` | **Entretiens participants (§5b)** : matrice thématique n = 8, lue en travers des participants. |
+| `interpretation-resultats.md` | **Pointeurs de rédaction** : croise quanti (RTLX / STAI / auto-efficacité) + entretiens (participants §4, expert §4b) → §6.3 + Discussion. |
+
 ## Remplir `data/responses.csv`
 
 Saisir les **valeurs brutes**, ne **rien** pré-calculer (le script fait les moyennes, les
