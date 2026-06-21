@@ -5,9 +5,10 @@
 > À remplir depuis les transcriptions Whisper nettoyées (couche **capture**, rangée par
 > question du guide, dans un Google Doc séparé).
 >
-> **Grille a priori figée AVANT codage** : 13 thèmes déductifs (T1 à T13), dérivés du guide
-> Q3 et des QR, chacun ancré sur une question précise (cf. légende). Plus une zone
-> **émergente** (inductive) pour ce que la grille ne capture pas, créativité comprise.
+> **Grille a priori figée AVANT codage** : 13 thèmes déductifs (T1 à T13), plus **Tf**
+> (facilité ressentie) et **Aé** (auto-évaluation Q8), dérivés du guide Q3 et des QR, chacun
+> ancré sur une question précise (cf. légende). Plus une zone **émergente** (inductive) pour
+> ce que la grille ne capture pas (créativité **Tcr**, fourre-tout **Div**).
 >
 > **Présentation vs interprétation (à ne pas mélanger ici)** :
 > - **Résultats (§6.3)** = la *synthèse par thème* plus bas : par thème, `n/8` + direction +
@@ -22,18 +23,20 @@
 
 | Code | Thème | Source dans le guide Q3 | Lien |
 |---|---|---|---|
+| **Tf** | Facilité ressentie (« c'était plus facile avec ») | Q2 relance *facilité* | QR1, vécu |
 | **T1** | Charge réduite / « je pensais à moins de choses » | Q2 relance *charge* ; aussi Q1 | QR1 (charge), TLX |
 | **T2** | Anticipation des changements d'accord (vu venir vs subi) | Q2 relance *anticipation* | QR1 |
 | **T3** | Confiance / oser / prise de risque | Q2 relance *assurance* + Q3 transgression | QR2, auto-efficacité |
 | **T4** | Anxiété / blocage / sécurité | Q2 relance *assurance* + Q1 incident | QR2, STAI-6 |
+| **T12** | Préférence avec / sans | Q2 relance *préférence* | synthèse vécu |
 | **T5** | Agentivité : suggestion vs règle, transgression (touche éteinte) | **Q3** (question dédiée) | QR2 / agentivité |
-| **T6** | Partage de l'attention : yeux & oreilles, conflit lumière/oreille | **Q4** (question dédiée) | QR1 (attention) |
+| **T6** | Partage de l'attention : yeux & oreilles — *regard* (écran/grille iReal vs touches lumineuses ; allers-retours partition↔piano) & conflit lumière/oreille | **Q4** (question dédiée) | QR1 (attention) |
 | **T7** | Gêne / lisibilité : trop vite, trop de touches, couleurs, latence | **Q5** (question dédiée) | plafond Evaristo |
 | **T8** | Trace / rétention / formes sur le clavier | **Q6** (question dédiée) | transfert / apprentissage |
 | **T9** | Image / métaphore du dispositif (partition, jeu vidéo, petites roues, GPS, prof) | **Q7** principale + relance *prof* | vécu / apprentissage |
 | **T10** | Désétayage / autonomie / s'en passer (l'aide s'efface, « petites roues qui s'enlèvent ») | **Q7** relance *détachement* | apprentissage / transfert |
 | **T11** | Motivation / envie de pratiquer | **Q7** relance *usage* | engagement (lié QR2) |
-| **T12** | Préférence avec / sans | Q2 relance *préférence* | synthèse vécu |
+| **Aé** | Auto-évaluation de la performance (« mieux joué avec / sans ») | **Q8** (pari) | QR1/QR2, triangulation §4 |
 | **T13** | Améliorations souhaitées / wishlist | **Q9** (clôture, baguette magique) | conception |
 
 **Zone émergente (inductive) :**
@@ -41,14 +44,16 @@
 | Code | Thème | Statut |
 |---|---|---|
 | **Tcr** | Découverte créative / exploration | **Pas de question dédiée** dans Q3 : construit exploratoire déclaré (« créativité », cf. §0) mais sous-échantillonné par le guide. Attendu **mince** : ne se code qu'inductivement, surtout depuis Q1 (incident) et Q3 (transgression). Si peu de matière, le signaler comme **limite**, ne pas surinterpréter une colonne quasi vide. |
+| **Div** | Divers / moment marquant & autres saillances | **Fourre-tout**, pas un thème analytique : moment marquant (Q1) et toute remarque intéressante hors grille. **Ne pas calculer de `n/8`** ; sert de réservoir de verbatim à reclasser (esprit « cut, don't delete »). |
 | **Té1…** | (libre) | Tout thème récurrent non prévu par la grille. Ouvrir une ligne dès qu'il revient chez ≥ 2 participants. |
 
 **Questions sans colonne dédiée (par conception)** :
 - **Q1 (incident critique)** : question ouverte d'amorce : son contenu se **code dans les
   thèmes ci-dessus** (le plus souvent T1 / T3 / T4) ou en émergent. C'est le matériau le
   plus riche pour les thèmes inductifs : ne pas le perdre.
-- **Q8 (pari d'auto-évaluation)** : **pas un thème** : un point de donnée par participant,
-  reporté dans le *tableau des paris* (§4) pour la triangulation objectif/subjectif.
+- **Q8 (pari d'auto-évaluation)** : résumé dans la colonne **Aé** de la matrice (§3, sens du
+  pari AVEC/SANS/égal) ; le détail chiffré (confiance %, RTLX) reste dans le *tableau des
+  paris* (§4) pour la triangulation objectif/subjectif.
 
 ---
 
@@ -56,7 +61,9 @@
 
 Dans chaque cellule remplie :
 
-- **1 verbatim court** entre guillemets, dans **les mots du participant** (ne pas reformuler).
+- **1 verbatim court** entre guillemets droits `"…"`, **première lettre en capitale**,
+  dans **les mots du participant** (ne pas reformuler ; la majuscule initiale est une
+  convention de présentation de la citation, le texte reste verbatim).
 - **horodatage** `[mm:ss]` du `.srt` (pour retrouver l'extrait vidéo en 2 s).
 - **signe de direction** vis-à-vis du dispositif :
   `(+)` favorable · `(-)` défavorable · `(±)` mitigé · `(o)` neutre / descriptif.
@@ -64,26 +71,27 @@ Dans chaque cellule remplie :
 Cellule **vide** = le thème n'est pas ressorti pour ce participant (information en soi :
 compte dans le `n/8`). Plusieurs verbatim possibles dans une cellule (séparer par `;`).
 
-Exemple de cellule (T7, P03) : `« les lumières allaient trop vite sur le pont » [04:12] (-)`
+Exemple de cellule (T7, P03) : `"Les lumières allaient trop vite sur le pont" [04:12] (-)`
 
 ---
 
 ## 3. Matrice thème × participant (à remplir)
 
-> Lignes = P01…P08, colonnes = thèmes (codes T1…T13 + Tcr). On lit **une colonne en
-> travers des 8** = la tendance. (Pour Google Docs : coller en orientation paysage, ou
-> transposer si plus lisible : l'opération d'analyse est identique.)
+> Lignes = P01…P08, colonnes = thèmes rangés dans l'**ordre du flux du guide Q3**
+> (Tf · T1–T4 · T12 · T5–T11 · Aé · T13 · Tcr · Div), et non l'ordre des numéros T. On lit
+> **une colonne en travers des 8** = la tendance. (Pour Google Docs : coller en orientation
+> paysage, ou transposer si plus lisible : l'opération d'analyse est identique.)
 
-| | T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | T12 | T13 | Tcr |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **P01** | | | | | | | | | | | | | | |
-| **P02** | | | | | | | | | | | | | | |
-| **P03** | | | | | | | | | | | | | | |
-| **P04** | | | | | | | | | | | | | | |
-| **P05** | | | | | | | | | | | | | | |
-| **P06** | | | | | | | | | | | | | | |
-| **P07** | | | | | | | | | | | | | | |
-| **P08** | | | | | | | | | | | | | | |
+| | Tf | T1 | T2 | T3 | T4 | T12 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | Aé | T13 | Tcr | Div |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **P01** | | | | | | | | | | | | | | | | | |
+| **P02** | | | | | | | | | | | | | | | | | |
+| **P03** | | | | | | | | | | | | | | | | | |
+| **P04** | | | | | | | | | | | | | | | | | |
+| **P05** | | | | | | | | | | | | | | | | | |
+| **P06** | | | | | | | | | | | | | | | | | |
+| **P07** | | | | | | | | | | | | | | | | | |
+| **P08** | | | | | | | | | | | | | | | | | |
 
 ---
 
@@ -113,20 +121,23 @@ Exemple de cellule (T7, P03) : `« les lumières allaient trop vite sur le pont 
 
 | Thème | n/8 | Direction dominante | Verbatim 1 | Verbatim 2 |
 |---|---|---|---|---|
+| Tf Facilité ressentie | /8 | (+)/(-)/(±) | | |
 | T1 Charge réduite | /8 | (+)/(-)/(±) | | |
 | T2 Anticipation | /8 | | | |
 | T3 Confiance / oser | /8 | | | |
 | T4 Anxiété / sécurité | /8 | | | |
+| T12 Préférence avec/sans | /8 | | | |
 | T5 Agentivité | /8 | | | |
-| T6 Attention yeux/oreilles | /8 | | | |
+| T6 Attention : regard (écran/touches) & oreilles | /8 | | | |
 | T7 Gêne / lisibilité | /8 | | | |
 | T8 Trace / rétention | /8 | | | |
 | T9 Image / métaphore | /8 | | | |
 | T10 Désétayage / autonomie | /8 | | | |
 | T11 Motivation / pratiquer | /8 | | | |
-| T12 Préférence avec/sans | /8 | | | |
+| Aé Auto-évaluation perf *(Q8 — détail §4)* | /8 | (AVEC/SANS/égal) | | |
 | T13 Améliorations / wishlist | /8 | | | |
 | Tcr Découverte créative *(émergent)* | /8 | | | |
+| Div Divers / moment marquant *(fourre-tout, pas de n/8)* | — | — | | |
 
 ---
 
