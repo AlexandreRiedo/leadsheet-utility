@@ -103,7 +103,7 @@ Contre-sens : **P04, P07, P08**.
 
 - **Convergence pro-dispositif sur le vécu** : Facilité **Tf 8/8 (+)**, Charge **T1 (+)**, Confiance
   **T3 7/8 (+)**, Sécurité **T4 (+)**, Préférence/3ème essai **T12 6/8 (+)** (6/8 reprendraient AVEC ; seuls P04/P08 resteraient SANS).
-  → cohérent avec RTLX/STAI ↓ et SELFEFF ↑.
+  → nette avec RTLX ↓ et STAI ↓ ; sur SELFEFF (médiane plate, p .234) l'entretien est **plus favorable que le score** → nuance, cf. §5.
 - **Les deux (-) récurrents = P04 et P08** (lecteurs chevronnés) sur Tf/T1/T3 : **les mêmes
   individus que les contre-sens quantitatifs**. À nommer explicitement.
 - **Anticipation T2 : split 3/3** = bénéfice si espace mental, subi en survie. Ne pas surinterpréter ;
@@ -166,11 +166,14 @@ Contre-sens : **P04, P07, P08**.
 
 ## 5. Triangulation et réponse aux QR (Discussion : ne PAS mettre en Résultats)
 
-**Ce que la triangulation autorise (et ce qu'elle n'autorise pas).** Les trois mesures vont dans le
-même sens (charge ↓, anxiété ↓, confiance ↑ AVEC) **et** le vécu en entretien va dans le même sens.
-Cette convergence est **encourageante mais faible** : aucun test n'est significatif, et la convergence
-peut être en partie un artefact (désirabilité sociale ; mêmes participants des deux côtés). À écrire
-comme **faisceau d'indices cohérent**, pas comme preuve.
+**Ce que la triangulation autorise (et ce qu'elle n'autorise pas).** En *rang* (r_rb), les trois
+mesures penchent vers H1 (charge ↓, anxiété ↓, confiance ↑ AVEC), mais l'**auto-efficacité est la plus
+faible** (médiane plate, p = .234). La convergence entretien↔chiffré n'est donc **nette que sur deux
+construits** : charge (RTLX ↔ T1) et anxiété/sécurité (STAI ↔ T4). Sur l'auto-efficacité, l'entretien
+est **plus favorable que le score** (confiance T3 6/7 vs médiane SELFEFF plate) → à lire comme
+**prudence supplémentaire, pas comme 3e confirmation**. Le tout reste **encourageant mais faible** :
+aucun test n'est significatif, et la convergence peut être en partie un artefact (désirabilité sociale ;
+mêmes participants des deux côtés). À écrire comme **faisceau d'indices cohérent**, pas comme preuve.
 
 - **Motif observé : axe familiarité de la grille** (P05 le verbalise, « gestion de l'inhabituel »,
   [16:04]) : débutants/interm. (P01, P02, P05, P06) plutôt favorables ; chevronnés (P04, P07, P08 ;
