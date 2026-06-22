@@ -163,7 +163,7 @@ augmentée/diminuée. Déjà bien décrits dans le DS p.10-11, à reprendre + ph
 - Style de référence : Carusi (diagramme de déploiement / cas d'usage).
 
 ### 5.4 Sous-systèmes (un bloc chacun, prompter le code pour les détails)
-- **Harmonie** : table qualité→gamme, arithmétique mod-12, guide tones, 6 règles de contexte.
+- **Harmonie** : table qualité→gamme, arithmétique mod-12, guide tones, 7 règles de contexte.
 - **Backing** : walking bass algorithmique, drums swing, comping drop-2/3 voice-leadé,
   rendu par couches parallèles (GIL libéré), mix numpy.
 - **Projection / calibration** : layout 88 touches, homographie, UI calibration 5 phases.

@@ -114,8 +114,8 @@ If the projector or piano gets bumped, the user presses `C` from the main screen
 | Module | Status | Responsibility |
 |---|---|---|
 | `leadsheet` | **Done** | Parse MIR-style `.tsv` + `.meta.json` into `LeadSheet`/`ChordEvent` dataclasses |
-| `harmony` | **Done** | Chord symbol → scale pitches, chord tones, guide tones (lookup + 6 context rules) |
-| `timeline` | **Done** | Musical clock deriving beat position from audio playback, resolving current chord |
+| `harmony` | **Done** | Chord symbol → scale pitches, chord tones, guide tones (lookup + 7 context rules) |
+| `timeline` | **Done** | Musical clock deriving beat position from wall-clock elapsed time (`perf_counter`, started in sync with audio), resolving current chord |
 | `backing` | **Done** | Walking bass + swing drums + jazz guitar comping (drop-2/drop-3 voicings, Phil DeGreg swing patterns) + metronome + count-in + FluidSynth offline rendering with per-instrument layer cache for instant remix |
 | `gui` | **Done** | HUD window: chord display, exercise selection, transport, progress bar, frozen-mode indicator, count-in grid |
 | `projection` | **Done (wired into main)** | Canonical 88-key layout + `cv2.warpPerspective`; main app loads saved calibration on startup and warps Free-Mode highlights every frame with audio-delay compensated lead time |
@@ -202,7 +202,7 @@ The harmony module is implemented in `harmony/constants.py` (all tables) and `ha
 ### Two-Layer Resolution
 
 1. **Layer 1 — Default lookup**: `QUALITY_TO_SCALE` dict maps chord quality (+ extensions) to a default scale. See `constants.py` for the full mapping.
-2. **Layer 2 — Context-aware resolution**: examines previous/next chords to refine scale choice. 6 rules implemented in `resolve_scale()`.
+2. **Layer 2 — Context-aware resolution**: examines previous/next chords to refine scale choice. 7 rules total: rules 1, 2, 5, 6 in `resolve_scale()`; rules 3, 4, 7 in a chain-detection pre-pass (`_assign_chain_overrides`).
 
 ### Context Rules (Layer 2)
 
@@ -217,6 +217,8 @@ The harmony module is implemented in `harmony/constants.py` (all tables) and `ha
 **Rule 5: IV chord in major context** — `X:maj*` preceded by `Y:maj*` where `(X_root - Y_root) % 12 == 5` → Lydian.
 
 **Rule 6: Half-diminished standalone** — `X:hdim7` where next chord is NOT dominant-function → Locrian natural 9 (instead of default Locrian natural 6).
+
+**Rule 7: Minor ii-V-i resting tonic** — `Xø7` → `Y:7` (P4 up) → `Z:min7` (V resolves down a P5), where the `Z:min7` is a *resting* tonic (not immediately followed by more `min`/`7` ii-V material) → Aeolian (natural minor) instead of the default Dorian. Runs in the chain pre-pass alongside Rules 3/4.
 
 ### Resolution Priority
 
@@ -396,7 +398,7 @@ Target **60 FPS**. Per-frame work: ~7–15 filled rectangles into a small canoni
 1. **Event generation** (pure Python): bass / drums / guitar / metronome algorithms each produce a `list[MidiEvent]`.
 2. **Parallel per-layer rendering** (FluidSynth): a worker thread spins a `ThreadPoolExecutor` and runs `render_layer` for each layer concurrently. Each layer gets its own `Synth` instance (own SoundFont load, own state — no shared mutable state), and FluidSynth's `get_samples` releases the GIL, so layers actually overlap on multiple cores. Each layer returns a raw float32 buffer, unclipped, so dense moments don't get pre-shorn.
 3. **Layer cache**: the four buffers are kept in memory (`App._layers`).
-4. **Mix** (`mix_layers`): sums the active layers, clips, and converts to int16. Called every time the mix changes (metronome toggle, BackingMode cycle). Mid-stream changes slice the new mix from the current playhead so audio continues seamlessly.
+4. **Mix** (`mix_layers`): sums the active layers, applies a fixed master gain (`MIX_MASTER_GAIN = 2.5`) and a *conditional* peak limiter (attenuates only if the gained sum would exceed ~0.95 full-scale), then converts to int16. The limiter is deliberately conditional rather than a hard clip or per-render normalization, so within- and between-render dynamics stay linear and the CC7 instrument balance is preserved. Called every time the mix changes (metronome toggle, BackingMode cycle). Mid-stream changes slice the new mix from the current playhead so audio continues seamlessly.
 5. **Playback** (`pygame.mixer`): final int16 buffer loaded as `pygame.mixer.Sound`.
 
 ### SoundFont
@@ -442,7 +444,7 @@ Applied during event generation. The "and" of each beat is shifted later:
 
 ### Guitar Comping Generator — Implemented
 
-Algorithmic jazz guitar comping in `backing/comping.py`. Generates `MidiEvent` objects on channel 1 (GM nylon/electric guitar). Two-layer design:
+Algorithmic jazz guitar comping in `backing/comping.py`. Generates `MidiEvent` objects on channel 1 (GM Electric Guitar (jazz), program 26). Two-layer design:
 
 - **Voicings** (`comping_voicings.py`): drop-2 and drop-3 root-bass voicings built from `chord.chord_tones`. 4-note drop-2 = `[R, 5, 7, 3+12]`, drop-3 = `[R, 7, 3+12, 5+12]`; triads use a 3-note drop-2 analog. Root register clamped to A2–A3, top voice ≤ G5. The natural 5th is substituted with `#11` when the chord has `#11`/`b5`/`maj7#11`, or with `b6` when the chord has `b9`/`b13` without a natural 13 (phrygian-dominant / harmonic-minor V feel). `best_voicing()` picks the candidate that minimises total semitone movement from the previous voicing.
 - **Rhythm patterns** (`comping_rhythms.py`): 12 one-bar and 4 two-bar swing patterns transcribed from Phil DeGreg's *Jazz Keyboard Harmony* comping-rhythms page. Two-bar patterns include anticipations (hits in bar 1 that ring into bar 2 using bar 2's harmony). `pick_pattern()` chooses randomly per 2-bar window.
@@ -460,7 +462,7 @@ Each hit emits note-on/off pairs with swing applied to offbeat 8ths, ±8 velocit
 
 Implemented in `timeline/engine.py`. Wall-clock-based musical clock with play/pause/stop transport. Uses `ClockSource` protocol for testability. Binary-searches chord list to resolve current chord each frame.
 
-Key design: no dedicated thread. `timeline.get_state()` is polled each frame by the main loop, returning `(current_beat, current_chord, prev_chord, form_repeat)`. Beat position derived from audio playback position.
+Key design: no dedicated thread. `timeline.get_state()` is polled each frame by the main loop, returning `(current_beat, current_chord, prev_chord, form_repeat)`. Beat position is derived from wall-clock elapsed time (`PerfCounterClock`, a `ClockSource` over `time.perf_counter`), with the clock started in sync with audio playback rather than read back from the audio device. A `wrap_around` flag makes the clock loop modulo the total length (used by loop-practice mode) instead of clamping at the end.
 
 ---
 
@@ -518,16 +520,24 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 ### Python Dependencies
 
 ```
+# core (pyproject [project].dependencies)
 python = ">=3.13"
-pygame-ce = ">=2.5.2"          # Community Edition — required for multi-window
-numpy = ">=1.26"
-opencv-python = ">=4.9"
-pyfluidsynth = ">=1.3"
-pytest = ">=8.0"
-ruff = ">=0.4"
+pygame-ce = ">=2.5.7,<3.0.0"     # Community Edition: required for multi-window
+numpy = ">=2.4.4,<3.0.0"
+opencv-python = ">=4.13,<5.0"
+pyfluidsynth = ">=1.3.4,<2.0.0"
+
+# dev group (poetry install)
+pytest = ">=9.0.2,<10.0.0"
+ruff = ">=0.15.8,<0.16.0"
+pypdf = "^6.13.2"
+
+# stats group (report figures/analysis): poetry install --with stats
+scipy = "^1.17.1"
+matplotlib = "^3.11.0"
 ```
 
-**Important**: `pygame-ce` and standard `pygame` conflict — cannot coexist.
+**Important**: `pygame-ce` and standard `pygame` conflict and cannot coexist.
 
 ### System-Level: FluidSynth DLL
 
@@ -540,7 +550,7 @@ ruff = ">=0.4"
 ### Done
 
 - [x] Lead sheet parser (MIR-style `.tsv` + `.meta.json`)
-- [x] Harmony analyzer (chord → scale, 6 context rules, guide-tone voice-leading)
+- [x] Harmony analyzer (chord → scale, 7 context rules, guide-tone voice-leading)
 - [x] Timeline engine (audio-clock-synced, play/pause/stop, form looping)
 - [x] Offline FluidSynth rendering + `pygame.mixer` playback
 - [x] Walking bass generator (algorithmic, quarter notes, phrase-direction arcs)
