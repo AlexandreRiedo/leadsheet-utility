@@ -90,9 +90,9 @@ setup_style()
 # code -> (direction H1, libellé). "less" = on prédit AVEC < SANS ; doit rester
 # IDENTIQUE aux directions du tableur et d'analyze_tests.py (sinon les couleurs mentent).
 MEASURES = {
-    "RTLX": ("less", "NASA-TLX (RTLX, 0-100) — charge"),
-    "STAI6": ("less", "STAI-6 (20-80) — anxiété"),
-    "SELFEFF": ("greater", "Auto-efficacité (1-7) — confiance"),
+    "RTLX": ("less", "NASA-TLX (RTLX, 0-100) : charge"),
+    "STAI6": ("less", "STAI-6 (20-80) : anxiété"),
+    "SELFEFF": ("greater", "Auto-efficacité (1-7) : confiance"),
 }
 
 # 6 dimensions NASA-TLX (colonne brute -> libellé). Perf saisie telle quelle
