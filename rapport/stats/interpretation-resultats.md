@@ -102,7 +102,7 @@ Contre-sens : **P04, P07, P08**.
 > Source : `matrice-synthese-portable.md` §5. Rester descriptif ici ; le « pourquoi » va en §5.
 
 - **Convergence pro-dispositif sur le vécu** : Facilité **Tf 8/8 (+)**, Charge **T1 (+)**, Confiance
-  **T3 7/8 (+)**, Sécurité **T4 (+)**, Préférence **T12 (+) faible** (personne ne préfère franchement SANS).
+  **T3 7/8 (+)**, Sécurité **T4 (+)**, Préférence/3ème essai **T12 6/8 (+)** (6/8 reprendraient AVEC ; seuls P04/P08 resteraient SANS).
   → cohérent avec RTLX/STAI ↓ et SELFEFF ↑.
 - **Les deux (-) récurrents = P04 et P08** (lecteurs chevronnés) sur Tf/T1/T3 : **les mêmes
   individus que les contre-sens quantitatifs**. À nommer explicitement.

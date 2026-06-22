@@ -42,7 +42,7 @@ Ordre des colonnes = **flux du guide Q3**, pas l'ordre des numéros T :
 | **T2** | Anticipation des changements d'accord (vu venir vs subi) | Q2 relance *anticipation* | QR1 |
 | **T3** | Confiance / oser / prise de risque | Q2 relance *assurance* + Q3 transgression | QR2, **auto-efficacité** |
 | **T4** | Anxiété / blocage / sécurité | Q2 relance *assurance* + Q1 incident | QR2, **STAI-6** |
-| **T12** | Préférence avec / sans | Q2 relance *préférence* | synthèse vécu |
+| **T12** | Préférence avec / sans (pour un 3ème essai) | Q2 relance *préférence* | synthèse vécu |
 | **T5** | Agentivité : suggestion vs règle, transgression (touche éteinte) | **Q3** (dédiée) | QR2 / agentivité |
 | **T6** | Partage de l'attention — *regard* (écran/grille iReal vs touches lumineuses ; allers-retours partition↔piano) & *écoute* (conflit lumière/oreille) | **Q4** (dédiée) | QR1 (attention) |
 | **T7** | Gêne / lisibilité : trop vite, trop de touches, couleurs, latence | **Q5** (dédiée) | plafond d'usage |
@@ -99,13 +99,13 @@ Ordre des colonnes = **flux du guide Q3**, pas l'ordre des numéros T :
 | | Tf | T1 | T2 | T3 | T4 | T12 | T5 | T6 | T7 | T8 | T9 | T10 | T11 | Aé | T13 | Tcr | Div |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | **P01** | (+) | (+) | (±) | (+) | (+) | (+) | (+) | (+) | (+) | (-) | (o) | (o) | (+) | AVEC | (o) | (+) | (o) |
-| **P02** | (+) | (±) | (+) | (+) | (+) | (±) | (o) | (-) | (-) | (-) | (±) | (o) | (o) | AVEC* | (o) | (+) | (o) |
-| **P03** | (+) | (±) | (-) | (+) | (+) | (±) | (+) | (±) | (±) | (-) | (o) | (o) | · | SANS | (o) | (±) | (o) |
-| **P04** | (-) | (-) | (-) | · | (±) | (±) | (o) | (-) | (±) | (o) | (o) | (o) | · | SANS | (o) | · | (o) |
+| **P02** | (+) | (±) | (+) | (+) | (+) | (+) | (o) | (-) | (-) | (-) | (±) | (o) | (o) | AVEC* | (o) | (+) | (o) |
+| **P03** | (+) | (±) | (-) | (+) | (+) | (+) | (+) | (±) | (±) | (-) | (o) | (o) | · | SANS | (o) | (±) | (o) |
+| **P04** | (-) | (-) | (-) | · | (+) | (-) | (o) | (-) | (±) | (o) | (o) | (o) | · | SANS | (o) | · | (o) |
 | **P05** | (+) | (+) | (+) | (+) | (+) | (+) | (+) | (+) | (±) | (+) | (o) | (o) | (+) | AVEC | (o) | (+) | (o) |
 | **P06** | (+) | (+) | (+) | (+) | (+) | (+) | (±) | (+) | (±) | (-) | (o) | (o) | (+) | AVEC | (o) | (+) | (o) |
 | **P07** | (+) | (+) | (o) | (+) | (-) | (+) | (+) | (-) | (±) | (-) | (o) | (o) | (+) | SANS | (o) | (±) | (o) |
-| **P08** | (-) | (-) | (-) | (-) | (-) | (±) | (o) | (-) | (±) | (o) | (o) | (o) | (o) | SANS | (o) | (±) | (o) |
+| **P08** | (-) | (-) | (-) | (-) | (-) | (-) | (o) | (-) | (±) | (o) | (o) | (o) | (o) | SANS | (o) | (±) | (o) |
 
 `·` = cellule vide (donnée). `AVEC*` = pari implicite à confirmer sur questionnaire.
 
@@ -119,8 +119,8 @@ Ordre des colonnes = **flux du guide Q3**, pas l'ordre des numéros T :
 | **T1** Charge réduite | 8/8 | (+)×4 · (±)×2 · (-)×2 | **(+)** bipolaire *((-) = P04/P08)* | P05 « J'étais soulagée du poids de penser à chaque mesure, chaque note » `[08:36]` | P08 *(contre)* « Bah plus parce que j'avais trop plus d'éléments à gérer » `[05:35]` |
 | **T2** Anticipation | 8/8 | (+)×3 · (-)×3 · (±)×1 · (o)×1 | **split 3/3** *(bénéfice si espace mental ; subi en survie/réaction)* | P06 « Tu avais la projection qui arrivait un poil avant… ça a été bien pour permettre d'anticiper un poil plus » `[12:23]` | P04 *(subi)* « Il faudrait que j'essaye d'utiliser le système d'anticipation, mais là j'ai pas eu le temps de l'exploiter » `[04:38]` |
 | **T3** Confiance / oser | 7/8 *(P04 ·)* | (+)×6 · (-)×1 | **(+)** | P02 « J'essayais de faire des trucs que j'oserais moins faire » `[02:50]` | P08 *(contre)* « Sans la projection… tu connais ton vocabulaire de base et du coup t'es tranquille, tu peux un peu oser » `[06:36]` |
-| **T4** Anxiété / sécurité | 8/8 | (+)×5 · (-)×2 · (±)×1 | **(+)** *((-) = P07/P08 : zone de confort = grille connue)* | P06 « Tu as vraiment un truc de sécurité, un filet qui est là » `[15:08]` | P07 *(contre)* « Honnêtement, je me sentais plus en sécurité sans la projection… Je suis même surpris de dire ça » `[08:12]` |
-| **T12** Préférence avec/sans | 8/8 | (+)×4 · (±)×4 | **(+) faible** *(nul ne préfère franchement SANS ; préférence ≠ perf, cf. Aé)* | P05 « Avec, avec. Avec, de fou » `[11:27]` | P08 « Sans, mais un peu avec regret parce que c'est quand même bien d'essayer autre chose » `[07:13]` |
+| **T4** Anxiété / sécurité | 8/8 | (+)×6 · (-)×2 | **(+)** *(6/8 ; (-) = P07/P08 : zone de confort = grille connue ; P04 « un peu plus en sécurité avec »)* | P06 « Tu as vraiment un truc de sécurité, un filet qui est là » `[15:08]` | P07 *(contre)* « Honnêtement, je me sentais plus en sécurité sans la projection… Je suis même surpris de dire ça » `[08:12]` |
+| **T12** Préférence avec/sans (3ème essai) | 8/8 | (+)×6 · (-)×2 | **(+)** *(6/8 reprendraient AVEC pour un 3ème essai ; seuls P04/P08 resteraient SANS ; préférence ≠ perf, cf. Aé)* | P05 « Avec, avec. Avec, de fou » `[11:27]` | P08 « Sans, mais un peu avec regret parce que c'est quand même bien d'essayer autre chose » `[07:13]` |
 | **T5** Agentivité | 8/8 | (+)×4 · (o)×3 · (±)×1 | **(+)** *(transgression assumée + posture « suggestions »)* | P05 « Dans le jazz… tout est des suggestions » `[12:44]` | P01 « Tu peux jouer un petit peu out… par négation tu vois ce qui est out » `[38:05]` |
 | **T6** Attention : *regard* & *écoute* | 8/8 | (-)×4 · (+)×3 · (±)×1 | **split serré** *(2 sous-axes, cf. §6)* | P01 *(regard, +)* « Tout était sous mes yeux sur le piano, pourquoi regarder la grille ? » `[25:46]` | P02 *(écoute, -)* « J'ai peur que ce système me fasse moins anticiper avec l'oreille » `[07:00]` |
 | **T7** Gêne / lisibilité | 8/8 | (±)×6 · (+)×1 · (-)×1 | **(±)** *(lisible mais réserves récurrentes : vitesse/turnarounds, densité, bichromie vert/bleu)* | P06 « Le fait d'avoir vraiment les deux couleurs, le vert et le bleu, c'est ça qui agresse » `[26:40]` | P05 « Ça allait un peu vite et je n'avais pas le temps de comprendre tout ce que je faisais » `[20:33]` |

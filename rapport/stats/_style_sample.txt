@@ -1,0 +1,400 @@
+# **Introduction (TO EDIT)**
+
+Improviser des belles lignes de jazz, voici une problématique que toute personne souhaitant pratiquer le jazz doit affronter. N’oublions pas aussi les pianistes classiques qui souhaitent aussi aborder l’improvisation (pas uniquement jazz), là aussi un grand obstacle se pose pour eux. En effet, l’improvisation jazz n’est pas particulièrement évidente : la grille harmonique défile très vite, les gammes à utiliser ne sont pas faciles, et arriver à produire un discours cohérent et intéressant, c’est-à-dire générer une mélodie qui ne sonne pas comme des gammes ascendantes et descendantes, demeure un défi particulièrement ardu. 
+
+  
+
+Ce projet a pour but de créer un système de piano augmenté qui aide un utilisateur à concevoir des improvisations jazz plus qualitatives. On souhaite, après que l’utilisateur ait profité des fonctionnalités pédagogiques du système, qu’il puisse traverser les *changes* d’un morceau jazz avec une improvisation plus fluide et réussie.
+
+  
+
+L’artefact est un système de piano augmenté : 
+
+  - un projecteur surmonté illumine ou non les touches d’un piano, dont on utilise pour proposer des jeux qui stimulent l’improvisation créative.
+  - un ordinateur connecté déchiffre une grille de jazz au préalable, et est capable à partir d’une représentation interne de la grille de calculer intelligemment des informations musicales pertinentes (comme la gamme actuelle de l’accord) et de modifier la projection en conséquence.
+  - un système de backing track simple qui génère idéalement un *comping* de basse/piano/batterie depuis la représentation interne de la grille.
+  - idéalement une implémentation d’un OMR pour lire et déchiffrer un lead sheet, sinon utilisation de fichiers MusicXML préconçus comme grilles harmoniques.
+
+  
+
+Le but est d’étudier la question de recherche principale suivante : “Comment favoriser des improvisations jazz plus créatives et bien conçues avec l’aide d’un piano augmenté? ”.
+
+  
+
+# **Etat de l’art (TO EDIT)**
+
+## **Comment travaille-t-on l'improvisation mélodique jazz normalement?**
+
+**La revue de littérature de C. Graham Spice**
+
+C. Graham Spice a rédigé en été 2010 une revue de littérature des différents livres, méthodes, et articles dont le but est d’enseigner l’improvisation jazz [\[1\]](https://www.zotero.org/google-docs/?AULVXH). La contribution clé de cette revue est d’avoir construit un corpus solide de la littérature pédagogique, puis de l’avoir classifié en 5 catégories, ou plutôt frameworks, pour enseigner le jazz. Il y a ainsi :
+
+1.   Une approche reposant sur les gammes
+2.  Une approche qui prône l’appui sur les *changes* (harmonie)
+3.  Une approche qui tourne autour de l'embellissement mélodique
+4.  Une approche qui favorise l’utilisation de *patterns mélodiques*
+5.  Une approche qui utilise les transcriptions de solos : en réaliser, en jouer, et en analyser.
+
+  
+
+**Exploration de quelques livres**
+
+À partir de cette classification, j’ai survolé quelques livres sur l’improvisation jazz, et j’ai organisé quelques exemples et exercices selon les 5 frameworks. En réalité, j’ai considéré les 5 catégories avec une 6ème catégorie que j’ai ajoutée en plus pour recenser les exercices qui ne sont pas classables selon ces 5 frameworks. Cette 6ème catégorie inclut des exercices qui relèvent davantage de l’improvisation pure et des jeux de créativité, et moins d’application méthodique de gammes ou de patterns. Ce sont donc des exercices difficiles, mais qui sont très riches pour le savoir faire d’improvisation.
+
+1.  Une approche qui stimule l’improvisation créative et qui met en avant les jeux musicaux.
+
+  
+
+Il est possible de consulter l’annexe “Annexe 1 - Revue de quelques livres de jazz.pdf” pour voir le travail en brut de cette recherche. 
+
+  
+
+Pouvoir voir des exemples concrets de comment travailler l’improvisation jazz sera très utile pour la conception de l’artefact, d’où l'intérêt d’avoir fait ce travail. Ci-dessous est ainsi présentée le contenu de ce document.
+
+  
+
+Dans Creative Jazz Improvisation[\[2\]](https://www.zotero.org/google-docs/?BsAVVC), on retrouve des exercices qui demandent au lecteur  de jouer des gammes ascendantes sur un II-V-I. On retrouve aussi des exercices du 2ème framework qui l’invite à exprimer l’harmonie clairement avec des lignes fondées sur les guide tones. Un exercice avec un pattern à transposer sur un blues, ainsi que des exemples de solo sont données.
+
+  
+
+Dans The Pianist’s Guide to Blues, Jazz & Melodic improvisation[\[3\]](https://www.zotero.org/google-docs/?Y7lRkX), il est possible de retrouver des exemples pour les 5 frameworks : un exercice qui demande de jouer la gamme associée de chaque accord de progressions courantes, un qui propose d’utiliser des voicings comme source pour une mélodie, un qui démontre comment embellir une mélodie avec des “nonharmonic tones”, un qui propose de transposer une ligne dans toutes les tonalités, et finalement des exemples de solos écrits.
+
+  
+
+Patterns for Jazz[\[4\]](https://www.zotero.org/google-docs/?r5weeX) et Patterns for Improvisation[\[5\]](https://www.zotero.org/google-docs/?dStrSM) sont axés sur l’approche 3) des patterns. Certains patterns sont liés à des suites harmoniques, d’autres sont plus libres et doivent plutôt être pensés comme une série d’intervalle à transposer dans toutes les tonalités.
+
+  
+
+Certains exercices du Improviser’s Bass Method[\[6\]](https://www.zotero.org/google-docs/?fXRZnu) font partie de la 6ème catégorie. Ils encouragent à improviser, tout en ayant une valeur pédagogique importante. Souvent, le lecteur doit improviser une ligne selon certaines contraintes (un rythme, un arpège, des motifs, un pool de notes, le flux de notes, etc.). Un exemple d’exercice : “Faites de la musique avec juste des tierces diatoniques comme motif de base, comme ci-dessous.”
+
+  
+
+How to play Bebop, Vol. 1[\[7\]](https://www.zotero.org/google-docs/?jldWEP) propose des exercices de la catégorie 1 avec des gammes bebop, de la catégorie 3 avec l’augmentation de mélodie par approches chromatiques et enclosures, de la catégorie 4 avec des “Public Domain Patterns”, ainsi que quelques exercices créatives de la catégorie 6 avec par exemple “Comment obtenir de la variété à partir d’une gamme”.
+
+  
+
+How to play Bebop, Vol. 2 [\[8\]](https://www.zotero.org/google-docs/?Gi24iv) quant à lui propose exclusivement des patterns à travailler. Les exercices ont des noms du style : “101 Favorite Bebop Era II V7 Patterns”.
+
+  
+
+Le troisième de la trilogie, How to play Bebop, Vol. 3 [\[9\]](https://www.zotero.org/google-docs/?broken=WqdMSC), contient des exercices de la catégorie 2 (naviguer des *changes* avec des *guide tones*), des exercices de la catégorie 4 (naviguer un *rhythm changes* avec des patterns stock), et des exercices de la catégorie 6 qui prônent l’assimilation des formes jazz. Ces derniers sont assez uniques : définir des plages de contraintes dans la forme pour un solo, réappliquer des fragments du thème sur toute la forme, des jeux de citations ou chaque phrase doit reprendre la dernière note du précédent,  etc.
+
+  
+
+**La thèse de Dre Yawen Eunice Chyu**
+
+En 2004 fut publiée la thèse de Dre Yawen Eunice Chyu intitulée “Teaching Improvisation to piano students of elementary to intermediate levels”[\[10\]](https://www.zotero.org/google-docs/?broken=FT470u). C’est un document qui est avant tout destiné aux enseignants, issus du monde classique, qui souhaitent apprendre à leurs élèves les bases de l’improvisation jazz. Trois techniques sont proposées : la “lecture créative”, les “questions-réponses”, et “l’improvisation autour d’accords”. De plus, on y retrouve une revue de littérature qui explore les grandes méthodes et œuvres utilisées dans la pédagogie de la musique classique, ainsi que quelques méthodes plus jazzy.
+
+  
+
+Examinons davantage les trois techniques de la thèse : 
+
+  - La “lecture créative” relève de la catégorie 3) de notre liste précédente. Le but ici est d’improviser à partir d’un thème écrit, en modifiant des paramètres de la mélodie comme le contour ou la taille des intervalles, et aussi en extrayant des motifs pour les développer davantage.
+  - Les “questions-réponses” font plutôt partie de la catégorie 6). Le professeur joue un fragment d’improvisation, puis l’élève y répond avec son propre fragment.
+  - “L’improvisation autour d’accords” fait partie de la catégorie 2).
+
+## **Les pianos augmentés**
+
+**La revue de littérature de 2022 sur les pianos augmentés**
+
+On a de la chance qu’en novembre 2022 une revue de littérature sur les prototypes de pianos augmentés a été réalisée par Jordan Deja, Sven Mayer, Klen Pucihar, et Matjaz Kljun[\[11\]](https://www.zotero.org/google-docs/?broken=d1EyaN).  Les auteurs ont constitué un corpus d’études de 56 articles présentant un prototype de piano augmenté pour la période de 2005 à 2021. Ils ont ensuite conduit des interviews avec 10 professeurs de piano classique pour obtenir des connaissances sur :
+
+  - la pédagogie et l’apprentissage
+  - l’improvisation : on ne l’enseigne pas assez bien dans les méthodes traditionnelles occidentales,  la visualisation peut aider les élèves
+  - la technologie et l’augmentation : “la meilleure façon d’apprendre le piano avec les technologies est de rester proche de méthodes analogiques”
+  - autres : le feedback auditif est aussi important
+
+  
+
+Les auteurs ont aussi catalogué les différents artefacts de l’augmentation du piano. Par exemple, utiliser une visualisation du piano roll, l’utilisation d’EMG et du tracking des mains, projection d’une main virtuelle pour indiquer le placement des doigts, etc.
+
+  
+
+Pour ce qui concerne l’improvisation, il n'y a, parmi les 56 prototypes de l’étude, que 16 qui intègrent un module d’impro. Parmi ces 16, seulement 3 attaquent directement l’apprentissage du jazz. Il y a donc de la place pour essayer de contribuer à la recherche des pianos augmentés traitant de ce sujet. Selon les auteurs : “authentic improvisation studies requires further exploration”.
+
+  
+
+**Pianos augmentés traitant de l’improvisation jazz**
+
+Le travail le plus convaincant traitant de l’harmonie jazz est celui de Frode Sandnes et Evelyn Eika[\[12\]](https://www.zotero.org/google-docs/?broken=AzusMA). Ils ont développé un système utilisant un projecteur placé en haut un clavier MIDI pour afficher les différents voicings de piano jazz sur les touches. Un système de couleur est utilisé pour distinguer les différents chord tones du voicing (tierce, neuvième, etc.). 
+
+N’oublions pas cette idée des couleurs, car elle servira peut-être d’inspiration pour le projet.
+
+  
+
+Jordan Deja et Matjaz Kljun, deux des auteurs de la revue de littérature de 2022, ont rédigé avec 5 autres chercheurs un article détaillant un piano augmenté utilisant de la visualisation en piano roll pour enseigner l’improvisation[\[9\]](https://www.zotero.org/google-docs/?ZXXegt). Leur système utilise une structure de leçons, travaillant ainsi des notions comme le swing, les patterns, les motifs, les variations, et les questions-réponses. Ils ont ensuite évalué le système avec un test sur une durée de 5 jours et avec 6 participants. Néanmoins le système a un point faible majeur : tout se déroule dans une seule tonalité, celle de do majeur. Sachant que la grande majorité des tunes de jazz modulent, il faut travailler dans toutes les tonalités impérativement \! 
+
+Pour le projet, on pourrait retenir en tout cas l’idée de la structuration en leçons, qui selon leurs évaluations, ont permis de maintenir la motivation pour les élèves.
+
+  
+
+“Improvisation Supporting Systems” est un prototype de piano augmenté réalisé en 2005[\[14\]](https://www.zotero.org/google-docs/?broken=jd8BBo) qui utilise une base de données de thèmes de jazz pour effectuer de la correction automatique en temps réel de données MIDI générées par l’utilisateur lors d’une improvisation. Il y a aussi un 2ème prototype qui implémente un feedback via des vibrations sur les touches correspondant aux fausses notes. Le système fonctionne avec un contexte harmonique : les mélodies sont corrigées selon la grille harmonique d’un backing track qui accompagne l’improvisateur.
+
+# **Questions de recherches**
+
+On peut affirmer, grâce à la revue de littérature de Jordan Deja et al.[\[11\]](https://www.zotero.org/google-docs/?broken=dBXxiN), qu’il y a de la place pour un projet explorant l’improvisation jazz assistée avec un piano augmenté, étant donné que les prototypes de ce genre sont très rares.
+
+  
+
+Le focus de ce projet est de surtout explorer l’improvisation mélodique jazz assistée, c’est-à-dire nous mettons l'accent sur la main droite. Contrairement à ImproVisAR[\[13\]](https://www.zotero.org/google-docs/?broken=GZisFG), notre projet se focalise principalement sur des personnes plutôt intermédiaires en jazz (ou en tout cas à l’aise avec le piano). Nous cherchons à stimuler et faciliter l’improvisation créative, dans plusieurs tonalités (ce que ImproVisAR ne fait pas, leur système ne traite que de la gamme de do), et dans un contexte jazz réaliste (backing track, et le système est basé sur des lead sheets de morceaux jazz). De plus, le projet reste ancré dans les méthodes d’enseignement de jazz traditionnelles, nous implémentons des jeux d’improvisation qui sont directement inspirés de la littérature pédagogique.
+
+  
+
+La question de recherche mère de ce travail, c’est de savoir **si l’usage de la réalité augmentée et diminuée sur un piano peut soutenir l’improvisation jazz mélodique dans le contexte de grille de standards swing.**
+
+  
+
+Pour pouvoir répondre à cette question, il faut donc trouver un angle d’attaque car celle-ci reste difficilement solvable dans cette forme. La clé se trouve dans notre hypothèse, fondée sur notre expérience personnelle de musicien jazz amateur, qu’un élément (parmi tous) troublant la production d’une improvisation sur une grille jazz est la nécessité de devoir calculer mentalement la gamme associée à chaque accord chiffré de la grille. À cette charge cognitive liée au calcul de gammes se couple l’anticipation de l’accord suivant, la création d’une phrase avec un fil conducteur et du sens musical, la synchronisation avec le tempo, et la gestion du stress d’une performance musicale improvisée.
+
+  
+
+Étant donné que ce travail s’inscrit dans le domaine de la Design Science Research aussi, nous avons donc déterminé les deux sous-questions suivantes par circonscription d’un état intermédiaire de l’artefact (qui lui en réalité répondait à une autre sous-question de recherche que nous avons donc écarté car l’évaluation de celle-ci n’était pas faisable) :
+
+1.  **\*\*Est-ce qu’un artefact de piano augmenté/diminué aide à réduire la charge cognitive perçue lors d’une improvisation sur une grille de jazz qui défile ?\*\***
+2.  **\*\*En réduisant cette charge, l’artefact peut-il aussi abaisser la barrière affective (moins d’anxiété, plus de confiance, plus d’envie d’oser) lors d’une improvisation sur une grille de jazz qui défile ?\*\***
+
+  
+
+La structuration de l’évaluation de l’artefact sert donc à répondre à ces deux questions principalement. Néanmoins, des éléments de réponse à la question mère pourront être élaborés aussi.**  
+**
+
+# **Solution Conceptuelle (TO EDIT)**
+
+## **Exigences**
+
+*Figure 1. Diagramme des exigences du projet*  
+
+Ma proposition d’un système pour promouvoir l’improvisation jazz au piano se partage en 4 parties majeures : 
+
+  - l’augmentation de la réalité avec de la projection sur les touches
+  - la génération d’un backing track dynamique
+  - la lecture et compréhension d’un lead sheet fourni comme contexte musical pour y appliquer des jeux d’improvisations.
+  - un GUI pour utiliser le système
+
+  
+
+Je m’inspire des systèmes de Sadnes/Eika et Jordan Deja et al. pour l’idée de projection avec des couleurs sur les touches d’un piano. Ci-dessous figure une image de cette proposition :
+
+*Figure 2. Le système de Sadnes/Eika avec une projection en couleurs*
+
+  
+
+En ce qui concerne l’OCRisation d’un lead sheet, il existe déjà des recherches qui explorent ce domaine dont une d’août 2025[\[10\]](https://www.zotero.org/google-docs/?lfDSbL) qui partage même le code python sous licence MIT pour l’OCRisation.
+
+  
+
+En l’état, le projet est déjà assez fourni. Pour le rendu du bachelor, il faudra viser en tout cas de faire un Minimum Viable Product plus simple.
+
+  
+
+**Exemple d’une utilisation du système**
+
+Notre élève de piano jazz souhaite improviser sur une grille comme “Confirmation”. Il va d’abord transmettre sa partition du lead sheet sur l'ordinateur, que ce soit via un scan ou une photo (ou bien le système cherche un fichier musicXML correspondant en ligne). Une représentation numérique de l’enchaînement d’accords de la grille se fait. Ensuite, on propose à l’utilisateur des jeux/exercices d’improvisation qui sont inscrits dans le contexte de l’harmonie de la grille. Par exemple l’utilisateur choisit l’exercice du “contour” : après que le tempo est explicité, le backing track commence à faire sonner le morceau, et le projecteur illumine les touches pour des fragments de la gamme correspondante pour l’accord qui est  en train d’être joué. Ce fragment illuminé se déplace de droite à gauche sur le clavier, indiquant ainsi à l’utilisateur de suivre son improvisation selon la position d'illumination. De cette manière, l’utilisateur développe un discours mélodique suivant une contrainte de contour, à l’instar d’un des exercices de la thèse de Chyu[\[11\]](https://www.zotero.org/google-docs/?GtTbHH).
+
+## **Design**
+
+**Description d’artefacts : schéma potentiel du système**
+
+Ci-dessous figure un aperçu du système.
+
+*Figure 3. : Schéma du système*
+
+  
+
+**Design et lien avec le problème : de la nécessité d’un contexte musical**
+
+Le sous-projet principal est surtout l’augmentation du piano via un projecteur surmonté. Néanmoins, il est important pour l’apprentissage de l’improvisation de donner un contexte musical pour l’utilisateur où il peut pratiquer l’improvisation. Le jazz n’a son sens pleinement qu’au sein d’une grille harmonique qui défile en boucle. C’est pour cela qu’il faut ce système de backing track.
+
+  
+
+L’OCRisation du lead sheet est peut-être un sujet superflu pour ce projet. Ce serait bien de pouvoir l'intégrer (en réutilisant le travail sur l’OMR des lead sheet jazz[\[15\]](https://www.zotero.org/google-docs/?broken=Vl5803)), mais on pourra très bien se débrouiller avec un système plus simple (requêtes à des bases de données de lead sheet, hard-coding de quelques grilles de jazz seulement, etc.).
+
+  
+
+**Design et lien avec le problème : explication des exercices**
+
+On propose ici en tout cas 5 idées d’exercices qui utilisent les capacités des touches illuminées pour stimuler l’improvisation créative jazz. Les voici :
+
+  
+
+  - Le jeu du contour : pour sensibiliser les utilisateurs à considérer la mélodie improvisée de façon holistique (c’est-à-dire à une échelle macro sur la forme entière, pas juste l’échelle micro de l’accord par accord), le jeu du contour propose d’illuminer une partie de la gamme de l’accord actuel de la grille et déplacer cet échantillon lumineux à gauche ou à droite au fil du temps. Cela implique deux choses : l’improvisateur est forcé à explorer des régions de la gamme plus intéressantes (versus l’option à défaut de commencer sur la tonique de la gamme), et  l’improvisateur est forcé à suivre un schéma d’improvisation sur une durée macro.
+
+Ce jeu appartient à la catégorie 6 de notre classification d’exercices jazz.
+
+  
+
+  - Le jeu du flux : inspiré par une leçon au CPMDT de Genève, l’idée du jeu est celui du “gommage” : l’utilisateur doit générer du flux mélodique, donc de jouer des croches en permanence, et doit de temps en temps arrêter ce flux, “gommant” ainsi les notes du flux qui devraient être jouées. Ici le système simule l’ouverture et la fermeture du flux en illuminant ou pas les touches du clavier, sachant qu’on éclaire les touches qui forment la chord-scale de l’accord actuel. Quand les touches sont éclairées, le flux est ouvert et donc l’utilisateur doit jouer des croches non-stop, et quand il ferme, l’utilisateur s’arrête. La justification didactique est ainsi : forcer à prendre des silences favorise la formation de phrases bien formées. C’est comme si on ajoutait des points et des virgules à des phrases, sans cela, le discours devient indigeste. En même temps, on peut aussi promouvoir des placements rythmiques plus mémorables.
+
+ Ce jeu appartient à la catégorie 6 de notre classification.
+
+  
+
+  - Le jeu du guide tone : ici le projecteur illumine dans une autre couleur comme le rouge un guide tone de chaque accord. Le système doit pouvoir choisir les guide tones qui sont les plus proches de l’un des autres d’accord en accord. Souvent, pour des progressions jazzy, cela se traduit par une alternance entre septième et tierce. Le but pédagogique ici est de développer la création de lignes qui spécifient fortement l’harmonie en suivant les guide tones. Ainsi, c’est un pas vers l’avant pour arriver aux lignes bebop qui elles sont fortement liées aux changes.
+
+Ce jeu appartient à la catégorie 2 de notre classification.
+
+  
+
+  - Le jeu de la note de début et de fin : le projecteur illumine dans couleur une note de départ et dans une note d’arrivée. L’élève doit ainsi commencer sa phrase sur la note départ et arriver sur la note d’arrivée. Cela permet de donner une amorce pour ceux qui ont de la peine à savoir “quoi jouer” quand il faut improviser, aidant donc les personnes qui ont un certain blocage pour l’improvisation. En même temps, on apprend à construire des phrases qui visent des “target notes”, un concept important en improvisation jazz.
+
+Ce jeu appartient à la catégorie 6 de notre classification.
+
+*Figure 4. : Exemple de la projection du jeu pour un accord Gm7 (dorien). Note de départ en vert, note d’arrivée en rouge*
+
+  
+
+  - Le mode libre : on propose aussi un mode “vanilla” qui ne fait que illuminer les touches de la chord-scale actuelle de l’accord. Ce serait sûrement l’option introductive pour l’utilisation du système. On souhaite que les élèves utilisent ce mode pour improviser à leur manière, en ayant comme une aide en plus avec la chord-scale qui s’affiche.
+
+Ce mode appartient à la catégorie 1 de notre classification.
+
+  
+
+Ce que l’augmentation du piano apporte, c’est de faciliter la visualisation des notes correctes à jouer à tout moment. On réduit ainsi la charge mentale des utilisateurs qui ne doivent donc pas se soucier de calculer chaque gamme pour chaque mesure, surtout quand c’est des morceaux avec des changements d’accords rapides. On peut plutôt les aider à créer des discours mélodiques créatifs et intéressants.
+
+=========EVALUATION : INTERVIEW PROFESSEUR=========
+
+Contexte
+
+Nous avons pu entrer en contact avec un professeur de piano jazz enseignant au conservatoire populaire de Genève. Deux rencontres ont eu lieu : une fois le 27 mai, une autre fois le 3 juin. 
+
+  
+
+Lors de la première rencontre, nous avons fait découvrir le projet à chaud au professeur. Nous avons installé une instance de l’artefact dans ses locaux, et nous avons expliqué le but du projet et ainsi que les grandes lignes de ce que consiste la solution technique. Nous avons démontré les 5 modes de jeu de l’artefact en les faisant essayer au professeur de façon ad-hoc. Par la suite,le professeur a pu faire venir deux de ses élèves pour faire des essais, intégrant on the fly l’artefact pour quelques minutes de cours de ses deux élèves. Cette session fut très enrichissante mais manqua clairement de structure, ce qui nous a donc motivé de proposer une autre rencontre la semaine prochaine dans le cadre d'une interview semi-structurée (quasiment libre en réalité, nous avons largement laissé au professeur la liberté de digresser).
+
+  
+
+L’entretien de la deuxième session a été enregistré puis transcrit automatiquement via Whisper. Nous vous proposons ci-dessous une analyse thématique des savoirs produits par cet entretien. Nous avons conservé uniquement les savoirs qui ont un lien avec la question de recherche ou qui sont forts intéressants, l’interview est très large pour cause de digressions.
+
+  
+  
+
+### Analyse par thèmes de l’interview
+
+|  |  |  |  |
+| :-: | :-: | :-: | :-: |
+| \*\*Thème\*\* | \*\*Citation de l’interview\*\* | \*\*Analyse\*\* | \*\*Lien avec la QR\*\* |
+| Charge cognitive | \\\[PROFESSEUR\\\] : “Heureusement ou malheureusement, il y a un petit trait psy chez tout le monde, de voir quelle est la discussion ou non-discussion intérieure.Il faut que les gens ne parlent pas trop à l'intérieur. Il ne faut pas qu'ils se parlent trop quand ils jouent.” | Pour le professeur, il est important dans l’improvisation d'avoir un peu “d’impétuosité” : il faut oser se lancer même si “on n’a pas tous les outils, il faut juste y aller”, sinon on ne va pas même pouvoir jouer. L’improvisateur doit éviter de trop réfléchir car cela peut le bloquer et donc faire souffrir la musique en conséquence.  | Un des objectifs pédagogiques du professeur est donc d’empêcher les élèves de trop réfléchir  (à leur performance, à leur son, à la grille, etc.) lors de l’improvisation. Autrement dit, une réduction d’une forme de charge cognitive. |
+| Charge cognitive, Pédagogie Jazz | \\\[PROFESSEUR\\\] : “Puis là, en éclairant le clavier comme ça, tout ça, toute cette partie psy  là dont je viens d'insister pourrait un peu, on pourrait se dire, tu sais quoi, tu la mets en back-up, de toute façon, t'as qu'à suivre les couleurs.Ta gueule dedans quoi. En fait, pas besoin de parler. Le 2, le 5, tu suis la couleur, et comme tu suis, tu as moins de questions, tu es plus dans “ah mais après quand tu appuies, tu es là, ok, ça sonne bien” C’est comme ça que j'enseigne” | La “question psy” fait référence à ce monologue intérieur distrayant mentionné dans la ligne du dessus. Le professeur affirme qu’avec le système, on empêche le débordement de réflexions car en indiquant les gammes avec les couleurs, l’information n’a plus besoin d’être élucidée par l’improvisateur. | La réduction de la charge cognitive du système, à ce stade une hypothèse que nous vérifierons par la suite, est en phase avec ce que fait habituellement le professeur avec ses élèves. |
+| Charge Cognitive | \\\[PROFESSEUR\\\] : “Peut-être que ce dispositif permet de gommer tout ce côté psychologique compliqué, ou complexe, en fonction des humains. Et puis, plus on va directement à l'essentiel, qui est l'accord, qui est le gris, on fait quoi ? On peut juste jouer, puis se taire.” \\\[ETUDIANT\\\] : “Parce que moi, mon idée initiale, l'hypothèse que j'ai avec mon professeur, c'est qu'en faisant ça, on réduit ce qu'il appelle la charge mentale, la charge cognitive.” \\\[PROFESSEUR\\\] : “C'est ce que je suis en train de dire à l'instant.” | Ceci confirme qu’en tout cas en partie, les notions de “ se trop parler”, de “trop réfléchir” font référence à la charge cognitive. | Le professeur partage l’hypothèse que ce système permet de réduire la charge cognitive. Combiné avec les 2 lignes de dessus, nous avons donc confirmé l’orientation principale de ce travail dans l’étude de la réduction de charge mentale pour aider l’improvisateur jazz. |
+| Public Cible | \\\[PROFESSEUR\\\] : “On se trouve à un endroit, si je pense, open mind, où cet outil, on peut l'appliquer dans ce sens-là, dans n'importe quel niveau d'apprenant, je pense. Mais en même temps, l'outil, il faut l'adapter avec n'importe quel niveau d'épaisseur ou de complexité par rapport à l'apprenant qui est en train d'apprendre.” | Le public cible de l’artefact est donc réglable. Nous supposons que des critères comme : le choix des morceaux, le tempo, le choix des jeux, etc. entrent en matière. Par exemple, plus tard dans l’interview, le professeur a proposé, comme fonctionnalité pour les étudiants avancés, d’afficher des gammes de substitutions sur les dominantes (altéré, gamme par ton, hm5, lydien dominant, gamme diminuée, etc.). | Notre visons comme public cible des musiciens jazz avec un niveau de piano débutant à intermédiaire.Selon le professeur, la possibilité d’étendre le système avec d’autres modes de jeux et fonctionnalités pour les musiciens plus chevronnés reste ouverte. |
+| Pédagogie Alternative | \\\[PROFESSEUR\\\] : “L'école Suzuki, c'est un truc : tu singes le bordel qu'il y a. Mais maintenant, il y a même des choses avec audios et tout. Là-bas, c'est des cahiers avec des gommettes de couleurs, puis tu joues, puis tout le monde étudie en même temps. Donc, des systèmes d'apprentissage autres, avec un bout, une information partielle par rapport à la globalité, c'est peut-être ça la vraie discussion pour moi, ils existent déjà également, si jamais. C'est une simplification de la vraie histoire. C'est insister sur ou mettre un focus sur un des points, un des paramètres d'apprentissage ou de progression humaine dans l'apprentissage d'un sujet et éclairer, enfin éclairer, bref, mettre le focus sur un paramètre et le faire faire beaucoup.” | Voici ce que le professeur a dit quand la question était de savoir si l’artefact, potentiellement, limite l’apprentissage des bases du jazz. Sa réponse ancre l’artefact dans la lignée des méthodes d’enseignement musicales alternatives où en sacrifiant un paramètre, on arrive à développer un autre beaucoup plus. Implicitement, cela veut dire que l’artefact n’est en tout cas pas un outil qui permet d’aborder tout le savoir-faire nécessaire de l’improvisateur piano jazz. Ce n’est pas une méthodologie all-in-one. L’artefact permet de travailler qu’une partie de l’improvisation mélodique au piano. | En inscrivant l’artefact dans la lignée des pédagogies musicales alternatives, le qualifiant même à un moment de “pédagogie avant-garde”, le professeur justifie, à ses yeux, une utilité pédagogique de l’artefact. |
+| Pédagogie Alternative | \\\[PROF
+
+=========INTERPRETATION=========
+
+## **Interprétation des résultats**
+
+### NASA-TLX (“Raw TLX”)
+
+Avec le wilcoxon sur les scores composites des NASA-TLX, nous obtenons une valeure absolue de r de 0.5 (dans la direction qui favorise H1, donc que l’artefact réduit la charge cognitive).  Selon la littérature scientifique [\[20\]](https://www.zotero.org/google-docs/?BbYq2S), une valeur absolue de r \>= 0.5 est indicatif d’un effet large, que donc la projection a un effet large sur la réduction de la charge cognitive.
+
+  
+
+La valeur de p est de 0.125, au-dessus du seuil de significativité de 0.05. Nous ne pouvons donc pas rejeter l'hypothèse nulle H0. Concrètement : si l'artefact n'avait réellement aucun effet sur la charge cognitive, il y aurait tout de même 12,5% de chances d'observer, par hasard, un écart au moins aussi extrême que celui mesuré dans les tests. Il faut par conséquent tempérer la lecture de r.
+
+  
+
+Sur le graphique en pente des scores composites du NASA-TLX, nous remarquons que sur 8 participants, 6 s’orientent dans la direction en faveur de H1. Les participants P04 et P08 ont, au contraire, pensé que la projection ajoutait une charge cognitive importante à leur improvisation. La médiane indique toutefois une direction descendante en faveur de H1. Les participants P05, P06, P01 ont une mesure de réduction de charge cognitive importante (en observant le graphique ainsi que le tableau des scores). En effet, les trois changements de valeurs les plus drastiques sont en faveur de H1.
+
+  
+
+Sur le barchart des médianes des scores par question du NASA-TLX, nous remarquons que les médianes des scores dans la condition avec sont tous inférieures que les médianes sans. C’est particulièrement fort avec la question sur l’exigence mentale (critère phare de la question de réduction de charge cognitive que l’artefact essaie de favoriser) : le score passe de 75 à 35, cela semble fortement favoriser une réponse positive à notre sous-question 1. L’effort diminue aussi dans la condition avec, mais reste élevé. Il semble donc que la projection aide, mais la tâche d’improvisation reste toutefois exigeante.
+
+ 
+
+Nous discuterons des cas de P04 et P08 dans la section de croisement des regards. En observant les valeurs médianes et sommatives, il semblerait qu’il y a un impact positif dans la réduction de charge cognitive de l’artefact. Il y a donc qu’une minorité de participants qui font tendre les résultats dans le sens contraire de H1, et c’est ceci que nous allons essayer de comprendre dans la section de croisement des regards.
+
+### STAI-6
+
+La valeur absolue de “r” est de 0.44. Cela indique que le système a en tout cas un effet moyen sur l’anxiété perçue par les participants.[\[20\]](https://www.zotero.org/google-docs/?cFZ9zh) p a une valeur de 0.156 (la valeur exacte, pas l'approximation par loi normale), c’est, comme pour les résultats du NASA-TLX, trop élevé pour assurer que les résultats ont une significativité statistique forte.
+
+  
+
+En observant le graphique de pente du STAI-6, on remarque que même si  la médiane s’oriente en faveur de H1 (anxiété baissé dans la condition avec la projection), il reste quand même les participants P04, P07, P08 qui ont perçu une augmentation de l’anxiété ressentie dans l’usage du système. C’est particulièrement fort pour le participant P04 qui était beaucoup plus à l’aise sans la projection. 
+
+Toutefois, en regardant les rangs de Wilcoxon, la somme des rangs allant dans le sens de H1 (26) est supérieure à celle allant à contre-sens (10) : les deux plus forts écarts (P01 et P06) vont en faveur de H1, et viennent des participants les plus anxieux sans projection. La baisse d'anxiété, quand elle se produit, tend donc à être plus ample que la hausse d’anxiété, à une exception près : P04, dont la hausse égale en amplitude les fortes baisses de P03 et P05.
+
+Finalement, seuls 5 participants sur 8 ressentent l'impact positif. On ne peut donc pas affirmer une conclusion forte, ce résultat sur l'anxiété est indicatif et sous-puissant (car n = 8).
+
+### Questionnaire d’auto-efficacité
+
+La valeur absolue de "r" est de 0.36, dans la direction qui favorise H1 (ici l'artefact devrait augmenter la confiance, donc faire monter le score). C'est un effet moyen \[20\]. Mais p vaut 0.234, la plus haute des trois mesures : on ne peut pas rejeter H0, et il faut donc lire ce r avec beaucoup de prudence.
+
+  
+
+Le graphique en pente est le plus contrasté des trois. Cette fois la médiane ne va pas dans le sens de H1 : elle descend légèrement de 4.4 (sans) à 4.2 (avec). Toutefois, la pente plate de la médiane décrit la distribution des scores, alors que le le “r” a effet moyen indique l’ampleur des changements qui donc tend davantage à favoriser le sens de H1 que la médiane.
+
+  
+
+Sur 8 participants, 4 gagnent en confiance avec la projection (P01, P02, P05, P06), 3 en perdent (P04, P07, P08) et P03 reste identique (2.25 dans les deux cas). Les rangs wilcoxon penchent quand même vers H1 : la somme des rangs en faveur de H1 (19) dépasse celle à contresens (9), et les trois plus gros écarts vont tous dans le bon sens (P06 bondit de 2.5 à 6.25, puis P01 et P05).
+
+  
+
+En somme, c'est la mesure la plus faible entre le NASA-TLX et le STAI-6: seuls 4 participants sur 8 progressent, la médiane est plate et p est élevée. L'effet et les rangs vont dans le sens de H1, mais le résultat reste indicatif et sous-puissant (n = 8). Les cas de P04 et P08, encore à contre-sens ici, seront repris dans le croisement des regards. On ne peut donc difficilement affirmer, avec ces résultats, l’impact positif du système sur l’auto-efficacité des participants.
+
+### Interview des participants
+
+  
+  
+
+### Interview du professeur
+
+  
+
+### Croisement des regards
+
+  
+
+### Conclusion de l’interprétation
+
+  
+
+# **Conclusion (TODO)**
+
+TBD
+
+ 
+
+# **Bibliographie**
+
+[\[1\] G. Spice, “Literature Review of Jazz Improvisation Pedagogy,” Jan. 2010, Accessed: Nov. 16, 2025. \[Online\]. Available: https://www.academia.edu/1980578/Literature\_Review\_of\_Jazz\_Improvisation\_Pedagogy ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[2\] S. Reeves, *Creative jazz improvisation*, 3rd ed. Upper Saddle River, N.J: Prentice Hall, 2001. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[3\] H. Drury, *Creative Keyboard presents The pianist’s guide to blues, jazz & melodic improvisation*. Pacific, MO: Creative Keyboard Publications, 1993. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[4\] J. Coker, J. Casale, G. Campbell, and J. Greene, Eds., *Patterns for Jazz: for treble clef instruments*, 3. ed. Miami, Fla: Studio P/R, 1990. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[5\] O. Nelson, *Patterns for Improvisation*. Alfred Music, 2015. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[6\] C. Sher, *The improvisor’s bass method: for electric & acoustic bass*. Petaluma, CA: Sher Music, 2002. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[7\] D. Baker and D. Baker, *The Bebop scales and other scales in common use*. in How to play Bebop : for all instruments / David Baker, no. Vol. 1. Van Nuys, Calif: Alfred, 1985. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[8\] D. Baker and D. Baker, *Learning the Bebop language: patterns, formulae and other linking materials*. in How to play Bebop : for all instruments / David Baker, no. Vol. 2. Van Nuys, Calif: Alfred, 1985. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[9\] J. A. Deja *et al.*, “ImproVisAR: designing augmented reality piano roll for teaching improvisation,” *Virtual Real.*, vol. 29, no. 3, p. 140, Aug. 2025, doi: 10.1007/s10055-025-01215-z. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[10\] J. C. Martinez-Sevilla, F. Foscarin, P. Garcia-Iasci, D. Rizo, J. Calvo-Zaragoza, and G. Widmer, “Optical Music Recognition of Jazz Lead Sheets,” Aug. 31, 2025, *arXiv*: arXiv:2509.05329. doi: 10.48550/arXiv.2509.05329. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[11\] Y. E. Chyu, “Teaching improvisation to piano students of elementary to intermediate levels,” The Ohio State University, 2004. Accessed: Oct. 27, 2025. \[Online\]. Available: https://etd.ohiolink.edu/acprod/odb\_etd/etd/r/1501/10?clear=10\&p10\_accession\_num=osu1101867007 ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[12\] D. Greenblatt, *The Blues Scales: Essential Tools for Jazz Improvising*. Petaluma, CA: Sher: Sher Music, 2004. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[13\] MetricGate, “Wilcoxon Signed-Rank Median Test Calculator,” MetricGate. Accessed: Jun. 19, 2026. \[Online\]. Available: https://metricgate.com/docs/wilcoxon-signed-rank-test-for-median-difference/ ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[14\] “Wilcoxon signed-rank test,” *Wikipedia*. Mar. 19, 2026. Accessed: Jun. 19, 2026. \[Online\]. Available: https://en.wikipedia.org/w/index.php?title=Wilcoxon\_signed-rank\_test\&oldid=1344269584 ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[15\] “Hypothesis Test Calculator: t-test, ANOVA, chi-Square, ...” Accessed: Jun. 19, 2026. \[Online\]. Available: https://numiqo.com/statistics-calculator/hypothesis-test ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[16\] S. G. Hart and M. Field, “NASA-TASK LOAD INDEX (NASA-TLX); 20 YEARS LATER”. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[17\] “STAI Short Form Scoring Guide | PDF | Applied Psychology | Clinical Psychology,” Scribd. Accessed: Jun. 19, 2026. \[Online\]. Available: https://www.scribd.com/document/366801750/STAI-6item-Scoring-Bekker ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[18\] MetricGate, “Rank-Biserial Correlation Calculator,” MetricGate. Accessed: Jun. 19, 2026. \[Online\]. Available: https://metricgate.com/docs/rank-biserial-correlation/ ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[19\] “Wilcoxon Signed Rank test calculator.” Accessed: Jun. 19, 2026. \[Online\]. Available: https://www.statskingdom.com/175wilcoxon\_signed\_ranks.html ](https://www.zotero.org/google-docs/?Yk7giG)
+
+[\[20\] C. O. Fritz, P. E. Morris, and J. J. Richler, “Effect size estimates: Current use, calculations, and interpretation,” *J. Exp. Psychol. Gen.*, vol. 141, no. 1, pp. 2–18, 2012, doi: 10.1037/a0024338. ](https://www.zotero.org/google-docs/?Yk7giG)
+
+  

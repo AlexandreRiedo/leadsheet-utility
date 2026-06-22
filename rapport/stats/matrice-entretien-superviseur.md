@@ -211,7 +211,7 @@ Le professeur met en garde qu'il y a un risque de surcharge, l'opposé de la ré
 cognitive visée de l'artefact, car la densité d'information contenu dans l'affichage d'une
 nouvelle gamme pour chaque accord serait trop pour certains improvisateurs. Sa solution serait
 d'afficher des « gammes passe partout ». C'est une idée qui est explorée sans autre dans « The
-Blues Scales: Essential Tools for Jazz Improvising » [16] : il est possible de flouter le détail,
+Blues Scales: Essential Tools for Jazz Improvising » [12] : il est possible de flouter le détail,
 la spécificité locale de l'harmonie en prenant des gammes qui partagent assez de notes en commune
 ou qui ont une structure musicale très forte comme une gamme pentatonique. Typiquement, il est
 possible de jouer un jazz blues en alternant au bon moment la gamme blues majeure et la gamme
