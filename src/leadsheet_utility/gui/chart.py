@@ -200,7 +200,7 @@ def render_chart(
     header_h = band_h + 8
 
     # -- Title ---------------------------------------------------------------
-    title = f"{lead_sheet.title}  —  {lead_sheet.key}"
+    title = f"{lead_sheet.title}  :  {lead_sheet.key}"
     surface.blit(_font(30, bold=True).render(title, True, _TITLE), (margin, 11))
 
     # -- Grid geometry (auto-scaled to fit) ----------------------------------

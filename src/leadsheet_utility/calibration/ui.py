@@ -826,14 +826,14 @@ class CalibrationUI:
             low, high = self.midi_full_low, self.midi_full_high
             ep_label = "LOW" if self.active_endpoint is RangeEndpoint.LOW else "HIGH"
             lines = [
-                "Phase 1/5 — FULL range (projector's physical reach)",
+                "Phase 1/5 : FULL range (projector's physical reach)",
                 f"Active endpoint: {ep_label}   low MIDI {low}   high MIDI {high}",
                 "Tab: switch low/high    Left/Right: nudge (Shift = octave)",
                 "R: reset to defaults   Enter: next (markers)   Esc: cancel",
             ]
         elif self.phase is CalibrationPhase.MAIN:
             lines = [
-                f"Phase 2/5 — active marker: {MARKER_LABELS[self.active_idx]} ({self.active_idx + 1}/{NUM_MARKERS})",
+                f"Phase 2/5 : active marker: {MARKER_LABELS[self.active_idx]} ({self.active_idx + 1}/{NUM_MARKERS})",
                 "Drag markers, or use arrows (Shift = x10) to nudge. Tab cycles, 1-4 jumps.",
                 f"Black-key proportions:  width = {self.black_width_ratio:.2f}  height = {self.black_height_ratio:.2f}",
                 "Q / W  narrower / wider    A / S  shorter / longer    (Shift = x5)",
@@ -843,7 +843,7 @@ class CalibrationUI:
             midi = self._black_key_midis[self.active_black_idx]
             ox, oy = self.black_key_offsets.get(midi, (0.0, 0.0))
             lines = [
-                f"Phase 3/5 — tuning black key {self.active_black_idx + 1}/{len(self._black_key_midis)} (MIDI {midi})",
+                f"Phase 3/5 : tuning black key {self.active_black_idx + 1}/{len(self._black_key_midis)} (MIDI {midi})",
                 f"Offset: dx = {ox:+.0f}px  dy = {oy:+.0f}px",
                 "Arrows: nudge active key (Shift = x10)   Tab / Shift-Tab: prev / next key",
                 "R: reset all per-key offsets   Enter: next (exercise bands)   Esc: cancel",
@@ -857,7 +857,7 @@ class CalibrationUI:
             }[self.active_range_mode]
             ep_label = "LOW" if self.active_endpoint is RangeEndpoint.LOW else "HIGH"
             lines = [
-                f"Phase 4/5 — exercise {band_label}   "
+                f"Phase 4/5 : exercise {band_label}   "
                 f"(clipped to FULL {self.midi_full_low}-{self.midi_full_high})",
                 f"Active endpoint: {ep_label}   low MIDI {low}   high MIDI {high}",
                 "B: switch 1-OCT / 2-OCT    Tab: low/high    Left/Right: nudge (Shift = octave)",
@@ -865,7 +865,7 @@ class CalibrationUI:
             ]
         else:  # AUDIO_DELAY
             lines = [
-                "Phase 5/5 — audio delay tuning",
+                "Phase 5/5 : audio delay tuning",
                 f"Audio delay: {self.audio_delay_ms:+d} ms",
                 "Up / Down: +/- 1 ms (Shift = +/- 10 ms)   R: reset to 0",
                 "Enter: confirm and save   Esc: cancel",

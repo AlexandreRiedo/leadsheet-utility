@@ -452,11 +452,11 @@ def _compute_progress(state: TimelineState, lead_sheet: LeadSheet) -> float:
 
 
 _PHASE_LABELS: dict[CalibrationPhase, str] = {
-    CalibrationPhase.RANGE_EDIT: "1/5 — FULL range (projector reach)",
-    CalibrationPhase.MAIN: "2/5 — Markers & ratios",
-    CalibrationPhase.BLACK_KEY_TUNE: "3/5 — Per-key offsets",
-    CalibrationPhase.BAND_EDIT: "4/5 — 1-OCT / 2-OCT exercise bands",
-    CalibrationPhase.AUDIO_DELAY: "5/5 — Audio delay",
+    CalibrationPhase.RANGE_EDIT: "1/5 : FULL range (projector reach)",
+    CalibrationPhase.MAIN: "2/5 : Markers & ratios",
+    CalibrationPhase.BLACK_KEY_TUNE: "3/5 : Per-key offsets",
+    CalibrationPhase.BAND_EDIT: "4/5 : 1-OCT / 2-OCT exercise bands",
+    CalibrationPhase.AUDIO_DELAY: "5/5 : Audio delay",
 }
 
 _RANGE_LABELS: dict[RangeMode, str] = {
