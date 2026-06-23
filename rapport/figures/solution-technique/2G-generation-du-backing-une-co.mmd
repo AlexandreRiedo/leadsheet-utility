@@ -1,0 +1,10 @@
+flowchart TD
+    H["harmony.analyze()<br/>(accords + gammes)"] --> WB["walking_bass<br/>arcs directionnels,<br/>notes d'approche,<br/>variation chord-tone"]
+    H --> CP["comping<br/>voicings drop-2 / drop-3<br/>voice-leades,<br/>rythmes DeGreg"]
+    H --> DR["drums<br/>pattern swing<br/>(events.py)"]
+    MET["metronome<br/>(optionnel)"]
+    WB --> EV["MidiEvent[]<br/>une couche par instrument"]
+    CP --> EV
+    DR --> EV
+    MET --> EV
+    EV --> RND["renderer (FluidSynth hors-ligne)<br/>→ mix_layers"]

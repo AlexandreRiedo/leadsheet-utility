@@ -1,0 +1,11 @@
+flowchart TD
+    A["Pour chaque temps de la mesure (1, 2, 3, 4)"] --> B["Ride : 1 coup sur le temps<br/>(temps 1 vel 100 ; sinon vel 90)"]
+    B --> C{"temps 2 ou 4 ?"}
+    C -- oui --> D["Ride skip sur le 'and' swingue (vel 75)<br/>+ charleston au pied sur le temps (vel 80)"]
+    C -- non --> E{"temps 1 ?"}
+    D --> E
+    E -- oui --> FK["Grosse caisse sur le temps (vel 50)"]
+    E -- non --> G["Ghost snare : 25% sur le 'and' swingue de CE temps<br/>(and de 1 / 2 / 3 / 4), tres doux (vel 60)"]
+    FK --> G
+    G --> HM["humanize tous les coups (+/-5 ms, +/-10 vel)<br/>→ MidiEvent canal 9 (GM drums)"]
+    HM -. temps suivant .-> A

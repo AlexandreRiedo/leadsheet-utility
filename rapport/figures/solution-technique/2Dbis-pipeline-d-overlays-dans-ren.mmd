@@ -1,25 +1,15 @@
-flowchart TD
-    A["Accord projete<br/>(timeline + lead-time)"] --> B{"ChordToneMode<br/>= ONLY ?"}
-    B -- oui --> C["chord_tone_only_highlights"]
-    B -- non --> D["free_mode_highlights"]
-    C --> E{"Exercice = Contour ?"}
-    D --> E
-    E -- oui --> F["apply_contour_window<br/>(pre-filtre)"]
-    E -- non --> G
-    F --> G{"ChordToneMode<br/>= OVERLAY ?"}
-    G -- oui --> H["apply_chord_tone_highlight"]
-    G -- non --> I
-    H --> I{"Root active ?"}
-    I -- oui --> J["apply_root_highlight"]
-    I -- non --> K
-    J --> K{"Exercice = Guide Tone ?"}
-    K -- oui --> L["apply_guide_tone_highlight<br/>(next preview puis courant)"]
-    K -- non --> M
-    L --> M{"Exercice = Flow ?<br/>(fenetre fermee)"}
-    M -- oui --> N["highlights = [] (blackout)"]
-    M -- non --> O
-    N --> P
-    O --> P{"Exercice = Start/End ?"}
-    P -- oui --> Q["apply_start_end_highlight"]
-    P -- non --> R
-    Q --> R["render_canonical → warp → blit"]
+flowchart LR
+    subgraph col1 ["Base + pre-filtre + 1ers overlays"]
+        direction TB
+        A["Accord projete<br/>(timeline + lead-time)"] --> B["Base des highlights :<br/>chord_tone_only (si ONLY)<br/>sinon free_mode"]
+        B --> C["Filtre Contour :<br/>apply_contour_window<br/>(si exercice Contour)"]
+        C --> D["Overlay chord-tone :<br/>apply_chord_tone_highlight<br/>(si ChordToneMode OVERLAY)"]
+    end
+    subgraph col2 ["Overlays restants + sortie"]
+        direction TB
+        E["Overlay root :<br/>apply_root_highlight<br/>(si actif)"] --> F["Guide tone :<br/>apply_guide_tone_highlight<br/>(si exercice Guide Tone)"]
+        F --> G["Flow :<br/>blackout si fenetre fermee<br/>(si exercice Flow)"]
+        G --> H["Start/End :<br/>apply_start_end_highlight<br/>(si exercice Start/End)"]
+        H --> I["render_canonical<br/>→ warp → blit"]
+    end
+    col1 --> col2

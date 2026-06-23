@@ -22,9 +22,12 @@ cible sans tout perdre, chaque morceau est étiqueté :
 
 Règle générale : le corps explique le **principe** et les **3-4 décisions techniques
 intéressantes** ; les constantes exactes, listes exhaustives et numéros de ligne descendent
-en annexe ou restent ici. Estimation : la version [corps] tient en **~8-9 pages**, ce qui
-laisse de la marge. Tout transcrire (les 6 sous-systèmes en détail + les 5 diagrammes)
-dépasserait 11-13 pages denses.
+en annexe ou restent ici. Estimation : avec un **bloc par sous-système** tous promus en corps
+et illustrés (harmonie, backing, rendu audio, séquence de chargement, overlays, projection,
+boucle de jeu, timeline, interface), la version [corps] tend vers **~11-13 pages** et le haut
+du budget. Leviers de coupe si ça déborde, dans l'ordre : redescendre la **boucle de jeu (2.D)**
+puis le **pipeline d'overlays (2.D bis)** en annexe, plier **timeline** et **interface** en
+quelques phrases, et garder les chiffres exacts hors prose.
 
 ---
 
@@ -52,26 +55,37 @@ le plan de Carusi tel quel serait une erreur : on adapte au flux
 Fusion du détail de Carusi et du squelette pipeline de Courtin. Pour chaque section :
 le contenu, la figure, les fichiers source, la thèse de référence.
 
-### 4.1 Vue d'ensemble : une architecture en pipeline  [corps]
-- **Contenu :** poser le principe avant les pièces (consigne récurrente de Patrick).
-  Une grille est lue, l'harmonie analysée, l'info utile projetée en temps réel sur les
-  touches, synchronisée à un backing track généré. Un seul processus, une seule horloge.
-- **Figure :** *Diagramme de flux haut niveau* (cf. §2.A).
-- **Source :** `src/leadsheet_utility/` (les 8 modules), `main.py:509-521` (la boucle).
-- **Référence :** Carusi Fig.8 (architecture du système).
+### 4.1 Architecture  [corps]
+Section unique : 4.1 (vue d'ensemble) et 4.2 (architecture du code) fusionnées. Le flux et
+les dépendances sont deux beats d'une même histoire ; les séparer en deux titres obligeait à
+re-lister les 8 modules en table juste après les avoir parcourus en prose. On garde les **deux
+diagrammes** (ils encodent des flèches opposées : données vs imports), on supprime le doublon.
 
-### 4.2 Architecture du code  [corps]
-- **Contenu :** les 8 modules et leurs dépendances ; pourquoi un pipeline (chaque étape
-  pure et testable, l'audio pré-rendu élimine l'ordonnancement temps réel). Glisser ici, en
-  un paragraphe, le **placement multi-fenêtre** (HUD / grille / projecteur, un par écran) et
-  la **conscience DPI** Windows (ex-§4.6) : gestion d'environnement, pas géométrie de projection.
-- **Figures :** *Diagramme de modules* (cf. §2.B) **[corps]** + tableau des 8 modules
-  **[corps]**. L'**arborescence ASCII complète** de `src/leadsheet_utility/` part en
-  **[annexe]** (Carusi la met dans le corps, mais c'est du remplissage optionnel).
-- **Source :** tableau des modules en §3 ; `main.py:326-392` (écrans), `main.py:23-32` (DPI).
-- **Référence :** Carusi (arborescence p.25), Courtin (4.2 structure du projet).
+- **Contenu :** poser le principe avant les pièces (consigne récurrente de Patrick) : un seul
+  processus, une seule horloge, un pipeline. La section enchaîne quatre temps :
+  1. **Le flux (vue dynamique)** : une grille est lue, l'harmonie analysée, l'info utile
+     projetée en temps réel sur les touches, synchronisée à un backing track généré
+     (`parser → harmonie → exercices → projection`, + branche `backing → rendu → mix → lecture`).
+  2. **Les dépendances (vue statique)** : `main.App` orchestre ; `harmony` / `timeline`
+     dépendent de `leadsheet` ; `exercises` de `harmony` ; `projection` de `calibration`.
+     Bien distinguer du flux : une flèche d'import n'est pas une flèche de données.
+  3. **Pourquoi un pipeline** (l'argument que le jury sondera) : chaque étape est une fonction
+     pure et testable (d'où les tests fixtures de l'harmonie) ; l'audio **pré-rendu** supprime
+     tout ordonnancement temps réel, ce qui réduit le tout à une boucle **mono-thread** 60 FPS
+     lisant une horloge murale (seuls le worker de rendu et le pool de 4 couches sont threadés).
+  4. **Environnement** : placement **multi-fenêtre** (HUD / grille / projecteur, un par écran)
+     et **conscience DPI** Windows : gestion d'environnement, pas géométrie de projection.
+- **Figures :** *Diagramme de flux haut niveau* (2.A) **[corps]** + *Diagramme de modules /
+  dépendances* (2.B) **[corps]**. La **table des 8 modules** et l'**arborescence ASCII** de
+  `src/leadsheet_utility/` partent en **[annexe]** : la prose du flux fait déjà le tour module
+  par module, une table dans le corps la redoublerait (Carusi met l'arborescence dans le corps,
+  mais c'est du remplissage optionnel).
+- **Source :** `src/leadsheet_utility/` (les 8 modules) ; `main.py:509-521` (la boucle) ;
+  `main.py:326-392` (écrans) ; `main.py:23-32` (DPI). Table des modules en §3.
+- **Référence :** Carusi Fig.8 (architecture du système) + arborescence p.25 ; Courtin 4.2
+  (structure du projet).
 
-### 4.3 Outils et choix techniques (besoin → choix → justification)  [corps]
+### 4.2 Outils et choix techniques (besoin → choix → justification)  [corps]
 - **Contenu :** un **tableau besoin → choix → pourquoi** (Patrick refuse le tableau
   "le LLM recommande X" : on documente ce qu'on a CHOISI et POURQUOI). Stack réel :
 
@@ -80,46 +94,70 @@ le contenu, la figure, les fichiers source, la thèse de référence.
   | Multi-fenêtre dans un seul processus (projecteur plein écran + HUD + grille) | **pygame-ce** | `pygame.Window` permet plusieurs fenêtres natives ; pygame standard non |
   | Synthèse audio hors-ligne d'événements MIDI | **FluidSynth** (`pyfluidsynth`) + SoundFont GM | rendu sans driver audio, `get_samples()` libère le GIL (rendu parallèle) |
   | Correction de la perspective du projecteur | **OpenCV** (`cv2.warpPerspective`) | homographie planaire = une seule transformation, calibration robuste |
-  | Sommation/mix des couches, géométrie | **numpy** | somme int16 en microsecondes, bascule de couche instantanée |
+  | Mix audio des couches et format d'échange avec OpenCV | **numpy** | (1) somme des couches en microsecondes (bascule de couche instantanée, limiteur sur le pic) ; (2) format des données géométriques qu'OpenCV consomme et produit : quads de points de calibration, homographie 3×3, buffers d'image, plus la transposition d'axes entre la convention pygame (x, y) et la convention image (ligne, colonne) |
   | Analyse harmonique | **maison** (dictionnaire + arithmétique mod-12) | décision KISS : pas de dépendance lourde (music21) pour une table de correspondance |
+  | Modélisation des données (grille, accords, surbrillances) | **`dataclasses` + `enum`** (bibliothèque standard) | enregistrements typés légers (`__init__` / `__repr__` / `__eq__` générés), avec `frozen=True` là où l'immuabilité compte (objets-valeurs : `KeyRect`, surbrillances, motifs d'exercices) et mutables pour les agrégats de domaine (`LeadSheet`, `Calibration`) ; pas d'ORM ni de framework lourd, dans la lignée KISS de l'harmonie maison |
   | Gestion d'environnement | **Poetry** (`package-mode = false`) | reproductible, groupe `stats` séparé (scipy + matplotlib) |
+  | Tests et qualité de code | **`pytest`** (+ fixtures) et **`ruff`** | les tests fixtures de l'harmonie matérialisent l'argument "chaque étape est une fonction pure et testable" de la §4.1 ; `ruff` assure lint et format |
 
-- **Source :** `pyproject.toml:10-15` (deps), `:24-26` (groupe stats), `:9` (Python 3.13+).
+  Ces six premières lignes couvrent l'intégralité des dépendances tierces effectivement
+  importées par l'artefact (vérifié : seuls `pygame`, `numpy`, `cv2` et `fluidsynth` le
+  sont, le reste relève de la bibliothèque standard). Les deux dernières lignes relèvent de
+  l'outillage de développement, pas de l'exécution. `scipy` / `matplotlib` (groupe `stats`)
+  et `pypdf` (impression des protocoles de test) servent au chapitre Évaluations, pas ici.
+
+- **Source :** `pyproject.toml:10-15` (deps runtime), `:17-20` (groupe dev : pytest, ruff,
+  pypdf), `:24-26` (groupe stats), `:9` (Python 3.13+).
 - **Référence :** Courtin 4.1 (outils utilisés), annotation Patrick p.13.
 
-### 4.4 Le diagramme de phase / séquence (demande explicite de Patrick)  [corps]
-- **Contenu :** **un seul** diagramme dans le corps, **2.C** (séquence de chargement et de
-  rendu) : c'est le point technique fort (rendu parallèle non bloquant, count-in, démarrage
-  synchronisé) et il satisfait à lui seul la demande "diagramme de phase haut niveau".
-- **[annexe] / prose :** la **boucle 60 FPS (2.D)** et le **pipeline d'overlays (2.D bis)**
-  partent en annexe ou se disent en deux phrases. La calibration étant un assistant
-  **linéaire** à 5 phases, l'énumération "RANGE → MAIN → BLACK_KEY → BAND → AUDIO_DELAY
-  (Enter avance, Esc annule)" vaut mieux qu'un diagramme d'états : **2.E n'est plus en corps**.
-- **Référence :** style Carusi (déploiement / cas d'usage), mais en séquence.
+### 4.3 Les briques techniques  [corps]
+Le chapitre suit le flux du pipeline (§2.A) et consacre un **bloc par sous-système**, la plupart
+avec leur schéma façon Huynh ("un diagramme par brique"). Détail vérifié et chiffres citables en
+§3. La prose reste au niveau du **principe** et des **décisions intéressantes** ; constantes
+exactes et listes exhaustives → [annexe]. Seul **2.E** (machine à états de la calibration) reste
+hors corps : l'assistant étant linéaire, une énumération suffit.
 
-### 4.5 Les briques techniques  [corps]
-Quatre blocs **[corps]** (les plus distinctifs), deux pliés en bref. Détail vérifié et
-chiffres citables en §3.
-
-**Les 4 blocs développés [corps] :**
-1. **Analyse harmonique** : table qualité→gamme, mod-12, lignes de guide tones voice-leadées,
-   le système de priorités (overrides d'extension → règles de contexte → défaut). Dire
-   "système de priorités" en une à deux phrases ; la **liste des 7 règles → [annexe]**.
-3. **Rendu audio en couches parallèles + cache + mix** : l'argument "bascule instantanée"
-   (le point technique le plus fort). Les **chiffres exacts** (CC7 60/85/115, gain 2.5×,
-   numéros de programme GM) → **[annexe]** ou note de bas de page, pas dans la prose.
-4. **Projection et calibration (géométrie)** : une seule histoire. Image canonique 1920×200
-   → homographie (`cv2.warpPerspective`) → projecteur ; l'homographie vient d'un assistant de
-   **calibration à 5 phases** (énumérées en prose, cf. §4.4) ; plus le *projection lead* qui
-   masque la latence. (Absorbe l'ex-§4.6 ; le multi-fenêtre / DPI passe en §4.2.)
-5. **Pipeline d'overlays des exercices** : base → filtre Contour → chord-tone / root /
-   guide tone / Flow / Start&End. Décrit en prose ; le **flowchart complet 2.D bis → [annexe]**.
-
-**Les 2 blocs pliés en bref [corps bref] :**
-2. **Génération du backing** : une phrase (walking bass à arcs directionnels, batterie swing,
-   comping drop-2/drop-3 voice-leadé). Schéma façon Huynh **[annexe]** si la place manque.
-6. **Timeline et mode boucle** : deux phrases (horloge perf_counter, `wrap_around`, forme
-   temporaire).
+1. **Analyse harmonique** (+ schéma **2.F**) : table qualité→gamme, mod-12, et le **système de
+   priorités** (overrides d'extension → pré-passe chaînes → règles de contexte → défaut) ; plus
+   les lignes de guide tones voice-leadées (deux chemins 3ce/7e). Dire "système de priorités" en
+   deux phrases ; la **liste des 7 règles → [annexe]**.
+2. **Génération du backing** (+ vue d'ensemble **2.G** ; détail par instrument **2.H** basse,
+   **2.I** comping, **2.J** batterie) : trois générateurs algorithmiques indépendants (walking bass
+   à arcs directionnels avec notes d'approche, comping drop-2/drop-3 voice-leadé sur motifs DeGreg,
+   batterie swing), chacun produisant une couche d'événements MIDI. En corps : la vue d'ensemble
+   2.G et le **principe** de chaque générateur ; les trois schémas de détail (2.H/2.I/2.J) →
+   [annexe] (en remonter un en corps pour illustrer si la place le permet).
+3. **Rendu audio en couches parallèles + cache + mix** : le point technique le plus fort. Quatre
+   couches rendues **en parallèle** (une instance FluidSynth par couche, GIL libéré), cache int16
+   par couche, et **bascule instantanée** par somme numpy (basculer métronome / densité ne
+   re-rend jamais). Les **chiffres exacts** (CC7 60/85/115, gain 2.5×, programmes GM) → [annexe]
+   ou note de bas de page.
+4. **Séquence de chargement** (+ séquence **2.C**) : l'orchestration temporelle, ouverture →
+   parse + analyse → rendu **asynchrone non bloquant** (worker + écran "Rendering audio...") →
+   count-in 2 mesures → **démarrage synchronisé** horloge/audio. C'est le "diagramme de phase
+   haut niveau" demandé par Patrick (la seule figure de séquence du corps).
+5. **Pipeline d'overlays des exercices** (+ flowchart **2.D bis**, deux colonnes A4) : base →
+   filtre Contour → chord-tone / root / guide tone / Flow / Start&End. Insister sur la
+   **composition** : chord-tone et root sont des sous-toggles **orthogonaux** (actifs sous
+   n'importe quel exercice), les autres sont conditionnés par l'exercice sélectionné.
+6. **Projection et calibration (géométrie)** : une seule histoire. Image canonique 1920×200 →
+   homographie (`cv2.warpPerspective`) → projecteur ; l'homographie vient d'un assistant de
+   **calibration à 5 phases** (énumérées en prose : RANGE → MAIN → BLACK_KEY → BAND → AUDIO_DELAY) ;
+   plus le *projection lead* qui masque la latence. Illustrée par une **photo** (bande canonique
+   vs. rendu projeté sur les touches), pas un schéma : la géométrie se montre, elle ne se diagramme
+   pas. (Absorbe l'ex-§4.6 ; le multi-fenêtre / DPI passe en §4.1.)
+7. **Boucle de jeu (60 FPS)** (+ flowchart **2.D**) : boucle **mono-thread** unique, séquence par
+   frame (events → update render → count-in → état timeline → changement d'accord → projection /
+   HUD / grille → tick). L'argument : pas de scheduling temps réel grâce à l'audio pré-rendu.
+8. **Timeline et mode boucle** (sans schéma, trivial) : horloge wall-clock (perf_counter),
+   recherche dichotomique de l'accord, mode `wrap_around` ; le **mode boucle** transforme les
+   barres sélectionnées en forme temporaire ré-analysée et re-rendue (basse/comping varient à
+   chaque passage), pendant que la grille continue d'afficher le morceau d'origine. Deux à trois
+   phrases.
+9. **Interface (GUI)** (sans schéma algorithmique) : HUD (info morceau, accord courant/suivant,
+   transport, count-in), grille style iReal Pro (`render_chart`, bande de boucle), mapping clavier
+   par enum. À illustrer par des **captures d'écran** (HUD + grille) [corps si la place le permet,
+   sinon annexe].
 
 ---
 
@@ -194,7 +232,7 @@ sequenceDiagram
     Note over App: l'ecran "Rendering audio..." couvre toute la phase de rendu
 ```
 
-### 2.D — Boucle de jeu (60 FPS)  [annexe / au choix]
+### 2.D — Boucle de jeu (60 FPS)  [corps]
 
 ```mermaid
 flowchart TD
@@ -210,38 +248,32 @@ flowchart TD
     TK --> F
 ```
 
-### 2.D bis — Pipeline d'overlays dans `_render_projection`  [annexe]
+### 2.D bis — Pipeline d'overlays dans `_render_projection` (deux colonnes A4)  [corps]
 
-> Ordre exact vérifié (`main.py:1686-1793`). Les overlays chord-tone et root sont des
-> sous-toggles orthogonaux (actifs sous n'importe quel exercice) ; Contour / Guide Tone /
-> Flow / Start&End sont conditionnés par l'exercice sélectionné.
+> Ordre exact vérifié (`main.py:1686-1793`). Réécrit en **chaîne linéaire d'étapes optionnelles**
+> (la condition devient l'étiquette de l'étape, plus de losanges imbriqués) pour tenir sur une
+> A4 en deux colonnes. Les overlays chord-tone et root sont des sous-toggles **orthogonaux**
+> (actifs sous n'importe quel exercice) ; Contour / Guide Tone / Flow / Start&End sont
+> conditionnés par l'exercice sélectionné. Lecture : colonne de gauche de haut en bas, puis
+> colonne de droite de haut en bas (inverser les flèches de la colonne 2 si l'on veut le
+> serpentin bas-gauche → haut-droite).
 
 ```mermaid
-flowchart TD
-    A["Accord projete<br/>(timeline + lead-time)"] --> B{"ChordToneMode<br/>= ONLY ?"}
-    B -- oui --> C["chord_tone_only_highlights"]
-    B -- non --> D["free_mode_highlights"]
-    C --> E{"Exercice = Contour ?"}
-    D --> E
-    E -- oui --> F["apply_contour_window<br/>(pre-filtre)"]
-    E -- non --> G
-    F --> G{"ChordToneMode<br/>= OVERLAY ?"}
-    G -- oui --> H["apply_chord_tone_highlight"]
-    G -- non --> I
-    H --> I{"Root active ?"}
-    I -- oui --> J["apply_root_highlight"]
-    I -- non --> K
-    J --> K{"Exercice = Guide Tone ?"}
-    K -- oui --> L["apply_guide_tone_highlight<br/>(next preview puis courant)"]
-    K -- non --> M
-    L --> M{"Exercice = Flow ?<br/>(fenetre fermee)"}
-    M -- oui --> N["highlights = [] (blackout)"]
-    M -- non --> O
-    N --> P
-    O --> P{"Exercice = Start/End ?"}
-    P -- oui --> Q["apply_start_end_highlight"]
-    P -- non --> R
-    Q --> R["render_canonical → warp → blit"]
+flowchart LR
+    subgraph col1 ["Base + pre-filtre + 1ers overlays"]
+        direction TB
+        A["Accord projete<br/>(timeline + lead-time)"] --> B["Base des highlights :<br/>chord_tone_only (si ONLY)<br/>sinon free_mode"]
+        B --> C["Filtre Contour :<br/>apply_contour_window<br/>(si exercice Contour)"]
+        C --> D["Overlay chord-tone :<br/>apply_chord_tone_highlight<br/>(si ChordToneMode OVERLAY)"]
+    end
+    subgraph col2 ["Overlays restants + sortie"]
+        direction TB
+        E["Overlay root :<br/>apply_root_highlight<br/>(si actif)"] --> F["Guide tone :<br/>apply_guide_tone_highlight<br/>(si exercice Guide Tone)"]
+        F --> G["Flow :<br/>blackout si fenetre fermee<br/>(si exercice Flow)"]
+        G --> H["Start/End :<br/>apply_start_end_highlight<br/>(si exercice Start/End)"]
+        H --> I["render_canonical<br/>→ warp → blit"]
+    end
+    col1 --> col2
 ```
 
 ### 2.E — Machine à états de la calibration (5 phases)  [annexe — optionnel, la prose suffit]
@@ -261,9 +293,126 @@ stateDiagram-v2
     AUDIO_DELAY --> [*]: Esc
 ```
 
+### 2.F — Résolution de gamme : le système de priorités (harmonie)  [corps]
+
+> Vérifié `core.py:184-241` (cascade `resolve_scale`) + `:88-177` (pré-passe
+> `_assign_chain_overrides`) + `:406-421` (ordre dans `analyze`). Lecture en **échelle de
+> priorité** : une pré-passe sur la séquence tague d'abord les accords de chaînes (règles
+> 3/4/7), puis chaque accord descend les tests **dans l'ordre, le premier vrai gagne** (sortie
+> "oui" vers le résultat à droite, sinon on tombe au test suivant). Plus clair que deux losanges
+> fourre-tout : l'ordre exact des règles devient lisible.
+
+```mermaid
+flowchart TD
+    CE["ChordEvent<br/>(root, qualite, extensions, basse)"] --> PRE["Pre-passe sur la sequence (1x)<br/>_assign_chain_overrides :<br/>regles 3/4 (chaines ii-V, I-vi-ii-V)<br/>+ regle 7 (ii-V-i mineur)<br/>tag chain_override sur certains accords"]
+    PRE --> T1{"1. Override d'extension ?<br/>(minmaj7 ; ou 7 avec #9/#5/#11/b5/b9/b13/13)"}
+    T1 -- non --> T2{"2. Slash 7sus4 ?"}
+    T2 -- non --> T3{"3. Regle 1 : 7 vers mineur (V vers i) ?"}
+    T3 -- non --> T4{"4. Regle 2 : substitution tritonique ?"}
+    T4 -- non --> T5{"5. chain_override present ? (regles 3/4/7)"}
+    T5 -- non --> T6{"6. Regle 5 : IV en contexte majeur ?"}
+    T6 -- non --> T7{"7. Regle 6 : hdim7 isole ?"}
+    T7 -- non --> T8["8. Defaut : lookup qualite vers gamme"]
+    T1 -- oui --> R1["gamme d'extension<br/>(altered / whole tone / lydien dom. /<br/>half-whole / phrygien dom. /<br/>mixolydien / melodique mineure)"]
+    T2 -- oui --> R2["mixolydien"]
+    T3 -- oui --> R3["phrygien dominant"]
+    T4 -- oui --> R4["lydien dominant"]
+    T5 -- oui --> R5["mode diatonique<br/>(dorien / phrygien / eolien / ionien)"]
+    T6 -- oui --> R6["lydien"]
+    T7 -- oui --> R7["locrien nat9"]
+    R1 --> OUT["gamme resolue, puis par accord :<br/>scale_notes, chord_tones,<br/>guide_tones, available_tensions"]
+    R2 --> OUT
+    R3 --> OUT
+    R4 --> OUT
+    R5 --> OUT
+    R6 --> OUT
+    R7 --> OUT
+    T8 --> OUT
+    OUT --> GTL["apres la boucle :<br/>ligne de guide tones<br/>(2 chemins voice-leades 3ce/7e,<br/>assignation a mouvement minimal)"]
+```
+
+### 2.G — Génération du backing (une couche par instrument)  [corps]
+
+> Modèle Huynh "un schéma par brique". Vue d'ensemble (corps) : les générateurs sont
+> indépendants, chacun émet sa propre liste de `MidiEvent`, consommée par le renderer (cf. bloc
+> rendu audio / séquence 2.C). Le détail algorithmique de chaque instrument est dans **2.H**
+> (basse), **2.I** (comping) et **2.J** (batterie) ci-dessous, à garder en [annexe] (en
+> remonter un seul en corps si l'on veut illustrer le propos).
+
+```mermaid
+flowchart TD
+    H["harmony.analyze()<br/>(accords + gammes)"] --> WB["walking_bass<br/>arcs directionnels,<br/>notes d'approche,<br/>variation chord-tone"]
+    H --> CP["comping<br/>voicings drop-2 / drop-3<br/>voice-leades,<br/>rythmes DeGreg"]
+    H --> DR["drums<br/>pattern swing<br/>(events.py)"]
+    MET["metronome<br/>(optionnel)"]
+    WB --> EV["MidiEvent[]<br/>une couche par instrument"]
+    CP --> EV
+    DR --> EV
+    MET --> EV
+    EV --> RND["renderer (FluidSynth hors-ligne)<br/>→ mix_layers"]
+```
+
+### 2.H — Walking bass : construction par mesure (basse)  [annexe]
+
+> Vérifié `walking_bass.py:178-224` (`_walk_four`), `:278-296` (contrôleur de phrase),
+> `:108-146` (notes d'approche). Registre E1-C3, une noire par temps.
+
+```mermaid
+flowchart TD
+    A["Accord analyse<br/>(chord_tones, scale_notes,<br/>root, accord suivant)"] --> B["Beat 1 : fondamentale<br/>(5te/3ce si mesure de continuation)"]
+    B --> C["Beats 2-3 : marche dans la direction de phrase<br/>mix chord tones / scale tones<br/>(ou chord-tones-only) ; arche occasionnelle 5%"]
+    C --> D["Beat 4 : note d'approche vers la fondamentale suivante<br/>(25% approche dominante P4 dessous / P5 dessus,<br/>sinon pas diatonique)"]
+    D --> E["dedup notes repetees<br/>4 noires = 4 MidiEvent (canal 0, GM Acoustic Bass)"]
+    E --> F{"fin de phrase (1-2 mes.)<br/>ou limite de registre E1-C3 ?"}
+    F -- non --> B
+    F -- oui --> G["inverser (ou forcer) la direction ;<br/>60% : streak chord-tones-only 1-2 mes."]
+    G --> B
+    D -. accord de 2 temps .-> H["fondamentale + approche<br/>(2 MidiEvent)"]
+```
+
+### 2.I — Comping : fenêtre 2 mesures + voicing (guitare)  [annexe]
+
+> Vérifié `comping.py:141-205` (boucle fenêtre + hit), `comping_rhythms.py:161-169`
+> (`pick_pattern`), `comping_voicings.py:99-151` (`candidate_voicings` / `best_voicing`).
+
+```mermaid
+flowchart TD
+    A["Debut de fenetre (2 mesures glissantes)"] --> B["pick_pattern : si >=2 mes. libres,<br/>50% motif 2-mes. sinon motif 1-mes.<br/>(pool DeGreg : 12 x 1-mes + 4 x 2-mes)"]
+    B --> C{"pour chaque hit du motif"}
+    C --> D{"skip 20% ?"}
+    D -- oui --> C
+    D -- non --> E["resoudre l'accord du hit<br/>(anticipation des motifs 2-mes. : harmonie de la mesure 2)"]
+    E --> F["best_voicing : candidats drop-2 / drop-3<br/>(toutes octaves de fondamentale en registre)<br/>celui qui minimise le mouvement depuis le voicing precedent"]
+    F --> G["omettre la fondamentale (la basse l'a)<br/>emit : swing, strum bas vers haut, humanize (vel / timing)"]
+    G --> C
+    C -- motif termine --> I["avancer la fenetre<br/>(window += longueur du motif)"]
+    I --> A
+```
+
+### 2.J — Batterie swing : motif par mesure (drums)  [annexe]
+
+> Vérifié `events.py:102-164` (`generate_drums`). Canal 9 (GM drums), humanize sur tous les
+> coups, `swing_ratio` 0.67 par défaut. Distinction clé : le **ride skip** ne tombe que sur le
+> "and" de 2 et 4 ; le **ghost snare** n'est lié à aucun temps : il est tiré à **chaque** temps,
+> sur le "and" swingué de ce temps (donc le and de 1, 2, 3 ou 4), à 25% indépendant.
+
+```mermaid
+flowchart TD
+    A["Pour chaque temps de la mesure (1, 2, 3, 4)"] --> B["Ride : 1 coup sur le temps<br/>(temps 1 vel 100 ; sinon vel 90)"]
+    B --> C{"temps 2 ou 4 ?"}
+    C -- oui --> D["Ride skip sur le 'and' swingue (vel 75)<br/>+ charleston au pied sur le temps (vel 80)"]
+    C -- non --> E{"temps 1 ?"}
+    D --> E
+    E -- oui --> FK["Grosse caisse sur le temps (vel 50)"]
+    E -- non --> G["Ghost snare : 25% sur le 'and' swingue de CE temps<br/>(and de 1 / 2 / 3 / 4), tres doux (vel 60)"]
+    FK --> G
+    G --> HM["humanize tous les coups (+/-5 ms, +/-10 vel)<br/>→ MidiEvent canal 9 (GM drums)"]
+    HM -. temps suivant .-> A
+```
+
 ---
 
-## 3. Faits techniques vérifiés (matière première des blocs §4.5)  [plan]
+## 3. Faits techniques vérifiés (matière première des blocs §4.3)  [plan]
 
 > Matière première, ne pas copier telle quelle dans le rapport : on en tire la prose
 > [corps] et on renvoie les énumérations / chiffres exacts en [annexe].
@@ -297,6 +446,17 @@ stateDiagram-v2
   numérotées (1 V7→min, 2 tritone, 3/4 chaînes ii-V, 5 IV→lydien, 6 hdim7, 7 i mineur de
   ii-V-i), dont 3, 4 et 7 dans une pré-passe (`_assign_chain_overrides`), en plus des
   overrides d'extension. Corrigé dans CLAUDE.md et SPEC.md (2026-06-22).
+
+### Génération du backing (`backing/walking_bass.py`, `comping*.py`, `events.py`)
+- **Walking bass** : arcs de direction de phrase, variation par chord-tone, notes d'approche
+  chromatiques / diatoniques. `walking_bass.py`.
+- **Comping** : voicings drop-2 / drop-3 avec optimisation de voice-leading, joués **rootless**
+  (la fondamentale est gardée pour le voice-leading mais omise à l'émission, `COMP_OMIT_ROOT`,
+  pour laisser le grave à la basse) ; 12 patterns rythmiques swing 1-mesure + 4 sur 2 mesures
+  (Phil DeGreg) avec anticipations. `comping.py`, `comping_voicings.py`, `comping_rhythms.py`.
+- **Batterie + métronome + count-in** : générateurs de patterns swing et de clic. `events.py`.
+- Chaque générateur émet une **liste de `MidiEvent`** indépendante ⇒ une couche par instrument,
+  consommée par le renderer. Schéma : §2.G.
 
 ### Rendu audio en couches parallèles (`backing/renderer.py`, `main.py`)
 - **4 couches** rendues en parallèle dans un `ThreadPoolExecutor(max_workers=4)` lancé
@@ -347,6 +507,15 @@ stateDiagram-v2
   threads (worker + `ThreadPoolExecutor`). Pas de scheduling temps réel grâce à l'audio
   pré-rendu.
 
+### Interface (`gui/`)
+- **HUD** (`hud.py`) : info morceau, accord courant / suivant, sélecteur d'exercice, barre de
+  progression, raccourcis, indicateur de mode frozen, grille de count-in.
+- **Grille style iReal Pro** (`chart.py`, `render_chart`) : 4 mesures par ligne, auto-échelle
+  pour qu'une forme de 32+ mesures tienne à l'écran, cellule active surlignée, bande de boucle
+  (amber en édition / bleu confirmée).
+- **Mapping clavier** (`input.py`) : mapping touche → action par enum.
+- Pas de schéma algorithmique : à montrer par **captures d'écran** (HUD + grille).
+
 ---
 
 ## 4. Corrections relevées pendant la vérification (propagées dans CLAUDE.md + SPEC.md le 2026-06-22)
@@ -383,17 +552,31 @@ stateDiagram-v2
 | Ligne de guide tones voice-leadée | `core.py:275-381` |
 | Multi-fenêtre / placement par écran | `main.py:326-392` |
 | Conscience DPI Windows | `main.py:23-32` |
+| Walking bass (arcs, approche, variation) | `backing/walking_bass.py` |
+| Comping rootless drop-2/3 + rythmes DeGreg | `backing/comping.py`, `comping_voicings.py`, `comping_rhythms.py` |
+| Patterns batterie / métronome / count-in | `backing/events.py` |
+| Interface (HUD / grille iReal / mapping) | `gui/hud.py`, `chart.py`, `input.py` |
 | Stack des dépendances | `pyproject.toml:9-15`, `:24-26` |
 
 ---
 
-## 6. Diagrammes à produire en priorité (rappel)
+## 6. Diagrammes à produire (par ordre de priorité)
 
-Trois figures suffisent pour le corps :
-1. **2.A pipeline** + **2.B modules** (l'ossature du chapitre).
-2. **2.C séquence de rendu** (le point technique fort : rendu parallèle non bloquant ;
-   c'est aussi le "diagramme de phase" demandé par Patrick).
+**Ossature (indispensable) :**
+1. **2.A pipeline** + **2.B modules** (l'architecture, §4.1).
+2. **2.C séquence de chargement** (le point fort : rendu parallèle non bloquant ; le
+   "diagramme de phase" demandé par Patrick).
 
-Le reste part en annexe ou se dit en prose : **2.D** (boucle 60 FPS), **2.D bis** (pipeline
-d'overlays), **2.E** (calibration). La calibration étant un assistant linéaire à 5 phases,
-une simple énumération vaut mieux qu'un diagramme d'états.
+**Un schéma par brique (modèle Huynh) :**
+3. **2.F** résolution de gamme (harmonie), **2.G** vue d'ensemble du backing.
+4. **2.D bis** pipeline d'overlays (version deux colonnes A4), **2.D** boucle de jeu.
+5. **Détail backing par instrument** (annexe) : **2.H** walking bass, **2.I** comping,
+   **2.J** batterie swing.
+
+**Figures non-Mermaid :**
+6. **Photo** projection : bande canonique vs. rendu projeté sur les touches (proto-media).
+7. **Captures d'écran** : HUD + grille style iReal Pro.
+
+**Hors corps :** **2.E** (machine à états de la calibration) reste en annexe ou en prose,
+l'assistant étant linéaire (RANGE → MAIN → BLACK_KEY → BAND → AUDIO_DELAY). Premiers leviers
+de coupe si le chapitre déborde : redescendre **2.D** puis **2.D bis** en annexe (cf. légende).
