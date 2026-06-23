@@ -1,0 +1,25 @@
+flowchart TB
+    T0(["Play : instant t0 partage"])
+    T0 --> A0["sound.play()"]
+    T0 --> V0["timeline.play()<br/>memorise t0"]
+
+    subgraph AUDIO ["Audio : tourne librement"]
+        direction TB
+        A0 --> A1["mixer SDL, thread audio<br/>cadence par la carte son"]
+        A1 --> A2["lit le buffer pre-rendu<br/>jusqu'a la fin, sans la boucle"]
+    end
+
+    subgraph VISUEL ["Visuel : re-ancre a chaque frame"]
+        direction TB
+        V0 --> V1["boucle 60 FPS"]
+        V1 --> V2["lit perf_counter<br/>secondes depuis t0"]
+        V2 --> V3["recalcule TimelineState<br/>beat + accord"]
+        V3 --> V4["redessine projection / HUD / grille"]
+        V4 -->|frame suivante| V1
+    end
+
+    A2 -. "aucun feedback<br/>ne se parlent jamais" .- V3
+
+    RT{{"Temps reel"}}
+    A1 -. ancre sur .-> RT
+    V2 -. ancre sur .-> RT

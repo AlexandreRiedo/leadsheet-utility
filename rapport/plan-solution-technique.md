@@ -410,6 +410,44 @@ flowchart TD
     HM -. temps suivant .-> A
 ```
 
+### 2.K — Synchronisation fire-and-forget (audio libre, visuel re-ancré)  [corps]
+
+> Vérifié `main.py:1091-1094` (`_update_count_in` : `sound.play()` + `timeline.play()` au même
+> instant, fin du count-in) et `:1250-1254` (reprise). Idée : un seul instant de départ partagé
+> (`t0`), puis deux processus indépendants. L'audio pré-rendu (cf. 2.C) joue librement sur la
+> carte son ; la boucle 60 FPS (cf. 2.D) recalcule la position depuis `perf_counter` à chaque
+> frame. Aucun feedback entre les deux : ils restent alignés parce qu'ils sont tous deux ancrés
+> au temps réel, pas parce que l'un suit l'autre. Illustre l'argument central de la boucle de jeu
+> (§4.3.7) et de la timeline (§4.3.8).
+
+```mermaid
+flowchart TB
+    T0(["Play : instant t0 partage"])
+    T0 --> A0["sound.play()"]
+    T0 --> V0["timeline.play()<br/>memorise t0"]
+
+    subgraph AUDIO ["Audio : tourne librement"]
+        direction TB
+        A0 --> A1["mixer SDL, thread audio<br/>cadence par la carte son"]
+        A1 --> A2["lit le buffer pre-rendu<br/>jusqu'a la fin, sans la boucle"]
+    end
+
+    subgraph VISUEL ["Visuel : re-ancre a chaque frame"]
+        direction TB
+        V0 --> V1["boucle 60 FPS"]
+        V1 --> V2["lit perf_counter<br/>secondes depuis t0"]
+        V2 --> V3["recalcule TimelineState<br/>beat + accord"]
+        V3 --> V4["redessine projection / HUD / grille"]
+        V4 -->|frame suivante| V1
+    end
+
+    A2 -. "aucun feedback<br/>ne se parlent jamais" .- V3
+
+    RT{{"Temps reel"}}
+    A1 -. ancre sur .-> RT
+    V2 -. ancre sur .-> RT
+```
+
 ---
 
 ## 3. Faits techniques vérifiés (matière première des blocs §4.3)  [plan]

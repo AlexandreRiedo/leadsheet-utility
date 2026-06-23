@@ -18,6 +18,7 @@ une copie régénérable.
 | `2H-walking-bass-construction-pa` | 2.H Walking bass (détail par mesure) | annexe |
 | `2I-comping-fenetre-2-mesures-vo` | 2.I Comping (fenêtre 2 mesures + voicing) | annexe |
 | `2J-batterie-swing-motif-par-mes` | 2.J Batterie swing (motif par mesure) | annexe |
+| `2K-synchronisation-fire-and-for` | 2.K Synchronisation fire-and-forget (audio libre / visuel re-ancré) | corps |
 
 Pour le corps du rapport : **2.A, 2.B, 2.C, 2.F, 2.G** et, selon la place, **2.D bis** puis
 **2.D** (cf. plan §6). Le détail backing par instrument (**2.H / 2.I / 2.J**) et **2.E**
