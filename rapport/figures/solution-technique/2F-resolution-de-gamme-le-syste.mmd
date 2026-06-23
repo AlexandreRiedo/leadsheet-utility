@@ -1,4 +1,4 @@
-flowchart TD
+flowchart LR
     CE["ChordEvent<br/>(root, qualite, extensions, basse)"] --> PRE["Pre-passe sur la sequence (1x)<br/>_assign_chain_overrides :<br/>regles 3/4 (chaines ii-V, I-vi-ii-V)<br/>+ regle 7 (ii-V-i mineur)<br/>tag chain_override sur certains accords"]
     PRE --> T1{"1. Override d'extension ?<br/>(minmaj7 ; ou 7 avec #9/#5/#11/b5/b9/b13/13)"}
     T1 -- non --> T2{"2. Slash 7sus4 ?"}
