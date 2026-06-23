@@ -1,0 +1,16 @@
+flowchart TD
+    LS["Lead sheet<br/>.tsv + .meta.json"] --> P["leadsheet<br/>(parser)"]
+    P --> H["harmony<br/>(analyze)"]
+    H --> EX["exercises<br/>(highlights)"]
+    EX --> PR["projection<br/>(canonique + warp)"]
+    PR --> PW["Fenêtre projecteur"]
+
+    H --> B["backing<br/>(MIDI)"]
+    B --> R["renderer<br/>(FluidSynth hors-ligne)"]
+    R --> MX["mix_layers<br/>(somme numpy)"]
+    MX --> AU["pygame.mixer"]
+
+    TL["timeline<br/>(horloge perf_counter)"]
+    TL -. pilote .-> EX
+    TL -. pilote .-> HUD["gui (HUD + chart)"]
+    AU -. démarrée en phase .-> TL

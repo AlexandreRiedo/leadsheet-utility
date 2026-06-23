@@ -1,0 +1,25 @@
+flowchart TD
+    A["Accord projete<br/>(timeline + lead-time)"] --> B{"ChordToneMode<br/>= ONLY ?"}
+    B -- oui --> C["chord_tone_only_highlights"]
+    B -- non --> D["free_mode_highlights"]
+    C --> E{"Exercice = Contour ?"}
+    D --> E
+    E -- oui --> F["apply_contour_window<br/>(pre-filtre)"]
+    E -- non --> G
+    F --> G{"ChordToneMode<br/>= OVERLAY ?"}
+    G -- oui --> H["apply_chord_tone_highlight"]
+    G -- non --> I
+    H --> I{"Root active ?"}
+    I -- oui --> J["apply_root_highlight"]
+    I -- non --> K
+    J --> K{"Exercice = Guide Tone ?"}
+    K -- oui --> L["apply_guide_tone_highlight<br/>(next preview puis courant)"]
+    K -- non --> M
+    L --> M{"Exercice = Flow ?<br/>(fenetre fermee)"}
+    M -- oui --> N["highlights = [] (blackout)"]
+    M -- non --> O
+    N --> P
+    O --> P{"Exercice = Start/End ?"}
+    P -- oui --> Q["apply_start_end_highlight"]
+    P -- non --> R
+    Q --> R["render_canonical → warp → blit"]

@@ -1,0 +1,12 @@
+stateDiagram-v2
+    [*] --> RANGE_EDIT
+    RANGE_EDIT --> MAIN: Enter
+    MAIN --> BLACK_KEY_TUNE: Enter
+    BLACK_KEY_TUNE --> BAND_EDIT: Enter
+    BAND_EDIT --> AUDIO_DELAY: Enter
+    AUDIO_DELAY --> [*]: Enter (confirme + sauvegarde)
+    RANGE_EDIT --> [*]: Esc (annule)
+    MAIN --> [*]: Esc
+    BLACK_KEY_TUNE --> [*]: Esc
+    BAND_EDIT --> [*]: Esc
+    AUDIO_DELAY --> [*]: Esc

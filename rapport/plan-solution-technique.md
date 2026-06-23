@@ -62,11 +62,13 @@ le contenu, la figure, les fichiers source, la thèse de référence.
 
 ### 4.2 Architecture du code  [corps]
 - **Contenu :** les 8 modules et leurs dépendances ; pourquoi un pipeline (chaque étape
-  pure et testable, l'audio pré-rendu élimine l'ordonnancement temps réel).
+  pure et testable, l'audio pré-rendu élimine l'ordonnancement temps réel). Glisser ici, en
+  un paragraphe, le **placement multi-fenêtre** (HUD / grille / projecteur, un par écran) et
+  la **conscience DPI** Windows (ex-§4.6) : gestion d'environnement, pas géométrie de projection.
 - **Figures :** *Diagramme de modules* (cf. §2.B) **[corps]** + tableau des 8 modules
   **[corps]**. L'**arborescence ASCII complète** de `src/leadsheet_utility/` part en
   **[annexe]** (Carusi la met dans le corps, mais c'est du remplissage optionnel).
-- **Source :** voir le tableau des modules en §3.
+- **Source :** tableau des modules en §3 ; `main.py:326-392` (écrans), `main.py:23-32` (DPI).
 - **Référence :** Carusi (arborescence p.25), Courtin (4.2 structure du projet).
 
 ### 4.3 Outils et choix techniques (besoin → choix → justification)  [corps]
@@ -85,14 +87,15 @@ le contenu, la figure, les fichiers source, la thèse de référence.
 - **Source :** `pyproject.toml:10-15` (deps), `:24-26` (groupe stats), `:9` (Python 3.13+).
 - **Référence :** Courtin 4.1 (outils utilisés), annotation Patrick p.13.
 
-### 4.4 Diagrammes de phase / séquence haut niveau (demande explicite de Patrick)  [corps]
-- **Contenu :** garder **deux** diagrammes dans le corps : **2.C** (séquence de rendu,
-  le point technique fort : rendu parallèle non bloquant) **[corps]** et **2.E** (machine
-  à états de calibration, littéralement un "diagramme de phases", trivial à produire)
-  **[corps]**. La **boucle de jeu 2.D** et le **pipeline d'overlays 2.D bis** sont
-  intéressants mais coûteux en place : au plus un des deux en corps, l'autre en
-  **[annexe]** ou résumé en deux phrases.
-- **Référence :** style Carusi (déploiement / cas d'usage), mais en séquence/état.
+### 4.4 Le diagramme de phase / séquence (demande explicite de Patrick)  [corps]
+- **Contenu :** **un seul** diagramme dans le corps, **2.C** (séquence de chargement et de
+  rendu) : c'est le point technique fort (rendu parallèle non bloquant, count-in, démarrage
+  synchronisé) et il satisfait à lui seul la demande "diagramme de phase haut niveau".
+- **[annexe] / prose :** la **boucle 60 FPS (2.D)** et le **pipeline d'overlays (2.D bis)**
+  partent en annexe ou se disent en deux phrases. La calibration étant un assistant
+  **linéaire** à 5 phases, l'énumération "RANGE → MAIN → BLACK_KEY → BAND → AUDIO_DELAY
+  (Enter avance, Esc annule)" vaut mieux qu'un diagramme d'états : **2.E n'est plus en corps**.
+- **Référence :** style Carusi (déploiement / cas d'usage), mais en séquence.
 
 ### 4.5 Les briques techniques  [corps]
 Quatre blocs **[corps]** (les plus distinctifs), deux pliés en bref. Détail vérifié et
@@ -105,7 +108,10 @@ chiffres citables en §3.
 3. **Rendu audio en couches parallèles + cache + mix** : l'argument "bascule instantanée"
    (le point technique le plus fort). Les **chiffres exacts** (CC7 60/85/115, gain 2.5×,
    numéros de programme GM) → **[annexe]** ou note de bas de page, pas dans la prose.
-4. **Projection** : image canonique 1920×200 → homographie → projecteur ; le *projection lead*.
+4. **Projection et calibration (géométrie)** : une seule histoire. Image canonique 1920×200
+   → homographie (`cv2.warpPerspective`) → projecteur ; l'homographie vient d'un assistant de
+   **calibration à 5 phases** (énumérées en prose, cf. §4.4) ; plus le *projection lead* qui
+   masque la latence. (Absorbe l'ex-§4.6 ; le multi-fenêtre / DPI passe en §4.2.)
 5. **Pipeline d'overlays des exercices** : base → filtre Contour → chord-tone / root /
    guide tone / Flow / Start&End. Décrit en prose ; le **flowchart complet 2.D bis → [annexe]**.
 
@@ -114,12 +120,6 @@ chiffres citables en §3.
    comping drop-2/drop-3 voice-leadé). Schéma façon Huynh **[annexe]** si la place manque.
 6. **Timeline et mode boucle** : deux phrases (horloge perf_counter, `wrap_around`, forme
    temporaire).
-
-### 4.6 Calibration et multi-écran  [corps]
-- **Contenu :** la machine à 5 phases (diagramme 2.E), `getPerspectiveTransform`, la
-  conscience DPI (Windows), le placement d'une fenêtre par écran. **À garder court**
-  (0.5-1 p).
-- **Source :** `calibration/ui.py:59-64`, `main.py:23-32` (DPI), `main.py:326-392` (écrans).
 
 ---
 
@@ -131,7 +131,7 @@ chiffres citables en §3.
 ### 2.A — Pipeline / flux de données (haut niveau)  [corps]
 
 ```mermaid
-flowchart LR
+flowchart TD
     LS["Lead sheet<br/>.tsv + .meta.json"] --> P["leadsheet<br/>(parser)"]
     P --> H["harmony<br/>(analyze)"]
     H --> EX["exercises<br/>(highlights)"]
@@ -144,7 +144,7 @@ flowchart LR
     MX --> AU["pygame.mixer"]
 
     TL["timeline<br/>(horloge perf_counter)"]
-    TL -. pilote .-> PR
+    TL -. pilote .-> EX
     TL -. pilote .-> HUD["gui (HUD + chart)"]
     AU -. démarrée en phase .-> TL
 ```
@@ -218,33 +218,33 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Accord projete<br/>(timeline + lead-time)"] --> B{ChordToneMode<br/>= ONLY ?}
+    A["Accord projete<br/>(timeline + lead-time)"] --> B{"ChordToneMode<br/>= ONLY ?"}
     B -- oui --> C["chord_tone_only_highlights"]
     B -- non --> D["free_mode_highlights"]
-    C --> E{Exercice = Contour ?}
+    C --> E{"Exercice = Contour ?"}
     D --> E
     E -- oui --> F["apply_contour_window<br/>(pre-filtre)"]
     E -- non --> G
-    F --> G{ChordToneMode<br/>= OVERLAY ?}
+    F --> G{"ChordToneMode<br/>= OVERLAY ?"}
     G -- oui --> H["apply_chord_tone_highlight"]
     G -- non --> I
-    H --> I{Root active ?}
+    H --> I{"Root active ?"}
     I -- oui --> J["apply_root_highlight"]
     I -- non --> K
-    J --> K{Exercice = Guide Tone ?}
+    J --> K{"Exercice = Guide Tone ?"}
     K -- oui --> L["apply_guide_tone_highlight<br/>(next preview puis courant)"]
     K -- non --> M
-    L --> M{Exercice = Flow ?<br/>(fenetre fermee)}
+    L --> M{"Exercice = Flow ?<br/>(fenetre fermee)"}
     M -- oui --> N["highlights = [] (blackout)"]
     M -- non --> O
     N --> P
-    O --> P{Exercice = Start/End ?}
+    O --> P{"Exercice = Start/End ?"}
     P -- oui --> Q["apply_start_end_highlight"]
     P -- non --> R
     Q --> R["render_canonical → warp → blit"]
 ```
 
-### 2.E — Machine à états de la calibration (5 phases)  [corps]
+### 2.E — Machine à états de la calibration (5 phases)  [annexe — optionnel, la prose suffit]
 
 ```mermaid
 stateDiagram-v2
@@ -389,8 +389,11 @@ stateDiagram-v2
 
 ## 6. Diagrammes à produire en priorité (rappel)
 
+Trois figures suffisent pour le corps :
 1. **2.A pipeline** + **2.B modules** (l'ossature du chapitre).
-2. **2.C séquence de rendu** (le point technique fort : rendu parallèle non bloquant).
-3. **2.E machine à états de calibration** (trivial, et c'est littéralement un "diagramme de
-   phases").
-4. **2.D / 2.D bis** si la place le permet (boucle + pipeline d'overlays).
+2. **2.C séquence de rendu** (le point technique fort : rendu parallèle non bloquant ;
+   c'est aussi le "diagramme de phase" demandé par Patrick).
+
+Le reste part en annexe ou se dit en prose : **2.D** (boucle 60 FPS), **2.D bis** (pipeline
+d'overlays), **2.E** (calibration). La calibration étant un assistant linéaire à 5 phases,
+une simple énumération vaut mieux qu'un diagramme d'états.
