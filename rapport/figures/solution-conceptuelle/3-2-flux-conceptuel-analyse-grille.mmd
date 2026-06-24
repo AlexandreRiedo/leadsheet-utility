@@ -1,0 +1,16 @@
+flowchart TD
+    LS["Grille d'accords<br/>(lead sheet)"] --> AN["Analyse harmonique<br/>une chord-scale par accord"]
+
+    AN --> PROJ
+    AN ~~~ CLK
+    AN --> BACK
+
+    EX["Modes de jeu<br/>(les cinq exercices)"] -. sélectionnent les touches éclairées .-> PROJ
+    CLK(["Horloge musicale commune<br/>même accord au même instant"]) -. synchronise .-> PROJ
+    CLK -. synchronise .-> BACK
+
+    PROJ["Projection lumineuse<br/>sur les touches"] --> KEYS["Touches éclairées<br/>et codées en couleur"]
+    BACK["Backing track<br/>(walking bass, comping, batterie)"] --> AUDIO["Accompagnement sonore"]
+
+    KEYS --> USER(["L'utilisateur improvise<br/>de la main droite"])
+    AUDIO --> USER

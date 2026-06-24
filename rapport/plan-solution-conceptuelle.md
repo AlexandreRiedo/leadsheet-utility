@@ -71,6 +71,23 @@ la même UI à deux altitudes) :
 
 ---
 
+## Légende d'arbitrage (altitude de chaque morceau)
+
+Même système que `plan-solution-technique.md`, adapté au chapitre conceptuel :
+
+- **[corps]** : prose du chapitre. Réservé aux éléments qui portent un **argument** (lien QR,
+  pédagogie, cadre AR/DR, validation du professeur). Un paragraphe = un concept.
+- **[table]** : entre dans le **tableau récapitulatif** (§3.10), pas en prose. Sert le "indiquer
+  tout ce qui a été fait" de Patrick sans gonfler le texte.
+- **[annexe]** : énumérations exhaustives, valeurs exactes des réglages, raccourcis clavier.
+  Renvoyées à un guide utilisateur en annexe.
+
+**Règle :** une feature ne gagne un paragraphe de prose que si elle porte un concept distinct ;
+sinon, une ligne de tableau. Les **variantes d'un même mode** (largeurs, longueurs, vitesses)
+sont des [table]/[annexe], jamais des [corps].
+
+---
+
 ## Structure proposée du chapitre
 
 Ordre calé sur Mehmeti (problème → ingestion → présentation → cœur) et sur les puces de
@@ -114,21 +131,70 @@ a été fait".
 ### 3.2 Vue d'ensemble : le diagramme du système et le flux analyse → grille  [corps]
 
 - **Contenu :** la pièce que Patrick réclame en premier. Trois figures :
-  1. le **schéma du système** (DS Fig.3 : projecteur / piano / ordinateur) ;
-  2. le **diagramme des exigences** (DS Fig.1, déjà fait) ;
-  3. un **diagramme de flux conceptuel analyse → grille** : *lead sheet* → parser →
-     harmonie → *chord-scale* par accord → projection (+ exercices), avec la branche
-     *backing track*. C'est l'analogue de la Fig.2 de Carusi (modélisation conceptuelle)
-     et de la Fig.7 de Courtin (schéma de proposition). À dessiner (Mermaid ou éditeur).
-- **Prose (amorce) :**
+  1. le **schéma du système** (projecteur surplombant le piano + ordinateur). **À produire :
+     ce schéma n'est pas dans le DS** (le DS ne contient que le diagramme des exigences, sa
+     Fig.1, et la photo du système de Sandnes/Eika, sa Fig.2 ; il n'y a pas de Fig.3). Soit
+     un dessin à faire, soit le remplacer par une photo réelle du montage (cf. §3.9) ;
+  2. le **diagramme des exigences** (DS Fig.1, déjà fait) : finalité (développer les capacités
+     d'improvisation jazz au piano) → objectifs BI 1 (fournir un environnement de piano
+     augmenté) et BI 2 (proposer des jeux d'improvisation utilisant la projection) → exigences
+     fonctionnelles F1-F7 (lire un *lead sheet*, générer un *backing track*, augmenter le
+     piano par projection, afficher en temps réel la *chord-scale*, contour, *flow*) ;
+  3. un **diagramme de flux conceptuel analyse → grille** (ci-dessous ; source `.mmd` et
+     rendu PNG dans `figures/solution-conceptuelle/`) : la grille d'accords → analyse
+     harmonique → *chord-scale* par accord → deux branches synchronisées, projection
+     (modulée par les exercices) et *backing track*, convergeant vers l'utilisateur. C'est
+     l'analogue de la Fig.2 de Carusi (modélisation conceptuelle) et de la Fig.7 de Courtin
+     (schéma de proposition).
 
-  > Le flux conceptuel de l'artefact part d'un objet unique : la grille d'accords. Une fois
-  > lue, elle est analysée pour attribuer une gamme à chaque accord ; cette information
+```mermaid
+flowchart TD
+    LS["Grille d'accords<br/>(lead sheet)"] --> AN["Analyse harmonique<br/>une chord-scale par accord"]
+
+    AN --> PROJ
+    AN ~~~ CLK
+    AN --> BACK
+
+    EX["Modes de jeu<br/>(les cinq exercices)"] -. sélectionnent les touches éclairées .-> PROJ
+    CLK(["Horloge musicale commune<br/>même accord au même instant"]) -. synchronise .-> PROJ
+    CLK -. synchronise .-> BACK
+
+    PROJ["Projection lumineuse<br/>sur les touches"] --> KEYS["Touches éclairées<br/>et codées en couleur"]
+    BACK["Backing track<br/>(walking bass, comping, batterie)"] --> AUDIO["Accompagnement sonore"]
+
+    KEYS --> USER(["L'utilisateur improvise<br/>de la main droite"])
+    AUDIO --> USER
+```
+
+- **Prose :**
+
+  > La vue d'ensemble de l'artefact s'appuie sur trois figures. Le diagramme des exigences
+  > (figure X) formalise les objectifs énoncés plus haut : sous une finalité unique,
+  > développer les capacités d'improvisation jazz au piano, il distingue deux grands
+  > objectifs. Le premier, fournir un environnement de piano augmenté, couvre la lecture de la
+  > grille, son analyse harmonique, la génération d'un *backing track* et l'affichage en temps
+  > réel de la *chord-scale* de chaque accord. Le second, proposer des jeux d'improvisation
+  > utilisant la projection, regroupe les exercices construits par-dessus cet environnement.
+  > Le premier objectif est l'infrastructure, le second en est l'usage pédagogique. Un second
+  > schéma situe le dispositif physique : un projecteur surplombe le clavier et un ordinateur
+  > pilote l'ensemble.
+  >
+  > La troisième figure (figure Y) décrit le flux conceptuel de l'artefact, et c'est elle qui
+  > en résume le mieux le principe. Le flux part d'un objet unique : la grille d'accords. Une
+  > fois lue, elle est analysée pour attribuer une gamme à chaque accord ; cette information
   > alimente d'un côté la projection lumineuse, de l'autre la génération du *backing track*.
-  > Les deux sorties partagent la même horloge, ce qui garantit que les lumières et le son
-  > décrivent à tout instant le même accord.
+  >
+  > Les deux sorties partagent la même horloge musicale, ce qui garantit que les lumières et
+  > le son décrivent à tout instant le même accord. Les modes de jeu, eux, n'interviennent
+  > qu'en aval de la projection : ils sélectionnent, parmi les touches éclairables, celles qui
+  > restent affichées, sans rien changer à l'accompagnement. Tout converge enfin vers
+  > l'utilisateur, qui improvise de la main droite en lisant les touches éclairées et en
+  > s'appuyant sur le contexte sonore. C'est cette architecture, une source et deux sorties
+  > synchronisées, qui rend l'ensemble cohérent : son point de partage est l'analyse
+  > harmonique automatique, à laquelle nous consacrons la section suivante.
 
-- **Figures :** DS Fig.3, DS Fig.1, + nouveau diagramme de flux conceptuel.
+- **Figures :** schéma du système (à produire ou photo, cf. §3.9), DS Fig.1 (exigences),
+  + diagramme de flux conceptuel ci-dessus.
 - **Référence :** Carusi Fig.2 ; Courtin Fig.7 ; Mehmeti 3.1.
 
 ### 3.3 L'analyse harmonique : du chiffrage à la chord-scale  [corps]  ← cœur conceptuel
@@ -258,15 +324,16 @@ a été fait".
   augmentée). La colonne "Tendance" indique seulement de quel côté chaque mode penche : les
   modes qui "diminuent" éteignent davantage de touches pourtant éclairables (fenêtre, blackout).
 
-- **Paramètres par exercice (à mentionner : ils montrent la finesse de réglage) :** chaque
-  exercice expose ses propres réglages, qui dosent sa difficulté. Guide Tone change de voix
-  (3ce/7e) et peut afficher en orange un aperçu du *guide tone* de l'accord suivant ; Contour
-  règle la largeur de sa fenêtre et sa vitesse de dérive ; Flow choisit la longueur de ses
-  phrases ; Start & End fixe la longueur de phrase (2, 4 ou 8 mesures). Une convention visuelle
-  commune traverse ces modes : quand une note montrée (aperçu, *target note*) n'appartient pas
-  à la gamme de l'accord en cours, elle est hachurée, signe qu'il faut la voir sans encore la
-  jouer. C'est la traduction visuelle de l'anticipation : on prépare l'oreille à l'accord qui
-  vient.
+- **Réglages et convention (arbitré) :**
+  - **[corps], une phrase :** chaque exercice expose des réglages qui dosent sa difficulté (les
+    valeurs exactes sont au tableau §3.10).
+  - **[corps], à garder en prose car ça porte un concept :** une convention visuelle commune,
+    quand une note montrée (aperçu d'un *guide tone*, *target note*) n'appartient pas à la gamme
+    de l'accord en cours, elle est hachurée, signe qu'il faut la voir sans encore la jouer.
+    C'est la traduction visuelle de l'anticipation.
+  - **[table] → §3.10 :** les variantes (Contour ±2/±3/±5 et 4-8 / 2-4 / 1-2 mes. par arc, Flow
+    court/moyen/long, Start & End 2/4/8 mes., voix 3ce/7e + aperçu de Guide Tone). Ne pas les
+    énumérer en prose.
 - **Figure :** DS Fig.4 (Gm7, Start & End, photo réelle) + 1-2 photos des autres modes.
 - **Référence :** Carusi liste de fonctionnalités ; Huynh "un module = un encart".
 
@@ -360,14 +427,46 @@ a été fait".
 - **Figures :** capture du chart iReal + photos réelles de projection (DS Fig.11/13 du draft).
 - **Référence :** Carusi "Prototype interactif" ; Huynh "Prototype Design".
 
+### 3.10 Récapitulatif des fonctionnalités  [table]  ← satisfait "tout ce qui a été fait"
+
+- **Contenu :** un tableau unique listant toutes les fonctionnalités et leurs variantes, pour
+  répondre à la consigne "indiquer tout ce qui a été fait" sans alourdir la prose. C'est ici
+  qu'atterrissent les énumérations retirées des sections [corps]. Raccourcis clavier et
+  constantes exactes restent en annexe (guide utilisateur).
+
+  | Bloc | Fonctionnalité | Variantes / réglages |
+  |---|---|---|
+  | Projection | Code couleur | gamme (vert), fondamentale (bleu), chord tones (bleu clair), guide tone / note de départ (rouge), cible (orange) |
+  | Projection | Registre | complet / main droite / 2 octaves / 1 octave |
+  | Projection | Mode chord tones | off / seuls / overlay |
+  | Projection | Overlay fondamentale | on / off |
+  | Projection | Anticipation | off / croche / noire |
+  | Exercice | Mode libre (cat. 1) | base de tous les autres modes |
+  | Exercice | Guide Tone (cat. 2) | voix 3ce/7e, décalage d'octave, aperçu de l'accord suivant |
+  | Exercice | Contour (cat. 6) | largeur ±2/±3/±5, vitesse 4-8 / 2-4 / 1-2 mes. par arc, re-roll |
+  | Exercice | Flow (cat. 6) | phrasé court / moyen / long |
+  | Exercice | Start & End (cat. 6) | longueur de phrase 2 / 4 / 8 mes., re-roll |
+  | Accompagnement | Densité | aucune / batterie / batterie+basse / complet |
+  | Accompagnement | Métronome + tempo | métronome on/off, tempo réglable, count-in de 2 mesures |
+  | Pratique | Frozen | étude statique d'un accord, pas-à-pas |
+  | Pratique | Boucle | sélection de mesures, forme temporaire, backing régénéré à chaque passe |
+  | Grilles | Corpus | études (vamp, ii-V-I 12 tons, mineur) + standards gradués (drill/easy/medium/pro) |
+  | Affichage | Trois fenêtres | HUD, grille style iReal Pro (+ bande de boucle), fenêtre projecteur |
+  | Calibration | Assistant 5 phases | tessiture, coins, touches noires, bandes d'exercice, délai audio |
+
+- **Placement :** une page max, en clôture du chapitre (ou en ouverture, comme la liste de
+  fonctionnalités de Carusi en début de Proposition). Le "comment" renvoie au chapitre Solution
+  technique ; les raccourcis clavier à un guide utilisateur en annexe.
+- **Référence :** Carusi (liste de fonctionnalités en début de Proposition).
+
 ---
 
 ## Budget et ordre de rédaction
 
-- **Budget :** 9-11 pages (le détail des features pousse vers le haut). Répartition indicative :
-  3.1 (0.75 p, cœur AR/DR), 3.2 (1.5 p, 3 figures), 3.3 (0.75 p, + profondeur/cohérence),
-  3.4 (1 p), 3.5 (1.75 p, + registres), 3.6 (2 p, photos + params), 3.7 (0.5 p),
-  3.8 (1.5 p, réglages + corpus + boucle), 3.9 (1 p, captures).
+- **Budget :** ~9-10 pages après arbitrage (la prose redescend, les énumérations passent au
+  tableau §3.10). Répartition indicative : 3.1 (0.75 p, cœur AR/DR), 3.2 (1.5 p, 3 figures),
+  3.3 (0.75 p), 3.4 (1 p), 3.5 (1.75 p), 3.6 (1.5 p, prose compressée), 3.7 (0.5 p),
+  3.8 (1.5 p), 3.9 (1 p), 3.10 (0.5 p, tableau récap).
 - **Leviers de coupe si ça déborde :** plier 3.7 (backing) en un paragraphe dans 3.2 ; réduire
   les paramètres par exercice de 3.6 à une phrase + renvoi à un guide utilisateur en annexe ;
   fusionner frozen dans 3.8 en une ligne.
@@ -379,6 +478,7 @@ a été fait".
   un tableau + une photo ; renvoyer les captures multiples de 3.8 en annexe.
 - **Ordre conseillé :** 3.1 (le cadre AR/DR, vrai cœur conceptuel, à soigner) → 3.4 (OMR,
   déjà calé) → 3.5 (projection + registres) → 3.8 (réglages + boucle, bridge vers le prof) →
-  3.2 (diagrammes) → 3.3 (analyse, court) → 3.6 (reprise DS + params) → 3.7 → 3.9.
+  3.2 (diagrammes) → 3.3 (analyse, court) → 3.6 (reprise DS, prose compressée) → 3.7 → 3.9 →
+  3.10 (tableau récap en dernier, rempli depuis les sections rédigées).
 - **Dépendance :** 3.5 et 3.6 pointent vers le chapitre Évaluations (séquence AVEC, profils) :
   garder les renvois cohérents avec le chapitre 5.
