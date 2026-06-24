@@ -91,6 +91,14 @@ poetry run ruff check .
 
 # Format
 poetry run ruff format .
+
+# Assemble the final report: insert the annex PDFs after their title/separator
+# pages in the base. Interview script -> after base p.80 ("Questions de
+# l'interview..."); participant session -> after base p.81 ("Feuille de route...").
+# Base = rapport/final_export/to_finalize.pdf; output = rapport/final_export/
+# Projet de Bachelor - Alexandre RIEDO.pdf. Insertion points are in INSERTIONS
+# inside the script; --base / --output override the paths.
+poetry run python scripts/append_annexes.py
 ```
 
 The `src/` layout is configured via `[tool.pytest.ini_options] pythonpath = ["src"]` in `pyproject.toml` so pytest can find `leadsheet_utility` without installing it.
