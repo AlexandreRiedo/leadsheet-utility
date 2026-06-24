@@ -61,7 +61,7 @@ la même UI à deux altitudes) :
 | Code couleur | le vocabulaire (root=bleu, gamme=vert, *chord tones*=bleu clair…) + pourquoi | `render_canonical`, surface 1920×200, surbrillances |
 | 3 schémas de projection | l'échelle d'aide progressive (= séquence AVEC des tests) | pipeline d'overlays composables, ordre, `apply_*` |
 | Anticipation | réponse à la charge "anticiper l'accord suivant" (QR1) | lead matériel 160 ms, décalage musical, math du *look-ahead* |
-| Display iReal | représentation conventionnelle + base de comparaison (condition SANS) | fenêtre, auto-échelle, bande de boucle, placement multi-écran |
+| Display iReal | représentation conventionnelle + pont grille→projection (lisibilité) + base de comparaison (condition SANS) | fenêtre, auto-échelle, bande de boucle, placement multi-écran |
 | Registres (R.HAND / 1-2 OCT) | restreindre le champ : focus main droite, densité visuelle | calcul des bandes, `_range_midis`, clamp calibré |
 | Densité accompagnement | retirer des couches = doser l'info sonore (pédagogie) | `BackingMode`, `mix_layers`, splice du playhead |
 | Frozen / Boucle | modes de pratique : étude statique, drill d'un passage | forme temporaire, `wrap_around`, re-render, remix |
@@ -77,7 +77,7 @@ Même système que `plan-solution-technique.md`, adapté au chapitre conceptuel 
 
 - **[corps]** : prose du chapitre. Réservé aux éléments qui portent un **argument** (lien QR,
   pédagogie, cadre AR/DR, validation du professeur). Un paragraphe = un concept.
-- **[table]** : entre dans le **tableau récapitulatif** (§3.10), pas en prose. Sert le "indiquer
+- **[table]** : entre dans le **tableau récapitulatif** (§3.9), pas en prose. Sert le "indiquer
   tout ce qui a été fait" de Patrick sans gonfler le texte.
 - **[annexe]** : énumérations exhaustives, valeurs exactes des réglages, raccourcis clavier.
   Renvoyées à un guide utilisateur en annexe.
@@ -134,7 +134,7 @@ a été fait".
   1. le **schéma du système** (projecteur surplombant le piano + ordinateur). **À produire :
      ce schéma n'est pas dans le DS** (le DS ne contient que le diagramme des exigences, sa
      Fig.1, et la photo du système de Sandnes/Eika, sa Fig.2 ; il n'y a pas de Fig.3). Soit
-     un dessin à faire, soit le remplacer par une photo réelle du montage (cf. §3.9) ;
+     un dessin à faire, soit le remplacer par une photo réelle du montage (cf. §3.8) ;
   2. le **diagramme des exigences** (DS Fig.1, déjà fait) : finalité (développer les capacités
      d'improvisation jazz au piano) → objectifs BI 1 (fournir un environnement de piano
      augmenté) et BI 2 (proposer des jeux d'improvisation utilisant la projection) → exigences
@@ -193,7 +193,7 @@ flowchart TD
   > synchronisées, qui rend l'ensemble cohérent : son point de partage est l'analyse
   > harmonique automatique, à laquelle nous consacrons la section suivante.
 
-- **Figures :** schéma du système (à produire ou photo, cf. §3.9), DS Fig.1 (exigences),
+- **Figures :** schéma du système (à produire ou photo, cf. §3.8), DS Fig.1 (exigences),
   + diagramme de flux conceptuel ci-dessus.
 - **Référence :** Carusi Fig.2 ; Courtin Fig.7 ; Mehmeti 3.1.
 
@@ -326,21 +326,26 @@ flowchart TD
 
 - **Réglages et convention (arbitré) :**
   - **[corps], une phrase :** chaque exercice expose des réglages qui dosent sa difficulté (les
-    valeurs exactes sont au tableau §3.10).
+    valeurs exactes sont au tableau §3.9).
   - **[corps], à garder en prose car ça porte un concept :** une convention visuelle commune,
     quand une note montrée (aperçu d'un *guide tone*, *target note*) n'appartient pas à la gamme
     de l'accord en cours, elle est hachurée, signe qu'il faut la voir sans encore la jouer.
     C'est la traduction visuelle de l'anticipation.
-  - **[table] → §3.10 :** les variantes (Contour ±2/±3/±5 et 4-8 / 2-4 / 1-2 mes. par arc, Flow
+  - **[table] → §3.9 :** les variantes (Contour ±2/±3/±5 et 4-8 / 2-4 / 1-2 mes. par arc, Flow
     court/moyen/long, Start & End 2/4/8 mes., voix 3ce/7e + aperçu de Guide Tone). Ne pas les
     énumérer en prose.
 - **Figure :** DS Fig.4 (Gm7, Start & End, photo réelle) + 1-2 photos des autres modes.
 - **Référence :** Carusi liste de fonctionnalités ; Huynh "un module = un encart".
 
-### 3.7 Le contexte musical : le backing track  [corps]
+### 3.7 Le contexte musical et son réglage  [corps]  ← fusion backing + réglages
 
-- **Contenu :** justification pédagogique (répond à l'annotation p.12 du DS "et la basse
-  + le drum ?"). La génération algorithmique elle-même est en §4 technique.
+- **Contenu :** d'abord la justification pédagogique du *backing track* (répond à
+  l'annotation p.12 du DS "et la basse + le drum ?"), puis les leviers qui dosent la difficulté
+  du dispositif, rassemblés sous la bannière de l'"outil réglable" que le professeur de jazz
+  valide en entretien (chapitre Évaluations). Cinq leviers : choix du morceau (corpus gradué),
+  densité de l'accompagnement, tempo, mode frozen, mode boucle. C'est aussi notre réponse au
+  contre-risque de surcharge qu'il soulève : la charge nette dépend du dosage. La génération
+  algorithmique du *backing track* et la mécanique de la boucle restent au §4 technique.
 - **Prose :**
 
   > Le jazz ne prend son sens que dans une grille qui tourne. C'est pourquoi l'artefact
@@ -350,84 +355,75 @@ flowchart TD
   > une situation jazz réaliste. Sa génération algorithmique est décrite au chapitre Solution
   > technique ; ce qui compte ici, conceptuellement, c'est qu'il fournit le cadre rythmique
   > et harmonique sans lequel les touches éclairées n'auraient pas de sens musical.
-
-- **Figure :** aucune (ou renvoi au schéma de flux 3.2).
-- **Référence :** annotation DS p.12.
-
-### 3.8 Régler et approfondir : densité, tempo et modes de pratique  [corps]  ← features inédites
-
-- **Contenu :** rassembler les leviers d'adaptation sous la bannière de l'"outil réglable"
-  que le professeur de jazz valide en entretien (chapitre Évaluations). Cinq leviers : choix du
-  morceau (corpus gradué), densité de l'accompagnement, tempo, mode frozen, mode boucle. C'est
-  aussi notre réponse au contre-risque de surcharge qu'il soulève : la charge nette dépend du
-  dosage.
-- **Prose :**
-
-  > L'artefact est conçu pour s'adapter au niveau de l'utilisateur, un point que le professeur
-  > de jazz souligne en entretien : le même dispositif convient à des apprenants très différents
-  > pourvu qu'on en règle la complexité. Plusieurs leviers le permettent.
   >
-  > **Le choix du morceau.** Le dispositif est livré avec un corpus de grilles déjà gradué :
-  > des études (un seul accord de dominante tenu pour isoler une couleur, le ii-V-I qui monte
-  > par quartes dans les douze tonalités, sa version mineure) et de vrais standards rangés par
-  > difficulté, du plus diatonique (Autumn Leaves, Beautiful Love) aux harmonies les plus
-  > exigeantes (Coltrane changes, harmonie non fonctionnelle). L'expérimentateur, ou
-  > l'utilisateur, choisit une grille adaptée au niveau : c'est le premier réglage, et le plus
-  > déterminant selon le professeur, qui suggérait précisément de partir d'un ii-V-I ou d'un
-  > accord isolé avant d'aborder un standard.
+  > L'artefact est conçu pour s'adapter au niveau de l'utilisateur : le même dispositif convient
+  > à des apprenants très différents pourvu qu'on en règle la complexité. Plusieurs leviers le
+  > permettent :
   >
-  > **La densité de l'accompagnement.** L'utilisateur peut retirer des couches du *backing
-  > track* : batterie seule (pour ne travailler que le temps), batterie et basse, ou section
-  > complète. Un métronome peut s'ajouter par-dessus. Alléger l'accompagnement, c'est réduire
-  > la quantité d'information sonore à suivre, comme les registres réduisent la quantité
-  > d'information visuelle.
+  > - **Le choix du morceau**, le premier réglage et le plus déterminant : l'artefact lit
+  >   n'importe quelle grille, l'utilisateur n'est donc pas limité à un répertoire imposé et
+  >   travaille sur des morceaux taillés à son niveau. Il peut partir du plus simple, un accord de
+  >   dominante tenu pour isoler une couleur ou un ii-V-I, puis monter en difficulté à mesure qu'il
+  >   progresse, jusqu'aux standards les plus exigeants (harmonie chromatique, *Coltrane changes*).
+  >   Le parcours va naturellement d'une seule couleur vers la forme complète.
+  > - **La densité de l'accompagnement** : l'utilisateur retire des couches du *backing track*,
+  >   de la section complète à la batterie et basse, puis à la batterie seule, un métronome pouvant
+  >   s'ajouter par-dessus. Chaque couche retirée libère un rôle que l'utilisateur avancé tient
+  >   alors lui-même de la main gauche : sa propre walking bass, son propre *comping*, pendant
+  >   qu'il improvise de la main droite.
+  > - **Le tempo**, réglable librement avant lecture : ralentir une grille rapide redonne à
+  >   l'utilisateur le temps de lire, de préparer sa ligne et d'enchaîner.
+  > - **Le mode frozen** : il fige la projection sur un seul accord et arrête le défilement
+  >   automatique. L'utilisateur étudie la gamme en position statique, sans la pression de la grille
+  >   qui avance, et parcourt lui-même les *changes* accord par accord, au clavier, en passant au
+  >   suivant quand il le souhaite.
+  > - **La pratique en boucle** : l'utilisateur sélectionne quelques mesures (un ii-V, une cadence,
+  >   un passage difficile) et les met en boucle. Le passage devient une petite forme autonome,
+  >   rejouée plusieurs minutes, avec un accompagnement régénéré à chaque tour (la walking bass et
+  >   le *comping* varient d'un passage à l'autre) et des exercices qui progressent d'un tour sur
+  >   l'autre au lieu de se répéter à l'identique. C'est l'outil pour isoler les moments cadentiels
+  >   d'un morceau et les travailler en profondeur.
   >
-  > **Le tempo.** Il se règle librement avant lecture. Ralentir une grille rapide, c'est lui
-  > rendre le "temps humain" que le professeur appelle de ses vœux : le temps de lire, de
-  > préparer et d'enchaîner.
-  >
-  > **Le mode frozen.** Il fige la projection sur un seul accord et arrête le défilement.
-  > L'utilisateur étudie alors une gamme en position statique, sans la pression de la grille qui
-  > avance, et passe d'un accord à l'autre à son rythme.
-  >
-  > **La pratique en boucle.** L'utilisateur sélectionne quelques mesures de la grille (un ii-V,
-  > une cadence, un passage difficile) et les met en boucle. Le passage devient une petite forme
-  > autonome, rejouée plusieurs minutes, avec un accompagnement régénéré à chaque tour (la
-  > walking bass et le *comping* varient d'un passage à l'autre) et des exercices qui progressent
-  > d'un tour sur l'autre au lieu de se répéter à l'identique. C'est exactement l'usage que le
-  > professeur suggérait : isoler les moments cadentiels d'un morceau pour les travailler en
-  > profondeur.
-  >
-  > Ces briques se combinent enfin pour graduer la difficulté selon deux axes que le professeur
-  > a lui-même dégagés : ce qui tourne (d'un accord tenu à un standard complet) et ce qu'on
-  > demande de viser (de la fondamentale aux extensions, via Start & End et le mode chord
-  > tones). Un curriculum d'études enchaînées reste une perspective de développement, mais les
-  > briques, elles, existent déjà.
+  > Ces briques se combinent enfin pour graduer la difficulté selon deux axes : ce qui tourne
+  > (d'un accord tenu à un standard complet) et ce qu'on demande de viser (de la fondamentale aux
+  > extensions, via Start & End et le mode chord tones). Un curriculum d'études enchaînées reste
+  > une perspective de développement, mais les briques, elles, existent déjà.
 
 - **Figure :** capture du chart en mode boucle (bande surlignée), reprise du draft technique.
-- **Référence :** entretien professeur (chapitre Évaluations). **Reste en §4 :** mécanique de
-  la boucle (forme temporaire, `wrap_around`, re-render), cycle de remix, splice du playhead.
+- **Référence :** annotation DS p.12 ; entretien professeur (chapitre Évaluations).
+  **Reste en §4 :** génération algorithmique du *backing track* ; mécanique de la boucle
+  (forme temporaire, `wrap_around`, re-render), cycle de remix, splice du playhead.
 
-### 3.9 L'affichage de la grille et aperçu de l'interface  [corps]  ← idée 4 + photos
+### 3.8 L'affichage de la grille et aperçu de l'interface  [corps]  ← idée 4 + photos
 
-- **Contenu :** le display iReal comme design (et comme base de comparaison des tests),
-  puis l'aperçu visuel de l'artefact en situation (les captures = "Prototype interactif"
-  de Carusi). Mécanique de la fenêtre (auto-échelle, boucle, multi-écran) → §4.
+- **Contenu :** le display iReal comme design (représentation conventionnelle + pont qui rend
+  la projection lisible + base de comparaison des tests), puis l'aperçu visuel de l'artefact en
+  situation (les captures = "Prototype interactif" de Carusi). Mécanique de la fenêtre
+  (auto-échelle, boucle, multi-écran) → §4.
 - **Prose :**
 
   > À côté de la projection, l'artefact affiche la grille d'accords dans une fenêtre séparée,
   > dans un style proche d'iReal Pro : quatre mesures par ligne, l'accord courant surligné.
-  > Conceptuellement, cet affichage joue deux rôles. C'est d'abord la représentation
-  > conventionnelle de la grille, celle que l'improvisateur a l'habitude de lire ; l'artefact
-  > ne la remplace pas, il la complète par la projection sur les touches. C'est ensuite notre
-  > point de comparaison : lors des tests, la condition sans projection conserve cet affichage
-  > et le *backing track*, de sorte que nous mesurons bien l'apport de la projection, et non
-  > celui d'un accompagnement.
+  > Conceptuellement, cet affichage joue trois rôles. C'est d'abord la représentation
+  > conventionnelle de la grille, celle que l'improvisateur a l'habitude de lire : l'artefact
+  > ne la remplace pas, il la complète par la projection sur les touches.
+  >
+  > C'est ensuite le pont entre la grille et la projection. Prise isolément, la projection ne dit
+  > rien du contexte : elle éclaire des touches sans nommer l'accord ni situer l'endroit dans la
+  > forme. L'affichage de la grille fournit ce repère et rend le lien explicite : l'utilisateur lit
+  > l'accord courant et la mesure où il se trouve, puis reconnaît sur le clavier les touches qui
+  > s'allument pour cet accord. Nous en avons fait l'expérience : en montrant la projection seule,
+  > sans la grille, à un enseignant, celui-ci est resté désorienté, faute du repère reliant la
+  > notation au clavier.
+  >
+  > C'est enfin notre point de comparaison : lors des tests, la condition sans projection conserve
+  > cet affichage et le *backing track*, de sorte que nous mesurons bien l'apport de la projection,
+  > et non celui d'un accompagnement.
 
 - **Figures :** capture du chart iReal + photos réelles de projection (DS Fig.11/13 du draft).
 - **Référence :** Carusi "Prototype interactif" ; Huynh "Prototype Design".
 
-### 3.10 Récapitulatif des fonctionnalités  [table]  ← satisfait "tout ce qui a été fait"
+### 3.9 Récapitulatif des fonctionnalités  [table]  ← satisfait "tout ce qui a été fait"
 
 - **Contenu :** un tableau unique listant toutes les fonctionnalités et leurs variantes, pour
   répondre à la consigne "indiquer tout ce qui a été fait" sans alourdir la prose. C'est ici
@@ -464,21 +460,22 @@ flowchart TD
 ## Budget et ordre de rédaction
 
 - **Budget :** ~9-10 pages après arbitrage (la prose redescend, les énumérations passent au
-  tableau §3.10). Répartition indicative : 3.1 (0.75 p, cœur AR/DR), 3.2 (1.5 p, 3 figures),
-  3.3 (0.75 p), 3.4 (1 p), 3.5 (1.75 p), 3.6 (1.5 p, prose compressée), 3.7 (0.5 p),
-  3.8 (1.5 p), 3.9 (1 p), 3.10 (0.5 p, tableau récap).
-- **Leviers de coupe si ça déborde :** plier 3.7 (backing) en un paragraphe dans 3.2 ; réduire
-  les paramètres par exercice de 3.6 à une phrase + renvoi à un guide utilisateur en annexe ;
-  fusionner frozen dans 3.8 en une ligne.
+  tableau §3.9). Répartition indicative : 3.1 (0.75 p, cœur AR/DR), 3.2 (1.5 p, 3 figures),
+  3.3 (0.75 p), 3.4 (1 p), 3.5 (1.75 p), 3.6 (1.5 p, prose compressée),
+  3.7 (2 p, backing + leviers de réglage fusionnés), 3.8 (1 p, interface),
+  3.9 (0.5 p, tableau récap).
+- **Leviers de coupe si ça déborde :** comprimer la justification du *backing track* en tête
+  de 3.7 à deux ou trois phrases ; fusionner frozen dans 3.7 en une ligne ; réduire les
+  paramètres par exercice de 3.6 à une phrase + renvoi à un guide utilisateur en annexe ;
+  renvoyer les captures multiples de 3.7 en annexe.
 - **À reporter au chapitre Conclusion (limites, pas §3) :** absence d'une légende / page d'aide
   des couleurs (gap connu, `TODO.md` ; un participant, P03, réclamait une "légende") ; pipeline
   pensé pour un piano acoustique (les tests MIDI nécessiteraient un clavier). À ne pas vendre
   comme features.
-- **Leviers de coupe si ça déborde :** plier 3.7 en un paragraphe dans 3.2 ; réduire 3.6 à
-  un tableau + une photo ; renvoyer les captures multiples de 3.8 en annexe.
 - **Ordre conseillé :** 3.1 (le cadre AR/DR, vrai cœur conceptuel, à soigner) → 3.4 (OMR,
-  déjà calé) → 3.5 (projection + registres) → 3.8 (réglages + boucle, bridge vers le prof) →
-  3.2 (diagrammes) → 3.3 (analyse, court) → 3.6 (reprise DS, prose compressée) → 3.7 → 3.9 →
-  3.10 (tableau récap en dernier, rempli depuis les sections rédigées).
+  déjà calé) → 3.5 (projection + registres) → 3.7 (contexte musical + réglages + boucle,
+  bridge vers le prof) → 3.2 (diagrammes) → 3.3 (analyse, court) → 3.6 (reprise DS, prose
+  compressée) → 3.8 (interface) → 3.9 (tableau récap en dernier, rempli depuis les sections
+  rédigées).
 - **Dépendance :** 3.5 et 3.6 pointent vers le chapitre Évaluations (séquence AVEC, profils) :
   garder les renvois cohérents avec le chapitre 5.
