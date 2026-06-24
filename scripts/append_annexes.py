@@ -1,15 +1,15 @@
 """Assemble the final report by inserting the annex PDFs after their title pages.
 
 The base report ends with two annex title/separator pages:
-    page 80 : "Questions de l'interview avec le prof de piano jazz"
-    page 81 : "Feuille de route pour les participants des tests"
+    page 81 : "Questions de l'interview avec le prof de piano jazz"
+    page 82 : "Feuille de route pour les participants des tests"
 
 Each annex PDF is inserted right after its own title page, so the final order is:
-    base pages 1..80                       (..., prof-questions title page)
+    base pages 1..81                       (..., prof-questions title page)
     INTERVIEW SCRIPT V2.pdf      (3 p)      the prof questions
-    base page 81                           (session title page)
+    base page 82                           (session title page)
     session-participant.pdf      (9 p)      the participant session papers
-    (base pages 82.. if any)
+    (base pages 83.. if any)
 
 Result is saved as:
     rapport/final_export/Projet de Bachelor - Alexandre RIEDO.pdf
@@ -38,8 +38,8 @@ DEFAULT_OUTPUT = ROOT / "rapport" / "final_export" / "Projet de Bachelor - Alexa
 # (after_page is 1-indexed: the annex is inserted immediately after that base page,
 #  which is the annex's title/separator page.)
 INSERTIONS = [
-    (80, ROOT / "proto-media" / "7. evaristo-presentation V2" / "INTERVIEW SCRIPT V2.pdf"),
-    (81, ROOT / "proto-media" / "8-working-on-tests" / "protocole" / "pdf" / "session-participant.pdf"),
+    (81, ROOT / "proto-media" / "7. evaristo-presentation V2" / "INTERVIEW SCRIPT V2.pdf"),
+    (82, ROOT / "proto-media" / "8-working-on-tests" / "protocole" / "pdf" / "session-participant.pdf"),
 ]
 
 
