@@ -1,0 +1,12 @@
+TODO
+- IMAGES
+- ANNEXES SETUP
+- RELECTURE GENERALE
+
+
+RENDU/SLIDES (TODO)
+- DEMAIN MIDI GRAND MAX
+- MAX 30 MINUTES la presentation, la QR DOIT ETRE CLAIR + ce quon a fait (recherches, artefact, tests, interviews) + montrer quon maitrise le domaine + clairement expliquer l'artefact + expliquer les tests si on arrive a repondre a la QR + video de l'artefact
+- Pas solution technique en gros ! 
+- Montrer le coté augmneté / diminué. Parler aussi de l'OMR
+- Pour le probleme : expliquer le piano jazz, la problématique derriere l'improvisation du jazz (pour les débutants et intermédiaires). Voila le challenge, moi pour résoudre, je minsipre de la realité augmenté/diminué. Meme montrer une partition leadsheet. Ensuite jai testé : 2 parties, l'interview prof (voila la méthodologie prise, etre rigoureux) + evaluation (NASA-TLX, ce quil a pu montré, les questions. Montrer quon arrive a repondre +- a la QR) + interview participant
