@@ -73,13 +73,6 @@ l'un des deux cas a contre-sens, trop dure pour une decouverte en une seule sean
 
 > Est-ce que l'usage de la réalité augmentée et diminuée sur un piano peut soutenir l'improvisation jazz mélodique dans un contexte swing ?
 
-**L'angle d'attaque** : parmi les charges menées de front, le calcul mental de la gamme de chaque accord pèse lourd. Deux leviers permettent d'agir dessus :
-
-- **augmenter** la réalité : éclairer les touches utiles (ajouter de l'information)
-- **diminuer** la réalité : masquer les touches hors-gamme (retirer de l'information)
-
-Contexte voulu **réaliste** : une vraie grille qui tourne, un *backing track*, plusieurs tonalités, à la différence des systèmes limités au seul do majeur.
-
 <!--
 NOTE (~2 min) : Lire la QR mère lentement, c'est le pivot de toute la présentation. Expliquer
 "augmentée ET diminuée" : c'est le couple proposé par Patrick. Bien marteler "contexte réaliste",
@@ -97,8 +90,6 @@ c'est mon différenciateur par rapport à l'état de l'art (ImproVisAR = do maje
 <h3>QR2, barrière affective (le prolongement)</h3>
 
 > En réduisant cette charge, peut-on aussi **abaisser la barrière affective** : moins d'anxiété, plus de confiance, plus d'envie d'oser ?
-
-L'ordre encode une **chaîne causale** : QR2 n'a de sens que si QR1 tient. La baisse de charge de QR1 est l'explication attendue de l'allègement affectif de QR2.
 
 <!--
 NOTE (~2 min) : QR1 est confirmatoire et directement testable. QR2 en est le payoff logique :
@@ -131,34 +122,14 @@ direct dont je me démarque (do majeur). La RD est mon appui théorique pour "ma
 
 ---
 
-# L'artefact : le principe
-
-![bg right:38%](assets/projection-base.jpg)
-
-Le jeu se déroule dans une **pièce sombre**. Sans projection, le clavier devient presque invisible.
-
-- **Réalité diminuée** : l'obscurité soustrait du champ visuel toutes les touches hors-gamme. Les notes "fausses" cessent d'exister pour l'œil, plus besoin de calculer la gamme.
-- **Réalité augmentée** : le projecteur éclaire les seules touches utiles et y pose un **code couleur porteur de sens**.
-
-**La valeur ajoutée** : une analyse harmonique **automatique**, qui déduit la *chord-scale* de chaque accord dans **toutes les tonalités**, sur n'importe quelle grille chiffrée, synchronisée à un *backing track* généré.
-
-<!--
-NOTE (~2 min) : C'est le cœur conceptuel. RD = on enlève (l'obscurité), RA = on ajoute (la lumière).
-Bien dire que l'analyse harmonique automatique est la contribution clé : sans elle, il faudrait coder
-la gamme de chaque accord à la main pour chaque morceau. Le vocabulaire va jusqu'aux sonorités avancées
-(altérée, lydienne dominante, etc.).
--->
-
----
-
-# Le système : du concept au piano
+# Aperçu de l'artefact
 
 <div class="cols">
 <div>
 
-![w:360](assets/concept-flux.png)
+![w:545](assets/dispositif-eclaire.jpg)
 
-<p class="tiny">Le flux : de la grille à la touche éclairée.</p>
+<p class="tiny">Le dispositif éclairé.</p>
 
 </div>
 <div>
@@ -171,15 +142,59 @@ la gamme de chaque accord à la main pour chaque morceau. Le vocabulaire va jusq
 </div>
 
 <!--
-NOTE (~1 min) : Slide de respiration, presque sans texte. À gauche, le schéma du système : la grille
-est analysée, une chord-scale par accord, puis projection et backing track partent de la même horloge
-musicale. À droite, le dispositif réel en pièce sombre : touches éclairées et codées, grille au pupitre
-façon iReal Pro, projecteur sur trépied. Dire simplement : voilà ce qu'on vient de décrire, en vrai.
+NOTE (~1 min) : Slide de respiration, presque sans texte. Deux vues du dispositif réel. À gauche, le
+dispositif éclairé : les touches codées par couleur sous la projection. À droite, le même dispositif
+en pièce sombre : grille au pupitre façon iReal Pro, projecteur sur trépied. Dire simplement : voilà
+ce qu'on vient de décrire, en vrai.
 -->
 
 ---
 
-# Le code couleur
+# AR/DR dans l'artefact
+
+![bg right:38%](assets/projection-base.jpg)
+
+Le jeu se déroule dans une **pièce sombre**. Sans projection, le clavier devient presque invisible.
+
+- **Réalité diminuée** : l'obscurité soustrait du champ visuel toutes les touches hors-gamme. Les notes "fausses" cessent d'exister pour l'œil, plus besoin de calculer la gamme.
+- **Réalité augmentée** : le projecteur éclaire les seules touches utiles et y pose un **code couleur porteur de sens**.
+
+<!--
+NOTE (~2 min) : C'est le cœur conceptuel. RD = on enlève (l'obscurité), RA = on ajoute (la lumière).
+Le code couleur porte du sens : on y reviendra. La contribution clé, l'analyse harmonique automatique,
+fait l'objet de la slide suivante.
+-->
+
+---
+
+# Analyse harmonique et backing track
+
+<div class="cols">
+<div>
+
+- **Entrée** : une grille *.tsv*, 3 colonnes (début, fin, accord), saisie à la main.
+- **Analyse** : pour chaque accord, le système déduit sa *chord-scale*, la gamme à éclairer. Lecture **contextuelle** (*ii-V*, V7 vers mineur, substitution tritonique...) qui va jusqu'aux sonorités avancées (altérée, lydienne dominante).
+- **Backing track algorithmique** : *walking bass* + batterie + *comping* de guitare, construit lui aussi à partir de l'analyse harmonique.
+
+</div>
+<div>
+
+![w:300](assets/tsv.png)
+
+<p class="tiny">La grille de Beatrice en <em>.tsv</em>.</p>
+
+</div>
+</div>
+
+<!--
+NOTE (~2 min) : C'est la contribution clé. Sans cette analyse, il faudrait coder la gamme de chaque
+accord à la main pour chaque morceau. Insister sur la chaîne : une grille en entrée, et la même
+chord-scale pilote à la fois la lumière et l'accompagnement, synchronisés à l'instant près.
+-->
+
+---
+
+# Design de la projection : code couleur
 
 <div class="cols">
 <div>
@@ -190,8 +205,6 @@ façon iReal Pro, projecteur sur trépied. Dire simplement : voilà ce qu'on vie
 - **rouge** : *guide tone* / note de départ
 - **orange** : *target note*
 - **hachuré** : note à venir, instable dans l'accord courant
-
-Réglages selon le niveau : tessiture (complet, main droite, puis 2 ou 1 octave), densité du *backing*, tempo, mode figé, et une **anticipation** qui allume l'accord suivant une croche ou une noire avant.
 
 </div>
 <div>
@@ -204,6 +217,22 @@ Réglages selon le niveau : tessiture (complet, main droite, puis 2 ou 1 octave)
 <!--
 NOTE (~2 min) : Le code couleur est stable d'un mode à l'autre, ce qui permet de réinvestir ce qu'on
 a appris. Photo de droite : on voit le rouge et l'orange (un jeu actif) et une main qui joue.
+-->
+
+---
+
+# Design de la projection : réglages
+
+Le dispositif s'adapte au niveau du joueur :
+
+- **Tessiture** : clavier complet, main droite seule, puis 2 ou 1 octave pour resserrer.
+- **Densité du *backing*** : du silence au trio complet (basse, batterie, guitare).
+- **Tempo** : ajustable selon l'aisance.
+- **Mode figé** : plus de tempo, le joueur défile lui-même les accords de la grille un à un, à son rythme.
+- **Anticipation** : allume l'accord suivant une croche ou une noire avant le changement.
+
+<!--
+NOTE (~1.5 min) : Ces réglages sont la traduction concrète du "contexte réaliste" et de la progression.
 L'anticipation répond directement à une des charges nommées dans la QR : anticiper l'accord suivant.
 -->
 
