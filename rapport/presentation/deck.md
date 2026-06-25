@@ -151,6 +151,34 @@ la gamme de chaque accord à la main pour chaque morceau. Le vocabulaire va jusq
 
 ---
 
+# Le système : du concept au piano
+
+<div class="cols">
+<div>
+
+![w:360](assets/concept-flux.png)
+
+<p class="tiny">Le flux : de la grille à la touche éclairée.</p>
+
+</div>
+<div>
+
+![w:545](assets/setup-irl.jpg)
+
+<p class="tiny">Le dispositif dans une pièce sombre.</p>
+
+</div>
+</div>
+
+<!--
+NOTE (~1 min) : Slide de respiration, presque sans texte. À gauche, le schéma du système : la grille
+est analysée, une chord-scale par accord, puis projection et backing track partent de la même horloge
+musicale. À droite, le dispositif réel en pièce sombre : touches éclairées et codées, grille au pupitre
+façon iReal Pro, projecteur sur trépied. Dire simplement : voilà ce qu'on vient de décrire, en vrai.
+-->
+
+---
+
 # Le code couleur
 
 <div class="cols">
