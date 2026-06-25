@@ -320,8 +320,6 @@ Un professeur de piano jazz : premier retour sur le système, et orientation de 
 </div>
 </div>
 
-**À assumer** : c'est le concepteur qui a mené les tests, une seule séance, n petit. Le **protocole** et l'**outil statistique** suivent.
-
 <!--
 NOTE (~2 min) : Expliquer le within-subject AVEC/SANS : chaque personne est son propre témoin. Justifier
 Wilcoxon (n=8, pas de normalité supposée). Annoncer d'emblée l'honnêteté méthodo : biais de désirabilité
@@ -339,9 +337,7 @@ Un professeur de piano jazz du **conservatoire populaire de Genève**, en **deux
 - **27 mai** : découverte à chaud, essais avec deux de ses élèves (premier retour)
 - **3 juin** : entretien **semi-structuré** (montrer, puis questionner), environ **130 min**
 
-Format quasi libre : le professeur est largement laissé à ses digressions, avec des relances pour recentrer sur la QR.
-
-**Traitement** : transcription via *Whisper*, puis **analyse thématique** (thème, citation, analyse, lien avec la QR). C'est l'avis d'**un seul expert** : une **validation du cadrage**, pas une mesure.
+En réalité, un **format quasi libre** : le professeur est largement laissé à ses digressions, avec des relances pour recentrer sur la QR.
 
 <!--
 NOTE (~2 min) : Parallèle au protocole participants. Insister sur le format en 2 temps (montrer puis
@@ -480,6 +476,24 @@ sans projection). Auto-efficacité : signal le plus ténu, médiane plate, à ne
 
 ---
 
+# Entretiens : pourquoi les mener
+
+Au-delà des scores, un **entretien semi-directif** par participant, analysé par thèmes en travers des 8. Quatre intentions :
+
+- **Confirmer le quantitatif** : mettre en mots les tendances des questionnaires, trop fragiles seules à *n = 8*.
+- **Recueillir des retours** : faire remonter les irritants et les pistes d'amélioration, qui nourrissent la feuille de route.
+- **Valeur pédagogique ressentie** : ce que les scores ne captent pas, le sentiment d'apprendre et d'être aidé.
+- **Thèmes émergents** : laisser surgir des dimensions non anticipées (créativité, écoute, plaisir de jouer).
+
+<!--
+NOTE (~1.5 min) : Slide de transition du quantitatif vers le qualitatif. Justifier l'entretien : à n = 8,
+les scores ne suffisent pas, l'entretien les recoupe et leur donne du sens. Au passage on récolte des
+retours concrets (feuille de route), on capte la valeur pédagogique ressentie, et on laisse émerger des
+thèmes qu'on n'avait pas prévus, dont la créativité.
+-->
+
+---
+
 # Entretiens : la table thématique
 
 **16 thématiques**, codées par couleur (vert = positif, blanc = descriptif, rouge = négatif), lues en travers des 8 participants.
@@ -501,8 +515,6 @@ sans projection). Auto-efficacité : signal le plus ténu, médiane plate, à ne
 
 </div>
 </div>
-
-> P06 : "j'étais soulagée du poids de penser à chaque note", "un filet qui est là". P07 : "l'écoute était plus attentive sans".
 
 Réserves récurrentes : la bichromie vert / bleu "agresse", l'auto-évaluation se partage **4 / 4**. Les améliorations convergent en **feuille de route** : annoncer le prochain accord, distinguer la fondamentale, projeter le chiffrage sur les touches.
 
