@@ -56,21 +56,15 @@ Quand la leadsheet sera affichée : "voilà ce que l'improvisateur doit décoder
 
 ---
 
-# Décoder tout ça, en tempo
+<!-- _footer: '' -->
+<!-- _paginate: false -->
 
-![bg right:52% fit](assets/leadsheet-26-2.png)
-
-**"26-2"** (John Coltrane, *medium-up swing*, 196 à la noire), d'après *Confirmation* de Charlie Parker.
-
-Chaque chiffrage impose une **gamme à retrouver dans l'instant** : *changes* de Coltrane, modulations par tierces, peu de répétition.
-
-C'est l'une des grilles jouées pendant les tests, en condition AVEC pour P04.
+![bg fit](assets/leadsheet-26-2.png)
 
 <!--
-NOTE (~1 min) : Laisser l'image parler : c'est le "mur" de chiffrages à décoder en tempo (196 à la noire).
-Pointer un passage dense (les changes de Coltrane qui modulent par tierces). Lien avec l'évaluation :
-c'est précisément la grille tombée sur P04 en condition AVEC, l'un des deux cas à contre-sens, parce que
-trop dure pour une découverte en une seule séance.
+NOTE (~1 min) : Laisser l'image parler : le "mur" de chiffrages a decoder en tempo (196 a la noire),
+les changes de Coltrane qui modulent par tierces. C'est la grille tombee sur P04 en condition AVEC,
+l'un des deux cas a contre-sens, trop dure pour une decouverte en une seule seance.
 -->
 
 ---
@@ -244,22 +238,6 @@ l'analyse harmonique en Python pur (le cœur), et la projection par homographie 
 possible sur n'importe quel piano droit). Le reste du détail est en backup si questions.
 -->
 
----
-
-<!-- _class: invert -->
-<!-- _footer: '' -->
-
-<h3>Partie 2</h3>
-
-# Démonstration
-
-Le système sur un vrai piano, environ 5 minutes
-
-<!--
-NOTE : Basculer sur la vidéo proto-media/5. video demo V2/demo-2026-05-26.mp4 (6:14, en couper ~5 min).
-Montrer : pièce sombre, la grille qui défile, le mode libre, un jeu (contour ou guide tone), le backing
-track. Revenir aux slides juste après pour l'évaluation. (La démo est comptée séparément des 25 min.)
--->
 
 ---
 
@@ -271,7 +249,7 @@ Pour ancrer les tests dans la QR, **mode libre uniquement** : chaque participant
 <div>
 
 **Volet 1, entretien expert**
-Un professeur de piano jazz : évaluation pédagogique et cognitive du cadrage.
+Un professeur de piano jazz : premier retour sur le système, et orientation de l'évaluation.
 
 </div>
 <div>
@@ -297,16 +275,16 @@ Wilcoxon (n=8, pas de normalité supposée). Annoncer d'emblée l'honnêteté m�
 
 # Volet 1 : méthodologie de l'entretien expert
 
+**Objectif** : obtenir un premier retour d'expert sur le système, et orienter la façon de l'évaluer. Plusieurs choix de conception en sont issus, dont l'**affichage de la grille style iReal Pro**.
+
 Un professeur de piano jazz du **conservatoire populaire de Genève**, en **deux rencontres** :
 
-- **27 mai** : découverte à chaud, démo des 5 modes, essais avec deux de ses élèves (riche, mais peu structuré)
-- **3 juin** : l'entretien analysé, structuré (environ **130 min**)
+- **27 mai** : découverte à chaud, essais avec deux de ses élèves (premier retour)
+- **3 juin** : entretien **semi-structuré** (montrer, puis questionner), environ **130 min**
 
-**Semi-structuré, en deux temps** : d'abord **montrer** (présentation et démo), puis **questionner** (charge mentale, apport des couleurs, public visé, fonctionnalités manquantes). Format quasi libre : le professeur est largement laissé à ses digressions, avec des relances pour recentrer sur la QR. L'artefact reste **jouable tout du long**.
+Format quasi libre : le professeur est largement laissé à ses digressions, avec des relances pour recentrer sur la QR.
 
-**Traitement** : transcription via *Whisper* (relecture du vocabulaire jazz), puis **analyse thématique** (thème, citation, analyse, lien avec la QR).
-
-C'est l'avis d'**un seul expert** : une **validation du cadrage**, pas une mesure, avec un risque de désirabilité.
+**Traitement** : transcription via *Whisper*, puis **analyse thématique** (thème, citation, analyse, lien avec la QR). C'est l'avis d'**un seul expert** : une **validation du cadrage**, pas une mesure.
 
 <!--
 NOTE (~2 min) : Parallèle au protocole participants. Insister sur le format en 2 temps (montrer puis
@@ -485,7 +463,7 @@ deux bleus de P03) et les améliorations nourrissent directement la feuille de r
 
 En croisant questionnaires, entretiens et avis de l'expert, les tendances **convergent** vers H1, mais avec prudence.
 
-- les **débutants à intermédiaires** (P01, P02, P05, P06) sont favorables
+- les **débutants à intermédiaires** (P01, P02, P03, P05, P06) sont favorables
 - les **lecteurs de grille chevronnés** (P04, P08) vont **à contre-sens** : P08 parle de **"deux systèmes cognitifs"**, P04 dit que la projection le déconcerte
 - **6 sur 8** reprendraient la projection ; l'outil est vu comme une **béquille à dépasser** ("petites roues de vélo")
 
@@ -516,6 +494,21 @@ Le travail ne tranche pas, mais il établit la **faisabilité** et désigne l'an
 NOTE (~2 min) : Boucler sur la QR. Message honnête et assumé : pas de preuve statistique, mais une
 faisabilité démontrée et un angle clair. Finir large : augmenter et diminuer la réalité d'un instrument,
 au moment où on en joue, est une voie sérieuse au-delà du seul piano jazz. Merci, et place aux questions.
+-->
+
+---
+
+<!-- _class: invert -->
+<!-- _footer: '' -->
+
+# Démonstration
+
+Le système sur un vrai piano, environ 5 minutes
+
+<!--
+NOTE : Basculer sur la vidéo proto-media/5. video demo V2/demo-2026-05-26.mp4 (6:14, en couper environ 5 min).
+Montrer : pièce sombre, la grille qui défile, le mode libre, un jeu (contour ou guide tone), le backing track.
+C'est la dernière partie de la présentation, juste avant les questions.
 -->
 
 ---
