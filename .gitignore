@@ -218,3 +218,6 @@ rapport/stats/figures/_verify/
 
 # Per-machine mermaid-cli helper (hard-codes a local Chrome path; recreate per README)
 /puppeteer-config.json
+
+# Demo Video
+rapport/presentation/CUI Bachelor Demo Video.mov
