@@ -5,7 +5,7 @@ paginate: true
 html: true
 size: 16:9
 header: ''
-footer: 'Alexandre Riedo · Bachelor CUI 2026'
+footer: 'Alexandre Riedo, Bachelor CUI 2026'
 ---
 
 <!-- _paginate: false -->
@@ -22,7 +22,7 @@ footer: 'Alexandre Riedo · Bachelor CUI 2026'
 Alexandre Riedo<br>
 Projet de bachelor en systèmes d'information et science des services<br>
 Centre Universitaire d'Informatique, Université de Genève<br>
-Supervisé par le Professeur Patrick Roth · 26 juin 2026
+Supervisé par le Professeur Patrick Roth<br>26 juin 2026
 </div>
 
 <!--
@@ -45,11 +45,7 @@ Improviser de belles lignes mélodiques est au cœur du jazz, et un obstacle par
 - construire un **discours cohérent**, pas des gammes montées-descendues
 - le tout **en tempo**, sans pouvoir s'arrêter
 
-La barrière n'est pas que technique : faute de tout gérer à la fois, **on n'ose pas se lancer**. Elle touche surtout les débutants et intermédiaires.
-
-<!-- TODO IMAGE : ajouter ici une leadsheet (le "mur" de chiffrages à décoder). Source possible :
-     un scan d'un standard imprimé (ex. "Confirmation"), ou une capture de l'affichage style iReal Pro
-     de l'app (module gui/chart.py). C'est l'image qui rend le défi physique pour le jury. -->
+La barrière n'est pas que technique : faute de tout gérer à la fois, **l'élève n'ose pas se lancer**. Elle touche surtout les débutants et intermédiaires.
 
 <!--
 NOTE (~2 min) : Insister sur "en tempo, en même temps". Citer un participant : P01 dit que le plus dur
@@ -60,11 +56,30 @@ Quand la leadsheet sera affichée : "voilà ce que l'improvisateur doit décoder
 
 ---
 
+# Décoder tout ça, en tempo
+
+![bg right:52% fit](assets/leadsheet-26-2.png)
+
+**"26-2"** (John Coltrane, *medium-up swing*, 196 à la noire), d'après *Confirmation* de Charlie Parker.
+
+Chaque chiffrage impose une **gamme à retrouver dans l'instant** : *changes* de Coltrane, modulations par tierces, peu de répétition.
+
+C'est l'une des grilles jouées pendant les tests, en condition AVEC pour P04.
+
+<!--
+NOTE (~1 min) : Laisser l'image parler : c'est le "mur" de chiffrages à décoder en tempo (196 à la noire).
+Pointer un passage dense (les changes de Coltrane qui modulent par tierces). Lien avec l'évaluation :
+c'est précisément la grille tombée sur P04 en condition AVEC, l'un des deux cas à contre-sens, parce que
+trop dure pour une découverte en une seule séance.
+-->
+
+---
+
 # Question de recherche
 
 > Est-ce que l'usage de la réalité augmentée et diminuée sur un piano peut soutenir l'improvisation jazz mélodique dans un contexte swing ?
 
-**Mon angle d'attaque** : parmi les charges menées de front, le calcul mental de la gamme de chaque accord pèse lourd. On peut agir dessus de deux façons :
+**L'angle d'attaque** : parmi les charges menées de front, le calcul mental de la gamme de chaque accord pèse lourd. Deux leviers permettent d'agir dessus :
 
 - **augmenter** la réalité : éclairer les touches utiles (ajouter de l'information)
 - **diminuer** la réalité : masquer les touches hors-gamme (retirer de l'information)
@@ -81,11 +96,11 @@ c'est mon différenciateur par rapport à l'état de l'art (ImproVisAR = do maje
 
 # Deux sous-questions, dans cet ordre
 
-<h3>QR1 · charge cognitive (le cœur)</h3>
+<h3>QR1, charge cognitive (le cœur)</h3>
 
 > L'augmentation et la diminution de la réalité aident-elles à **réduire la charge cognitive perçue** lors d'une improvisation sur une grille qui défile ?
 
-<h3>QR2 · barrière affective (le prolongement)</h3>
+<h3>QR2, barrière affective (le prolongement)</h3>
 
 > En réduisant cette charge, peut-on aussi **abaisser la barrière affective** : moins d'anxiété, plus de confiance, plus d'envie d'oser ?
 
@@ -102,9 +117,9 @@ comme "le mécanisme va dans le sens prédit".
 
 # État de l'art
 
-<h3>Comment on travaille l'impro jazz</h3>
+<h3>Comment se travaille l'impro jazz</h3>
 
-Revue de Spice (2010) : 5 *frameworks* (gammes, *changes*, embellissement, *patterns*, transcriptions) + une 6e catégorie créative. Thèse de Chyu (2004) pour les niveaux débutant-intermédiaire. **Mes jeux s'y ancrent directement.**
+Revue de Spice (2010) : 5 *frameworks* (gammes, *changes*, embellissement, *patterns*, transcriptions) et une 6e catégorie créative. Thèse de Chyu (2004) pour les niveaux débutant-intermédiaire. **Les jeux proposés s'y ancrent directement.**
 
 <h3>Les pianos augmentés</h3>
 
@@ -126,12 +141,12 @@ direct dont je me démarque (do majeur). La RD est mon appui théorique pour "ma
 
 ![bg right:38%](assets/projection-base.jpg)
 
-On joue dans une **pièce sombre**. Sans projection, on ne voit presque plus le clavier.
+Le jeu se déroule dans une **pièce sombre**. Sans projection, le clavier devient presque invisible.
 
 - **Réalité diminuée** : l'obscurité soustrait du champ visuel toutes les touches hors-gamme. Les notes "fausses" cessent d'exister pour l'œil, plus besoin de calculer la gamme.
 - **Réalité augmentée** : le projecteur éclaire les seules touches utiles et y pose un **code couleur porteur de sens**.
 
-**Ma valeur ajoutée** : une analyse harmonique **automatique**, qui déduit la *chord-scale* de chaque accord dans **toutes les tonalités**, sur n'importe quelle grille chiffrée, synchronisée à un *backing track* généré.
+**La valeur ajoutée** : une analyse harmonique **automatique**, qui déduit la *chord-scale* de chaque accord dans **toutes les tonalités**, sur n'importe quelle grille chiffrée, synchronisée à un *backing track* généré.
 
 <!--
 NOTE (~2 min) : C'est le cœur conceptuel. RD = on enlève (l'obscurité), RA = on ajoute (la lumière).
@@ -154,7 +169,7 @@ la gamme de chaque accord à la main pour chaque morceau. Le vocabulaire va jusq
 - **orange** : *target note*
 - **hachuré** : note à venir, instable dans l'accord courant
 
-Réglages selon le niveau : tessiture (complet → main droite → 2 / 1 octave), densité du *backing*, tempo, mode figé, et une **anticipation** qui allume l'accord suivant une croche ou une noire avant.
+Réglages selon le niveau : tessiture (complet, main droite, puis 2 ou 1 octave), densité du *backing*, tempo, mode figé, et une **anticipation** qui allume l'accord suivant une croche ou une noire avant.
 
 </div>
 <div>
@@ -176,7 +191,7 @@ L'anticipation répond directement à une des charges nommées dans la QR : anti
 
 - **Mode libre** : éclaire juste la *chord-scale*. Le mode d'entrée. *(cat. 1, gammes)*
 - **Guide Tone** : 3ce / 7e conduites en rouge, pour des lignes qui spécifient l'harmonie, un pas vers le bebop. *(cat. 2, changes)*
-- **Contour** : un échantillon lumineux de la gamme monte et descend ; on suit un dessin mélodique sur une durée macro. *(cat. 6)*
+- **Contour** : un échantillon lumineux de la gamme monte et descend, traçant un dessin mélodique sur une durée macro. *(cat. 6)*
 - **Flow** ("gommage") : générer un flux de croches, puis prendre des silences pour ponctuer le discours. *(cat. 6)*
 - **Note de début et de fin** : une note de départ (rouge) et d'arrivée (orange) par phrase, une amorce pour ceux qui bloquent sur "quoi jouer". *(cat. 6)*
 
@@ -193,14 +208,14 @@ reste ancré dans des méthodes existantes.
 
 ![bg right:44% fit](assets/omr-fiabilite.png)
 
-Idéalement, on photographie la leadsheet et un module **OMR** en extrait la grille. Testé sur **11 standards** (outil de Martinez-Sevilla et al.) :
+Idéalement, la leadsheet est photographiée et un module **OMR** en extrait la grille. Testé sur **11 standards** (outil de Martinez-Sevilla et al.) :
 
 - précision moyenne : **44 / 100**
 - **11 / 11** tombent sur un **mauvais nombre de temps**
 
 Or une seule erreur de temps casse la **carrure** (un 4/4 devient 3/4) : inacceptable en apprentissage.
 
-**Conclusion** : on renonce à l'OMR, on part de grilles *.tsv*. C'est l'analyse harmonique automatique qui fait le reste.
+**Conclusion** : l'OMR est écarté, les grilles sont saisies à la main au format *.tsv*. C'est l'analyse harmonique automatique qui fait le reste.
 
 <!--
 NOTE (~2 min) : Point demandé explicitement. Le message à retenir est contre-intuitif : ce test ne
@@ -217,10 +232,10 @@ analyser l'harmonie : c'est l'artefact qui s'en charge.
 
 D'un *.tsv* jusqu'à la projection et au son, le long d'un pipeline de modules :
 
-- **harmonie en Python pur** : pas de bibliothèque de théorie, une table d'accords + arithmétique modulo 12
+- **harmonie en Python pur** : pas de bibliothèque de théorie, une table d'accords et de l'arithmétique modulo 12
 - **pygame-ce** : trois fenêtres (projection, HUD, grille), boucle 60 FPS
 - **FluidSynth hors-ligne** : *backing* en **4 couches parallèles**, mixées en numpy
-- **projection** : clavier canonique + **homographie OpenCV** (corrige l'angle du projecteur)
+- **projection** : clavier canonique, puis **homographie OpenCV** (corrige l'angle du projecteur)
 - **horloge murale** unique : lumières et son sur le même temps
 
 <!--
@@ -238,7 +253,7 @@ possible sur n'importe quel piano droit). Le reste du détail est en backup si q
 
 # Démonstration
 
-Le système sur un vrai piano · ~5 minutes
+Le système sur un vrai piano, environ 5 minutes
 
 <!--
 NOTE : Basculer sur la vidéo proto-media/5. video demo V2/demo-2026-05-26.mp4 (6:14, en couper ~5 min).
@@ -255,16 +270,16 @@ Pour ancrer les tests dans la QR, **mode libre uniquement** : chaque participant
 <div class="cols">
 <div>
 
-**Volet 1 · entretien expert**
+**Volet 1, entretien expert**
 Un professeur de piano jazz : évaluation pédagogique et cognitive du cadrage.
 
 </div>
 <div>
 
-**Volet 2 · tests participants** (**n = 8**)
-- NASA-TLX → charge cognitive (QR1)
-- STAI-6 → anxiété (QR2)
-- auto-efficacité → confiance (QR2)
+**Volet 2, tests participants** (**n = 8**)
+- NASA-TLX, la charge cognitive (QR1)
+- STAI-6, l'anxiété (QR2)
+- auto-efficacité, la confiance (QR2)
 - entretien semi-structuré
 
 </div>
@@ -285,9 +300,9 @@ Wilcoxon (n=8, pas de normalité supposée). Annoncer d'emblée l'honnêteté m�
 Un professeur de piano jazz du **conservatoire populaire de Genève**, en **deux rencontres** :
 
 - **27 mai** : découverte à chaud, démo des 5 modes, essais avec deux de ses élèves (riche, mais peu structuré)
-- **3 juin** : l'entretien analysé, structuré (~**130 min**)
+- **3 juin** : l'entretien analysé, structuré (environ **130 min**)
 
-**Semi-structuré, en deux temps** : on **montre** (présentation + démo), puis on **questionne** (charge mentale, apport des couleurs, public visé, fonctionnalités manquantes). Format quasi libre : on laisse le professeur digresser, on relance pour recentrer sur la QR. L'artefact reste **jouable tout du long**.
+**Semi-structuré, en deux temps** : d'abord **montrer** (présentation et démo), puis **questionner** (charge mentale, apport des couleurs, public visé, fonctionnalités manquantes). Format quasi libre : le professeur est largement laissé à ses digressions, avec des relances pour recentrer sur la QR. L'artefact reste **jouable tout du long**.
 
 **Traitement** : transcription via *Whisper* (relecture du vocabulaire jazz), puis **analyse thématique** (thème, citation, analyse, lien avec la QR).
 
@@ -306,11 +321,11 @@ Whisper + analyse thématique = la rigueur de traitement. Bien poser le statut :
 
 Le thème central qui ressort, c'est la **charge cognitive**. Le professeur cherche lui-même à empêcher ses élèves de "trop réfléchir" en improvisant, et il voit dans l'artefact un moyen d'y arriver : suivre la couleur pour **"juste jouer, puis se taire"**.
 
-- il décrit un outil **réglable**, applicable à tout niveau pourvu qu'on dose la complexité
+- il décrit un outil **réglable**, applicable à tout niveau pourvu que la complexité soit dosée
 - il lui donne une **légitimité pédagogique** (pédagogies alternatives, l'aide faite pour être retirée)
 - **réserves** : "bien foutu, mais très serré", "les lumières vont beaucoup trop vite" sur les grilles chargées, d'où l'idée de **gammes passe-partout**
 
-Le point fort : il **formule le mécanisme spontanément**, avant notre question ("c'est ce que je suis en train de dire à l'instant"). Une convergence sur l'orientation, pas une preuve de l'effet.
+Le point fort : il **formule le mécanisme spontanément**, avant toute question ("c'est ce que je suis en train de dire à l'instant"). Une convergence sur l'orientation, pas une preuve de l'effet.
 
 <!--
 NOTE (~2 min) : Le point fort : le prof formule le mécanisme spontanément, AVANT ma question, donc ce
@@ -327,7 +342,7 @@ dépend du dosage (tempo, densité, morceau).
 
 **Déroulé d'une séance (1 h à 1 h 30, individuelle) :**
 
-1. accueil, consentement, questionnaire initial → niveau et choix des morceaux
+1. accueil, consentement, questionnaire initial qui fixe le niveau et les morceaux
 2. explication du système et démonstration par l'expérimentateur
 3. morceau A, puis NASA-TLX et questionnaire anxiété / auto-efficacité
 4. morceau B (condition inverse), puis les mêmes questionnaires
@@ -359,14 +374,14 @@ Test de **Wilcoxon signed-rank** (apparié) sur les différences **AVEC − SANS
 <div>
 
 **Scores composites** (entrées du test)
-- NASA-TLX → *Raw TLX*, moyenne des 6 critères (0-100)
-- STAI-6 → score total (20-80)
-- auto-efficacité → moyenne des items (1-7)
+- NASA-TLX : le *Raw TLX*, moyenne des 6 critères (0-100)
+- STAI-6 : score total (20-80)
+- auto-efficacité : moyenne des items (1-7)
 
 </div>
 </div>
 
-**Lecture** : on retient le *p* **bilatéral** (prudent : le contre-risque de surcharge existe) et la taille d'effet *r* (rang-bisérial). À n = 8, *W*, *p* et *r* dérivent des **mêmes rangs** : un seul participant peut faire basculer *p*.
+**Lecture** : le *p* **bilatéral** est retenu (prudent : le contre-risque de surcharge existe), avec la taille d'effet *r* (rang-bisérial). À n = 8, *W*, *p* et *r* dérivent des **mêmes rangs** : un seul participant peut faire basculer *p*.
 
 <!--
 NOTE (~2 min) : Justifier Wilcoxon plutôt que t-test (pas de normalité, petit n). Les composites réduisent
@@ -377,13 +392,13 @@ un r moyen avec un p élevé, c'est une seule information, une tendance non assu
 
 ---
 
-# QR1 · charge cognitive : le signal le plus net
+# QR1 : charge cognitive, le signal le plus net
 
 ![bg right:44% fit](assets/slope_rtlx.png)
 
 NASA-TLX (*Raw TLX*), composite AVEC vs SANS :
 
-- **r ≈ 0,50** en valeur absolue, dans le sens de H1 (effet large)
+- **r de 0,50** en valeur absolue, dans le sens de H1 (effet large)
 - **6 participants sur 8** s'orientent en faveur de H1
 - l'**exigence mentale** passe de **75 à 35** en médiane
 
@@ -392,21 +407,21 @@ Mais **p = 0,25** : la tendance **ne** franchit **pas** le seuil de significativ
 À lire comme une **tendance de taille d'effet** en faveur de H1, pas comme une preuve. C'est néanmoins la réponse la plus solide du travail.
 
 <!--
-NOTE (~2 min) : C'est LA slide qui répond à QR1. Le 75 → 35 sur l'exigence mentale est l'indice le plus
+NOTE (~2 min) : C'est LA slide qui répond à QR1. Le 75 à 35 sur l'exigence mentale est l'indice le plus
 parlant, mais c'est une médiane descriptive sur une sous-échelle, pas un test. Le composite RTLX, lui,
 donne r=0.50 mais p=0.25 (n=8). Honnêteté : on ne démontre pas, on oriente. P04 et P08 vont à contre-sens.
 -->
 
 ---
 
-# QR2 · barrière affective : un signal plus faible
+# QR2 : barrière affective, un signal plus faible
 
 <div class="cols">
 <div>
 
 ![w:430](assets/slope_stai6.png)
 
-**STAI-6 (anxiété)** · r ≈ 0,44
+**STAI-6 (anxiété)**, r de 0,44
 L'anxiété **tend à baisser**, le sentiment de sécurité ressort. P06 parle d'un **"filet qui est là"**. 5 / 8 en faveur de H1.
 
 </div>
@@ -414,8 +429,8 @@ L'anxiété **tend à baisser**, le sentiment de sécurité ressort. P06 parle d
 
 ![w:430](assets/slope_selfeff.png)
 
-**Auto-efficacité (confiance)** · r ≈ 0,36
-La mesure la **plus faible** : médiane plate, 4 / 8 seulement. La confiance tend à monter, sans qu'on puisse l'affirmer.
+**Auto-efficacité (confiance)**, r de 0,36
+La mesure la **plus faible** : médiane plate, 4 / 8 seulement. La confiance tend à monter, sans que cela soit démontré.
 
 </div>
 </div>
@@ -446,7 +461,7 @@ sans projection). Auto-efficacité : signal le plus ténu, médiane plate, à ne
 <div>
 
 **Ce qui bascule en rouge**
-- partage de l'attention : le regard est soulagé, mais on craint de moins s'écouter
+- partage de l'attention : le regard est soulagé, mais avec la crainte de moins s'écouter
 - rétention de la musique : faible sur une séance unique
 
 </div>
@@ -487,9 +502,9 @@ en concurrence). Mais c'est post-hoc et confondu : P04 et P08 ont eu les morceau
 
 # Conclusion
 
-Revenons à la question : la réalité augmentée et diminuée peut-elle soutenir l'improvisation jazz mélodique ?
+Retour à la question de départ : la réalité augmentée et diminuée peut-elle soutenir l'improvisation jazz mélodique ?
 
-- **QR1** (charge) : le signal est **le plus net**, tout converge vers une charge allégée (75 → 35, *r* le plus fort)
+- **QR1** (charge) : le signal est **le plus net**, tout converge vers une charge allégée (75 à 35, *r* le plus fort)
 - **QR2** (affect) : **plus faible**, l'anxiété baisse et la sécurité ressort, l'auto-efficacité reste plate
 - **aucune mesure n'est significative** : à n = 8, l'étude est **sous-puissante**
 
@@ -513,7 +528,7 @@ au moment où on en joue, est une voie sérieuse au-delà du seul piano jazz. Me
 
 Questions ?
 
-<div class="meta">Alexandre Riedo · alexandreriedopro@gmail.com</div>
+<div class="meta">Alexandre Riedo, alexandreriedopro@gmail.com</div>
 
 <!--
 NOTE : Slides de réserve possibles pour le Q&A (à ajouter si besoin) : l'architecture technique (pipeline
