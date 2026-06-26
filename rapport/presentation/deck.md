@@ -476,6 +476,25 @@ sans projection). Auto-efficacité : signal le plus ténu, médiane plate, à ne
 
 ---
 
+# Lecture par profil, et limites
+
+En croisant questionnaires, entretiens et avis de l'expert, les tendances **convergent** vers H1, mais avec prudence.
+
+- les **débutants à intermédiaires** (P01, P02, P03, P05, P06) sont favorables
+- les **lecteurs de grille chevronnés** (P04, P08) vont **à contre-sens** : P08 parle de **"deux systèmes cognitifs"**, P04 dit que la projection le déconcerte
+- **6 sur 8** reprendraient la projection ; l'outil est vu comme une **béquille à dépasser** ("petites roues de vélo")
+
+**Limites** : n = 8 sous-puissant, lecture par profil **post-hoc**, confondue avec l'ordre et la difficulté des morceaux (26-2, Giant Steps tombés sur la condition AVEC), biais de désirabilité.
+
+<!--
+NOTE (~2 min) : La nuance importante : l'effet moyen recouvre deux populations. Ça marche pour les
+débutants-intermédiaires, ça résiste chez les chevronnés (réflexe de grille déjà automatisé qui entre
+en concurrence). Mais c'est post-hoc et confondu : P04 et P08 ont eu les morceaux les plus durs sur AVEC.
+À poser comme une piste, pas une conclusion.
+-->
+
+---
+
 # Entretiens : pourquoi les mener
 
 Au-delà des scores, un **entretien semi-directif** par participant, analysé par thèmes en travers des 8. Quatre intentions :
@@ -524,25 +543,6 @@ les plus verts recoupent les questionnaires (facilité, charge, sécurité). Deu
 et ils sont instructifs : le partage de l'attention (P02 "peur de moins anticiper avec l'oreille", P07/P08
 écoutent mieux sans) et la rétention (séance unique). Les réserves de lisibilité (bichromie, confusion des
 deux bleus de P03) et les améliorations nourrissent directement la feuille de route de la conclusion.
--->
-
----
-
-# Lecture par profil, et limites
-
-En croisant questionnaires, entretiens et avis de l'expert, les tendances **convergent** vers H1, mais avec prudence.
-
-- les **débutants à intermédiaires** (P01, P02, P03, P05, P06) sont favorables
-- les **lecteurs de grille chevronnés** (P04, P08) vont **à contre-sens** : P08 parle de **"deux systèmes cognitifs"**, P04 dit que la projection le déconcerte
-- **6 sur 8** reprendraient la projection ; l'outil est vu comme une **béquille à dépasser** ("petites roues de vélo")
-
-**Limites** : n = 8 sous-puissant, lecture par profil **post-hoc**, confondue avec l'ordre et la difficulté des morceaux (26-2, Giant Steps tombés sur la condition AVEC), biais de désirabilité.
-
-<!--
-NOTE (~2 min) : La nuance importante : l'effet moyen recouvre deux populations. Ça marche pour les
-débutants-intermédiaires, ça résiste chez les chevronnés (réflexe de grille déjà automatisé qui entre
-en concurrence). Mais c'est post-hoc et confondu : P04 et P08 ont eu les morceaux les plus durs sur AVEC.
-À poser comme une piste, pas une conclusion.
 -->
 
 ---
