@@ -2,7 +2,7 @@
 
 An augmented-reality piano for learning jazz improvisation. A projector above the keyboard lights up the right notes in real time (chord-scales, guide tones, target notes), synchronized with an auto-generated swing backing track (walking bass, drums, guitar comping). Everything is driven by an automatic harmonic analysis of the lead sheet.
 
-![The system in action](rapport/final_export/make-to-gif-small.gif)
+![The system in action](docs/demo.gif)
 
 Played in a dark room: light adds meaning to the useful keys (augmented reality), darkness removes the wrong ones (diminished reality). The goal is to offload the "which notes are correct right now?" question so the player's attention goes to the creative part.
 
@@ -12,8 +12,8 @@ Bachelor's project in Information Systems and Service Science, Centre Universita
 
 Research question: can augmented and diminished reality on a piano support melodic jazz improvisation in a realistic context (scrolling grid, backing track, multiple keys)? Evaluated with an expert interview and a within-subject study (n = 8): NASA-TLX, STAI-6, self-efficacy. Results show moderate-to-large effect-size trends in the predicted direction, none significant at n = 8.
 
-- Report (French): [rapport/final_export/Projet de Bachelor - Alexandre RIEDO.pdf](rapport/final_export/Projet%20de%20Bachelor%20-%20Alexandre%20RIEDO.pdf)
-- Slides: [rapport/presentation/deck.pdf](rapport/presentation/deck.pdf)
+- Report (French): [docs/Projet de Bachelor - Alexandre RIEDO.pdf](docs/Projet%20de%20Bachelor%20-%20Alexandre%20RIEDO.pdf)
+- Slides: [docs/deck.pdf](docs/deck.pdf)
 - Design reference: [SPEC.md](SPEC.md)
 
 ## Features

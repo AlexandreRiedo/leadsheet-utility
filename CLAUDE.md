@@ -14,7 +14,7 @@ SPEC.md is the authoritative design reference (treat it as a living document tha
 
 ## Written Work
 
-The bachelor report lives under `rapport/` (gitignored media and drafts; the LaTeX/Word source and PDFs accumulate here). Target length **40–60 pages**. Structure agreed with the supervisor (Patrick Roth), per `rapport/notes/final-meeting-notes.txt`:
+The bachelor report lives under `rapport/` (the whole directory is gitignored, local-only; the published deliverables the README links to — final PDF, slide deck, demo gif — are tracked copies in `docs/`). Target length **40–60 pages**. Structure agreed with the supervisor (Patrick Roth), per `rapport/notes/final-meeting-notes.txt`:
 
 1. **Introduction**
 2. **État de l'art** — restructured by theme; must cover cognitive load and anxiety in improvisation learning. Builds on the prior design-science work.
@@ -95,7 +95,7 @@ poetry run ruff format .
 # Assemble the final report: insert the annex PDFs after their title/separator
 # pages in the base. Interview script -> after base p.80 ("Questions de
 # l'interview..."); participant session -> after base p.81 ("Feuille de route...").
-# Base = rapport/final_export/to_finalize.pdf; output = rapport/final_export/
+# Base = rapport/final_export/to_finalize.pdf; output = docs/
 # Projet de Bachelor - Alexandre RIEDO.pdf. Insertion points are in INSERTIONS
 # inside the script; --base / --output override the paths.
 poetry run python scripts/append_annexes.py

@@ -200,24 +200,15 @@ __marimo__/
 # Per-machine projector calibration (geometry depends on physical setup)
 /data/calibration.json
 
-# Demo / prototype media (too large for git; host externally)
-proto-media/**/*.mp4
-proto-media/**/*.mov
-proto-media/**/*.avi
-proto-media/**/*.mkv
-proto-media/**/*.webm
-proto-media/**/*.m4v
-proto-media/**/*.wmv
-proto-media/**/*.flv
-
 # Videos and PDFs from the testing sessions
 testing-sessions/
-
-# Throwaway recoupement figures from analyze_tests.py (report figures live in figures/)
-rapport/stats/figures/_verify/
 
 # Per-machine mermaid-cli helper (hard-codes a local Chrome path; recreate per README)
 /puppeteer-config.json
 
-# Demo Video
-rapport/presentation/CUI Bachelor Demo Video.mov
+# Local-only work directories (kept on disk, not in the repo).
+# Published assets the README/CONTROLS need live in /docs.
+/proto-media/
+/rapport/
+/.claude/
+/.vscode/

@@ -2,7 +2,7 @@
 
 Key handling: [src/leadsheet_utility/gui/input.py](src/leadsheet_utility/gui/input.py) (main app), [src/leadsheet_utility/calibration/ui.py](src/leadsheet_utility/calibration/ui.py) (calibration).
 
-![The UI: chord chart and projected keyboard](rapport/figures/irl-captures/IMG_9022.JPG)
+![The UI: chord chart and projected keyboard](docs/ui-overview.jpg)
 
 ## Main application
 

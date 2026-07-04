@@ -33,7 +33,7 @@ from pypdf import PdfReader, PdfWriter
 ROOT = Path(__file__).resolve().parent.parent
 
 DEFAULT_BASE = ROOT / "rapport" / "final_export" / "to_finalize.pdf"
-DEFAULT_OUTPUT = ROOT / "rapport" / "final_export" / "Projet de Bachelor - Alexandre RIEDO.pdf"
+DEFAULT_OUTPUT = ROOT / "docs" / "Projet de Bachelor - Alexandre RIEDO.pdf"
 
 # (after_page is 1-indexed: the annex is inserted immediately after that base page,
 #  which is the annex's title/separator page.)
