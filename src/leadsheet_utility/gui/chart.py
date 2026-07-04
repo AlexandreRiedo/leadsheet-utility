@@ -49,7 +49,7 @@ def _font(size: int, bold: bool = False) -> pygame.font.Font:
     key = (size, bold)
     cached = _fonts.get(key)
     if cached is None:
-        cached = pygame.font.SysFont("consolas", size, bold=bold)
+        cached = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", size, bold=bold)
         _fonts[key] = cached
     return cached
 

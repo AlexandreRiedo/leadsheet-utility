@@ -72,12 +72,12 @@ _fonts: dict[str, pygame.font.Font] = {}
 
 def _get_fonts() -> dict[str, pygame.font.Font]:
     if not _fonts:
-        _fonts["title"] = pygame.font.SysFont("consolas", 39, bold=True)
-        _fonts["heading"] = pygame.font.SysFont("consolas", 30, bold=True)
-        _fonts["section"] = pygame.font.SysFont("consolas", 30, bold=True)
-        _fonts["body"] = pygame.font.SysFont("consolas", 27)
-        _fonts["small"] = pygame.font.SysFont("consolas", 20)
-        _fonts["small_bold"] = pygame.font.SysFont("consolas", 20, bold=True)
+        _fonts["title"] = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 39, bold=True)
+        _fonts["heading"] = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 30, bold=True)
+        _fonts["section"] = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 30, bold=True)
+        _fonts["body"] = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 27)
+        _fonts["small"] = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 20)
+        _fonts["small_bold"] = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 20, bold=True)
     return _fonts
 
 

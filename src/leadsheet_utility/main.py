@@ -1354,7 +1354,7 @@ class App:
         """Draw an animated 'Rendering audio...' screen while the render thread runs."""
         surface = self._hud_window.get_surface()
         surface.fill((30, 30, 30))
-        font = pygame.font.SysFont("consolas", 33)
+        font = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 33)
         n_dots = 1 + (int(time.perf_counter() * 3) % 3)
         text = font.render(f"{message}{'.' * n_dots}", True, (220, 220, 220))
         w, h = surface.get_size()
@@ -1470,7 +1470,7 @@ class App:
                 projector_size=self._proj_size,
             )
         if self._calibration_font is None:
-            self._calibration_font = pygame.font.SysFont("consolas", 20)
+            self._calibration_font = pygame.font.SysFont("dejavusansmono,consolas,liberationmono,monospace", 20)
         logger.info("Entered calibration mode")
 
     def _finish_calibration(self) -> None:

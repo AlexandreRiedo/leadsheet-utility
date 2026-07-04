@@ -1,6 +1,6 @@
 # SPEC.md — leadsheet-utility: Augmented Piano for Jazz Improvisation
 
-> **Status (2026-06):** The implementation is feature-complete — every module below is marked **Done** and the system has been used in real testing sessions. Only the §12 stretch goals remain unbuilt. Work has moved to the **written bachelor thesis** (40–60 pages); see CLAUDE.md → "Written Work" for the report structure. This document is now primarily a design reference to draw on while writing the *Solution conceptuelle* and *Solution technique* chapters.
+> **Status (2026-07, final):** The implementation is feature-complete — every module below is marked **Done** and the system has been used in real testing sessions. Only the §12 stretch goals remain unbuilt. This document is the design reference for the system; where prose and code disagree, the code is authoritative.
 
 ## 1. Project Overview
 
@@ -28,7 +28,7 @@ Jazz improvisation is hard because the harmonic context changes rapidly and the 
 
 ### Normal Usage (every session)
 
-1. User launches the app. It loads `data/calibration.json` (and, eventually, user config from `~/.leadsheet-utility/`).
+1. User launches the app. It loads `data/calibration.json`.
 2. The projector display goes fullscreen black (no light on the piano yet). The primary display shows the HUD.
 3. User presses `O` to open a `.tsv` lead sheet file (or the app loads the last-used file).
 4. The HUD shows: title, chord chart, tempo, exercise selection.
@@ -234,29 +234,17 @@ Pre-computed as two voice-led paths across the form (`LeadSheet.guide_tone_line`
 
 ## 6. Exercises (Projection Modes) — Implemented
 
-All exercises share a common interface:
+All exercises share a common currency: plain functions that emit or transform a `list[KeyHighlight]` (defined in `projection/renderer.py`), composed each frame by `App._render_projection`:
 
 ```python
-class Exercise(ABC):
-    name: str
-    description: str
-
-    @abstractmethod
-    def get_highlights(
-        self,
-        chord: ChordEvent,
-        beat_position: float,
-        form_position: float,   # 0.0–1.0 across the whole form
-        prev_chord: ChordEvent | None,
-    ) -> list[KeyHighlight]:
-        """Return which keys to highlight and in what color."""
-        ...
-
 @dataclass
 class KeyHighlight:
     midi_note: int
-    color: tuple[int, int, int]   # RGB
+    color: RGB                # (r, g, b) tuple
+    striped: bool = False     # diagonal black hashes: "right note, don't play it *yet*"
 ```
+
+There is no exercise base class. Each exercise contributes either a *base* highlight producer (Free Mode), a pre-overlay *filter* (Contour, Flow), or a post-overlay *painter* (chord tones, root, Guide Tone, Start & End); `main._render_projection()` runs them in a fixed order so colours compose predictably.
 
 ### 6.1 Free Mode (Mode Libre) — Implemented
 
@@ -320,9 +308,14 @@ These overlays are pure post-processing passes over a `list[KeyHighlight]`, so f
 | Element | Color | RGB |
 |---|---|---|
 | Chord-scale notes (base) | Green | `(60, 220, 90)` |
+| Chord-tone overlay | Cyan-blue | `(100, 200, 255)` |
+| Root overlay | Saturated blue | `(60, 130, 255)` |
 | Guide tone / Start & End start note | Red | `(255, 50, 50)` |
+| Next-chord guide-tone preview | Orange | `(255, 150, 30)` |
 | Start & End target note | Orange | `(255, 140, 40)` |
 | All other keys / blackout | Black | `(0, 0, 0)` — **no light** |
+
+Targets whose pitch class falls outside the currently sounding chord-scale keep their colour but are hatched with diagonal black stripes (`KeyHighlight.striped`).
 
 Black background is critical: the projector emits no light for black pixels, so only highlighted keys are visible on the physical piano.
 
@@ -331,8 +324,6 @@ Black background is critical: the projector emits no light for black pixels, so 
 ## 7. Projection Engine — Implemented
 
 Implemented in `projection/layout.py` (88-key `KeyRect` geometry with configurable MIDI range, per-instrument `black_width_ratio`/`black_height_ratio`, and per-black-key `(dx, dy)` offsets), `projection/renderer.py` (`render_canonical` draws `KeyHighlight`s into a flat 1920×200 surface), and `projection/warp.py` (`warp_canonical_to_projector` via `cv2.warpPerspective`). Default range is **F2–E6** so both edges align to the left side of an F-key — a single physical landmark for both calibration corners. Range endpoints are validated to be white keys. Wired into `main.py`: each frame, the timeline's current beat is shifted by `+_PROJECTION_LEAD_SECONDS - audio_delay_ms/1000` to mask projector input lag, the chord at that beat is resolved, Free-Mode (plus overlays) produces a `list[KeyHighlight]`, those are rendered → warped → blitted onto the projector window. A separate **musical anticipation** (`AnticipationMode`, key `A`: OFF / 8TH / QUARTER) adds a further look-ahead measured in note values rather than seconds, so the projection flips to the next chord on the last 8th or quarter before the change and the lead stays rhythmically constant at any tempo. This is independent of the seconds-based hardware lead above. `scripts/preview_projector.py` still exercises the same pipeline against a static C-minor highlight.
-
-### Reference Specification
 
 ### Rendering Principle
 
@@ -403,7 +394,7 @@ Target **60 FPS**. Per-frame work: ~7–15 filled rectangles into a small canoni
 
 ### SoundFont
 
-GM SoundFont (`.sf2`) required. The bundled `data/soundfonts/GeneralUser-GS.sf2` is used by default. Path configurable in `~/.leadsheet-utility/config.json`.
+GM SoundFont (`.sf2`) required. The bundled `data/soundfonts/GeneralUser-GS.sf2` is used (the path is hard-wired; a user config file for overriding it was planned but not implemented — see §10).
 
 ### Walking Bass Generator — Implemented
 
@@ -506,10 +497,7 @@ Implemented in `gui/hud.py` and `gui/input.py`. HUD renders in a second `pygame.
 
 ### Settings Persistence
 
-`~/.leadsheet-utility/config.json` (cross-platform via `pathlib.Path.home()`):
-- SoundFont path, projector display index, piano range
-- Calibration data (marker positions + homography matrix)
-- Last used directory/file, exercise parameters, colors, swing ratio, default tempo
+The only persisted state is the calibration, saved to `data/calibration.json` (project-local, gitignored). A broader user config file (`~/.leadsheet-utility/config.json` for SoundFont path, last-used file, exercise parameters, etc.) was planned but **not implemented**; display assignment is overridable via the `HUD_DISPLAY` / `CHART_DISPLAY` / `PROJ_DISPLAY` environment variables instead.
 
 ---
 
@@ -545,9 +533,9 @@ matplotlib = "^3.11.0"
 
 ---
 
-## 12. MVP Scope
+## 12. Scope
 
-### Done
+### Implemented
 
 - [x] Lead sheet parser (MIR-style `.tsv` + `.meta.json`)
 - [x] Harmony analyzer (chord → scale, 7 context rules, guide-tone voice-leading)
@@ -575,7 +563,7 @@ matplotlib = "^3.11.0"
 - [x] Start & End Note exercise (red entry + orange target per phrase, phrase length `P`, re-roll `Shift+P`)
 - [x] Contour exercise (sliding window filter over a smoothed random walk, width `W`, speed `X`, re-roll `Shift+W`)
 
-### Stretch Goals
+### Stretch Goals (not built — out of scope for the thesis)
 
 - [ ] Camera-based automatic calibration
 - [ ] Piano comping track
@@ -584,9 +572,9 @@ matplotlib = "^3.11.0"
 
 ## 13. Testing Strategy
 
-Test-driven development. Tests define expected behavior before implementation. The harmony analyzer has fixture-driven regression tests (JSON files in `tests/fixtures/harmony/` with expected pitch-class sets per chord for real lead sheets).
+Developed test-first: tests defined expected behavior before implementation. The harmony analyzer has fixture-driven regression tests (JSON files in `tests/fixtures/harmony/` with expected pitch-class sets per chord for real lead sheets).
 
-### Existing Tests
+### Test Suite
 
 - `test_parser.py` — chord symbol parsing, edge cases, `ChordEvent` field validation
 - `test_harmony.py` — scale resolution per quality, extension overrides, context rules
@@ -599,10 +587,10 @@ Test-driven development. Tests define expected behavior before implementation. T
 - `test_calibration_persistence.py` / `test_calibration_ui.py` — JSON round-trip with default fallbacks, 5-phase state machine
 - `test_main.py` — app integration
 
-### Planned Tests
+### Known Coverage Gaps
 
-- Guide Tone exercise — voice-led path selection and overlay outputs (not yet covered)
-- FluidSynth rendering (integration) — valid stereo int16 buffer of expected length
+- Guide Tone exercise — voice-led path selection and overlay outputs (exercised manually, no automated tests)
+- FluidSynth rendering (integration) — the offline render / mix path has no automated tests (validated by ear in real sessions)
 
 ---
 
