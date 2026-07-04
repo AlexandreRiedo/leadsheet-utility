@@ -6,6 +6,8 @@ A first session, install to practice run. Shortcuts: [CONTROLS.md](CONTROLS.md).
 
 Projector above the piano as a secondary display, keystone correction off, dark room.
 
+![The setup with lights off and on: projector on a tripod above the piano, HUD laptop, chord-chart tablet](docs/pair-9036-9040.jpg)
+
 ```bash
 poetry install
 cd src

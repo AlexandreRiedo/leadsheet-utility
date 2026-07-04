@@ -1373,6 +1373,7 @@ class App:
             root.withdraw()
             path = filedialog.askopenfilename(
                 title="Open Lead Sheet",
+                initialdir=str(Path("data/leadsheets").resolve()),
                 filetypes=[("TSV files", "*.tsv"), ("All files", "*.*")],
             )
             root.destroy()
