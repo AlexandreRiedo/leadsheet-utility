@@ -575,7 +575,7 @@ au moment où on en joue, est une voie sérieuse au-delà du seul piano jazz. Me
 Le système sur un vrai piano, environ 5 minutes
 
 <!--
-NOTE : Basculer sur la vidéo proto-media/5. video demo V2/demo-2026-05-26.mp4 (6:14, en couper environ 5 min).
+NOTE : Basculer sur la vidéo proto-media/05-video-demo-v2/demo-2026-05-26.mp4 (6:14, en couper environ 5 min).
 Montrer : pièce sombre, la grille qui défile, le mode libre, un jeu (contour ou guide tone), le backing track.
 C'est la dernière partie de la présentation, juste avant les questions.
 -->

@@ -281,4 +281,4 @@ Croiser les trois mesures entre elles **et** avec l'entretien :
 > vérification des calculs — les deux sont complémentaires, pas concurrentes.*
 
 > *Vérifier l'année/pagination exacte de Cegarra & Morgado et de Schweitzer & Paulhan dans les
-> PDF de `proto-media/8-working-on-tests/protocole/refs/` avant l'export final de la biblio.*
+> PDF de `proto-media/08-working-on-tests/protocole/refs/` avant l'export final de la biblio.*

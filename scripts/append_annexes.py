@@ -38,8 +38,8 @@ DEFAULT_OUTPUT = ROOT / "rapport" / "final_export" / "Projet de Bachelor - Alexa
 # (after_page is 1-indexed: the annex is inserted immediately after that base page,
 #  which is the annex's title/separator page.)
 INSERTIONS = [
-    (80, ROOT / "proto-media" / "7. evaristo-presentation V2" / "INTERVIEW SCRIPT V2.pdf"),
-    (81, ROOT / "proto-media" / "8-working-on-tests" / "protocole" / "pdf" / "session-participant.pdf"),
+    (80, ROOT / "proto-media" / "07-evaristo-presentation-v2" / "INTERVIEW SCRIPT V2.pdf"),
+    (81, ROOT / "proto-media" / "08-working-on-tests" / "protocole" / "pdf" / "session-participant.pdf"),
 ]
 
 

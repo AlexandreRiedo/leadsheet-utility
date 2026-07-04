@@ -1,11 +1,11 @@
 """Print the guide-tone line for a lead sheet.
 
 Usage:
-    poetry run python playground/show_guide_tone_line.py <piece>
+    poetry run python scripts/show_guide_tone_line.py <piece>
 
 Examples:
-    poetry run python playground/show_guide_tone_line.py 26_2
-    poetry run python playground/show_guide_tone_line.py all_the_things_you_are
+    poetry run python scripts/show_guide_tone_line.py 26_2
+    poetry run python scripts/show_guide_tone_line.py all_the_things_you_are
 
 <piece> is the stem of a .tsv file in data/leadsheets/.
 """

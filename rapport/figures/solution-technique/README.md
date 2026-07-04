@@ -1,7 +1,7 @@
 # Figures — Solution technique
 
 Rendus PNG en **mode clair** (thème mermaid `default`, fond blanc, échelle 3) des
-diagrammes du §2 de `../../plan-solution-technique.md`. Les fichiers `.mmd` sont les
+diagrammes du §2 de `../../plans/plan-solution-technique.md`. Les fichiers `.mmd` sont les
 sources extraites du plan : **le plan reste la source de vérité**, ces `.mmd` en sont
 une copie régénérable.
 
@@ -31,7 +31,7 @@ Depuis la racine du dépôt, avec Node installé :
 
 1. Réextraire les `.mmd` depuis le plan (resynchronise figures et doc) :
    ```bash
-   python rapport/_extract_mmd.py
+   python rapport/plans/_extract_mmd.py
    ```
 2. Créer un `puppeteer-config.json` pointant sur un Chrome/Edge local (évite le
    téléchargement de Chromium par puppeteer) :

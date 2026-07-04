@@ -8,9 +8,9 @@ import re
 import unicodedata
 from pathlib import Path
 
-here = Path(__file__).resolve().parent  # rapport/
+here = Path(__file__).resolve().parent  # rapport/plans/
 src = here / "plan-solution-technique.md"
-out = here / "figures" / "solution-technique"
+out = here.parent / "figures" / "solution-technique"
 out.mkdir(parents=True, exist_ok=True)
 
 lines = src.read_text(encoding="utf-8").splitlines()

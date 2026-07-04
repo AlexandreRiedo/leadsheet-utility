@@ -3,7 +3,7 @@
 
 Pour chaque mesure (charge, anxiété, confiance) : un score composite par participant
 et par condition → Wilcoxon apparié exact (scipy) dans la direction prédite → taille
-d'effet + figures. Justification de chaque choix : rapport/guide-interpretation-stats.md.
+d'effet + figures. Justification de chaque choix : rapport/plans/guide-interpretation-stats.md.
 
     poetry run python rapport/stats/analyze_tests.py   (deps : groupe Poetry « stats »)
 

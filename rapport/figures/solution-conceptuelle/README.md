@@ -1,7 +1,7 @@
 # Figures — Solution conceptuelle
 
 Rendus PNG en **mode clair** (thème mermaid `default`, fond blanc, échelle 3) des
-diagrammes du chapitre 3 "Solution conceptuelle" de `../../plan-solution-conceptuelle.md`.
+diagrammes du chapitre 3 "Solution conceptuelle" de `../../plans/plan-solution-conceptuelle.md`.
 Le plan reste la source de vérité ; les `.mmd` en sont une copie régénérable.
 
 | Fichier | Diagramme (§3) | Destination |

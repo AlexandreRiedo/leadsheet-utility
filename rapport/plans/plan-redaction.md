@@ -180,8 +180,8 @@ augmentée/diminuée. Déjà bien décrits dans le DS p.10-11, à reprendre + ph
 > Reprendre les méthodes d'ImproVisAR [13] (déjà prévu dans le DS).
 >
 > **Sources des résultats (sous-projet stats, déjà produit et vérifié) :**
-> - Plan d'analyse détaillé + intendance des entretiens : `rapport/plan-analyse-tests.md`.
-> - Méthodo statistique (scoring, Wilcoxon exact, tailles d'effet, limites n=8) : `rapport/guide-interpretation-stats.md`.
+> - Plan d'analyse détaillé + intendance des entretiens : `rapport/plans/plan-analyse-tests.md`.
+> - Méthodo statistique (scoring, Wilcoxon exact, tailles d'effet, limites n=8) : `rapport/plans/guide-interpretation-stats.md`.
 > - Données + scripts + figures : `rapport/stats/` (`README.md`, `SHEETS-LAYOUT.md`,
 >   `data/*.csv`, `results/wilcoxon_summary.md`, `figures/*.png`).
 >

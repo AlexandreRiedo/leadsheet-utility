@@ -48,7 +48,7 @@ L'évaluation menée dans ce travail vise principalement à répondre à ces deu
 1. *Si l'usage de la réalité augmentée et diminuée sur un piano peut soutenir l'improvisation jazz mélodique dans le contexte de grille de standards swing.* (retenue, tes mots exacts)
 2. *Dans quelle mesure la réalité augmentée et diminuée appliquée à un piano peut-elle soutenir l'improvisation jazz mélodique sur une grille de standards swing qui défile ?* (forme interrogative directe)
 
-**Variante des sous-questions (forme affirmative, plus proche de `question-de-recherche.md`)** :
+**Variante des sous-questions (forme affirmative, plus proche de `../plans/question-de-recherche.md`)** :
 - SQ1 : *La projection réduit la charge cognitive perçue par rapport à une improvisation sans assistance.*
 - SQ2 : *Cette baisse de charge abaisse la barrière affective : moins d'anxiété, plus d'auto-efficacité, plus d'envie de poursuivre.*
 

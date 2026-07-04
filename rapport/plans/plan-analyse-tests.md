@@ -3,7 +3,7 @@
 > But de ce document : savoir **comment dépouiller, présenter et analyser** les
 > données des sessions de test (12–19 juin 2026), section par section du chapitre
 > *Évaluations* (cf. `plan-redaction.md` §6).
-> Sources : le protocole réellement administré (`proto-media/8-working-on-tests/protocole/`),
+> Sources : le protocole réellement administré (`proto-media/08-working-on-tests/protocole/`),
 > les notes méthodo de chaque questionnaire, le cadrage QR (`cadrage-QR-evaluation.md`),
 > les notes de réunion finale Roth.
 > Répond aux 4 questions posées : (1) présenter le Q0, (2) présenter les questionnaires +
